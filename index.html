@@ -43,7 +43,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Animated Background Particles */
         .particles {
             position: fixed;
             top: 0;
@@ -124,11 +123,6 @@
         @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
-        .stagger-3 { animation-delay: 0.3s; }
-        .stagger-4 { animation-delay: 0.4s; }
 
         .glass-input {
             background: rgba(255, 255, 255, 0.05);
@@ -307,40 +301,40 @@
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs mb-1">
                             <span>Intimacy & Connection</span>
-                            <span id="cat-intimacy-val">0%</span>
+                            <span id="cat-inti-val">0%</span>
                         </div>
                         <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-intimacy-bar" class="category-bar bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full"></div>
+                            <div id="cat-inti-bar" class="category-bar bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full"></div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs mb-1">
                             <span>Physicality & Desire</span>
-                            <span id="cat-physical-val">0%</span>
+                            <span id="cat-phys-val">0%</span>
                         </div>
                         <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-physical-bar" class="category-bar bg-gradient-to-r from-purple-400 to-indigo-400 h-full w-0 rounded-full"></div>
+                            <div id="cat-phys-bar" class="category-bar bg-gradient-to-r from-purple-400 to-indigo-400 h-full w-0 rounded-full"></div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs mb-1">
                             <span>Psychology & Mind</span>
-                            <span id="cat-psych-val">0%</span>
+                            <span id="cat-psyc-val">0%</span>
                         </div>
                         <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-psych-bar" class="category-bar bg-gradient-to-r from-blue-400 to-cyan-400 h-full w-0 rounded-full"></div>
+                            <div id="cat-psyc-bar" class="category-bar bg-gradient-to-r from-blue-400 to-cyan-400 h-full w-0 rounded-full"></div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs mb-1">
                             <span>Values & Lifestyle</span>
-                            <span id="cat-values-val">0%</span>
+                            <span id="cat-valu-val">0%</span>
                         </div>
                         <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-values-bar" class="category-bar bg-gradient-to-r from-amber-400 to-yellow-400 h-full w-0 rounded-full"></div>
+                            <div id="cat-valu-bar" class="category-bar bg-gradient-to-r from-amber-400 to-yellow-400 h-full w-0 rounded-full"></div>
                         </div>
                     </div>
                 </div>
@@ -451,8 +445,9 @@
         let state = {
             userName: '',
             sessionId: '',
-            activeQuestions: [], // 30 selected
-            answers: [], // {id, value, category, weight}
+            activeQuestions: [],
+            answers: [],
+            currentQuestionIndex: 0, // Explicitly initialize
             categoryScores: {
                 Intimacy: { total: 0, max: 0 },
                 Physicality: { total: 0, max: 0 },
@@ -479,7 +474,6 @@
             return 'RES-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
-        // Generate session ID on load
         state.sessionId = generateSessionID();
         document.getElementById('session-id').innerText = state.sessionId;
         initParticles();
@@ -504,7 +498,6 @@
 
         function startApp() {
             switchView('user');
-            // Reshuffle for new session
             state.sessionId = generateSessionID();
         }
 
@@ -514,9 +507,12 @@
             
             state.userName = name;
             
-            // Randomly select exactly 30 questions from the master pool of 45+
+            // Randomly select exactly 30 questions
             const shuffled = [...masterPool].sort(() => 0.5 - Math.random());
             state.activeQuestions = shuffled.slice(0, 30);
+            
+            // CRITICAL FIX: Reset the question index
+            state.currentQuestionIndex = 0;
             
             // Reset scores
             state.categoryScores = {
@@ -533,11 +529,16 @@
         // --- Quiz Engine ---
         function startQuiz() {
             state.answers = [];
+            // Safety reset
+            state.currentQuestionIndex = 0;
             switchView('quiz');
             renderQuestion(0);
         }
 
         function renderQuestion(idx) {
+            // Update global index to match rendered index
+            state.currentQuestionIndex = idx;
+            
             const q = state.activeQuestions[idx];
             
             // Update progress
@@ -606,18 +607,18 @@
                 weight: question.weight || 1
             });
             
-            // Update category scores live
+            // Update category scores
             const cat = question.category;
             if (state.categoryScores[cat]) {
                 state.categoryScores[cat].total += (val * (question.weight || 1));
-                state.categoryScores[cat].max += (2 * (question.weight || 1)); // Max is 2 per weight unit
+                state.categoryScores[cat].max += (2 * (question.weight || 1));
             }
             
-            // Next
+            // Navigate next
             setTimeout(() => {
-                if (state.currentQuestionIndex < 29) {
-                    state.currentQuestionIndex++;
-                    renderQuestion(state.currentQuestionIndex);
+                const nextIdx = state.currentQuestionIndex + 1;
+                if (nextIdx < 30) {
+                    renderQuestion(nextIdx);
                 } else {
                     finishQuiz();
                 }
@@ -639,15 +640,28 @@
             let grandTotal = 0;
             let grandMax = 0;
             
+            // Map category names to DOM IDs
+            const catMap = {
+                'Intimacy': 'inti',
+                'Physicality': 'phys',
+                'Psychology': 'psyc',
+                'Values': 'valu',
+                'Desire': 'desi'
+            };
+            
             cats.forEach(cat => {
                 const data = state.categoryScores[cat];
                 const pct = data.max > 0 ? Math.round((data.total / data.max) * 100) : 0;
                 
-                // Update UI bars
-                setTimeout(() => {
-                    document.getElementById(`cat-${cat.toLowerCase().substring(0,4)}-bar`).style.width = `${pct}%`;
-                    document.getElementById(`cat-${cat.toLowerCase().substring(0,4)}-val`).innerText = `${pct}%`;
-                }, 500 + (cats.indexOf(cat) * 200));
+                const shortName = catMap[cat];
+                if (shortName) {
+                    setTimeout(() => {
+                        const bar = document.getElementById(`cat-${shortName}-bar`);
+                        const val = document.getElementById(`cat-${shortName}-val`);
+                        if (bar) bar.style.width = `${pct}%`;
+                        if (val) val.innerText = `${pct}%`;
+                    }, 500 + (cats.indexOf(cat) * 200));
+                }
                 
                 grandTotal += data.total;
                 grandMax += data.max;
@@ -665,7 +679,6 @@
             
             animateValue("score-percent", 0, finalScore, 1500);
             
-            // Determine profile
             determineProfile(finalScore);
             
             // Generate result ID
@@ -682,7 +695,7 @@
             let type = "";
             let desc = "";
             
-            // Complex determination based on dominant category
+            // Find dominant category
             const scores = {
                 Intimacy: state.categoryScores.Intimacy.total / (state.categoryScores.Intimacy.max || 1),
                 Physicality: state.categoryScores.Physicality.total / (state.categoryScores.Physicality.max || 1),
@@ -721,11 +734,10 @@ Harmony Score: ${score}%
 Profile Type: ${document.getElementById('profile-type').innerText}
 
 DIMENSIONAL BREAKDOWN:
-- Intimacy: ${document.getElementById('cat-intimacy-val').innerText}
-- Physicality: ${document.getElementById('cat-physical-val').innerText}
-- Psychology: ${document.getElementById('cat-psych-val').innerText}
-- Values: ${document.getElementById('cat-values-val').innerText}
-- Desire: ${document.getElementById('cat-desire-val')?.innerText || 'N/A'}
+- Intimacy: ${document.getElementById('cat-inti-val').innerText}
+- Physicality: ${document.getElementById('cat-phys-val').innerText}
+- Psychology: ${document.getElementById('cat-psyc-val').innerText}
+- Values: ${document.getElementById('cat-valu-val').innerText}
 
 ANALYSIS:
 ${document.getElementById('result-description').innerText}
@@ -759,7 +771,9 @@ Session: ${state.sessionId}
         // Email form handler
         document.getElementById('email-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const status = document.getElementById('form-status');
+            const status = document.createElement('div');
+            status.className = 'text-xs mt-2 text-green-400';
+            this.appendChild(status);
             status.innerText = "Sending...";
             
             fetch(this.action, {
@@ -769,7 +783,6 @@ Session: ${state.sessionId}
             .then(r => r.json())
             .then(data => {
                 status.innerText = data.success ? "Sent successfully!" : "Failed to send";
-                status.className = data.success ? "text-xs mt-2 h-4 text-green-400" : "text-xs mt-2 h-4 text-red-400";
             });
         });
     </script>
