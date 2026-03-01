@@ -3,458 +3,746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance | Soul Profile</title>
+    <title>Resonance | Complete Soul Mapping</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* Custom Sensual Aesthetic */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #f472b6;
+        }
+        
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #4a192c 100%);
+            background: linear-gradient(135deg, #0f0518 0%, #1a0b2e 50%, #2d0a1f 100%);
             color: #fce7f3;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: all 0.5s ease;
         }
 
-        h1, h2, h3, .serif {
-            font-family: 'Cormorant Garamond', serif;
+        body.light-mode {
+            background: linear-gradient(135deg, #f5e6ff 0%, #ffe6f0 50%, #fff0f5 100%);
+            color: #4a192c;
         }
 
-        /* Glassmorphism Card */
+        body.light-mode .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: #2d1b4e;
+        }
+
+        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; }
+
         .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.3s ease;
         }
 
-        /* Animated Background Blobs */
-        .blob {
-            position: absolute;
-            filter: blur(80px);
+        /* Animated Background Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
-            opacity: 0.6;
-            animation: float 10s infinite ease-in-out;
+            overflow: hidden;
         }
-        .blob-1 { top: 10%; left: 10%; width: 300px; height: 300px; background: #7c3aed; animation-delay: 0s; }
-        .blob-2 { bottom: 20%; right: 10%; width: 350px; height: 350px; background: #be185d; animation-delay: 2s; }
-        .blob-3 { top: 40%; left: 40%; width: 200px; height: 200px; background: #4f46e5; animation-delay: 4s; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0, 0) scale(1); }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(244, 114, 182, 0.5);
+            border-radius: 50%;
+            animation: float-particle 15s infinite;
+        }
+        @keyframes float-particle {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
 
-        /* Custom Radio Inputs */
         .option-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        .option-card:hover::before {
+            left: 100%;
         }
         .option-card:hover {
             background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+            transform: translateX(5px);
         }
         .option-card.selected {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(244, 114, 182, 0.3);
             border-color: #f472b6;
-            box-shadow: 0 0 15px rgba(244, 114, 182, 0.3);
-        }
-        .option-card.selected .check-icon {
-            opacity: 1;
-            transform: scale(1);
+            box-shadow: 0 0 20px rgba(244, 114, 182, 0.4);
         }
 
-        /* Progress Bar */
-        .progress-fill {
-            transition: width 0.5s ease-out;
+        .progress-fill { 
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #f472b6, #a855f7);
         }
 
-        /* Results Animation */
+        .category-bar {
+            transition: width 1s ease-out;
+        }
+
+        .pulse-btn { 
+            animation: pulse-glow 2s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(244, 114, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
+        }
+
         .result-reveal {
-            animation: fadeInUp 1s ease-out forwards;
+            animation: fadeInUp 0.8s ease-out forwards;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
         }
         @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Pulse effect for button */
-        .pulse-btn {
-            animation: pulse-glow 2s infinite;
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(244, 114, 182, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
-        }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
 
-        /* Input styling */
         .glass-input {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
+            color: inherit;
             transition: all 0.3s;
         }
         .glass-input:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: #f472b6;
             outline: none;
+            box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
+        }
+
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .mode-toggle:hover {
+            transform: rotate(180deg);
+        }
+
+        .signature-hash {
+            font-family: monospace;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
 
-    <!-- Background Elements -->
-    <div class="blob blob-1 rounded-full"></div>
-    <div class="blob blob-2 rounded-full"></div>
-    <div class="blob blob-3 rounded-full"></div>
+    <!-- Theme Toggle -->
+    <div class="mode-toggle" onclick="toggleTheme()" title="Toggle Light/Dark">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+    </div>
 
-    <!-- Main Application Container -->
-    <main id="app" class="glass-panel w-full max-w-2xl rounded-3xl p-8 md:p-12 relative overflow-hidden min-h-[600px] flex flex-col justify-center">
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <main id="app" class="glass-panel w-full max-w-3xl rounded-3xl p-6 md:p-12 relative min-h-[700px] flex flex-col justify-center">
         
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-5xl md:text-6xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-200 to-purple-200 mb-2">
+        <header class="text-center mb-6">
+            <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 mb-2">
                 Resonance
             </h1>
-            <p class="text-sm tracking-[0.3em] uppercase text-pink-200/70">Discover Your Soul Profile</p>
+            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Complete Soul Mapping Protocol</p>
         </header>
 
-        <!-- VIEW 1: Intro Screen -->
-        <section id="view-intro" class="text-center space-y-8">
-            <div class="space-y-4 text-lg font-light leading-relaxed text-gray-200">
-                <p>20 questions designed to map the depths of your psyche.</p>
-                <p>Uncover your resonance score and share your unique profile.</p>
+        <!-- VIEW: Intro -->
+        <section id="view-intro" class="text-center space-y-6 result-reveal">
+            <div class="space-y-4 text-base font-light leading-relaxed opacity-90 max-w-lg mx-auto">
+                <p>30 questions. Infinite dimensions.</p>
+                <p>Mapping your <span class="text-pink-300">Psychology</span>, <span class="text-purple-300">Physicality</span>, <span class="text-rose-300">Desires</span>, and <span class="text-indigo-300">Soul Signature</span>.</p>
+                <p class="text-sm mt-4">Each session generates a unique question sequence and a shareable compatibility ID.</p>
             </div>
             
-            <div class="pt-8">
-                <button onclick="startApp()" class="pulse-btn bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-lg tracking-widest uppercase text-sm">
-                    Begin Assessment
+            <div class="pt-6 space-y-3">
+                <button onclick="startApp()" class="pulse-btn bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-medium py-4 px-12 rounded-full transition-all transform hover:scale-105 shadow-lg tracking-widest uppercase text-sm">
+                    Initialize Sequence
+                </button>
+                <p class="text-xs opacity-50">Session ID: <span id="session-id">---</span></p>
+            </div>
+        </section>
+
+        <!-- VIEW: User Info -->
+        <section id="view-user" class="hidden space-y-6 result-reveal">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl italic mb-2">Identity Protocol</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Begin Transmission</p>
+            </div>
+            <div class="space-y-4 max-w-md mx-auto">
+                <div class="relative">
+                    <input type="text" id="user-name" placeholder="Designation / Name" 
+                           class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                </div>
+                <input type="text" id="partner-ref" placeholder="Compare with ID (Optional)" 
+                       class="w-full glass-input rounded-xl p-3 text-center text-sm placeholder-white/20">
+                <button onclick="lockUser()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
+                    Engage Neural Link
                 </button>
             </div>
         </section>
 
-        <!-- VIEW 2: User Info Input -->
-        <section id="view-user" class="hidden space-y-6">
-            <div class="text-center mb-6">
-                <h2 class="text-3xl italic mb-2">Your Identity</h2>
-                <p class="text-sm text-pink-200/60 uppercase tracking-widest">Enter the Void</p>
+        <!-- VIEW: Quiz -->
+        <section id="view-quiz" class="hidden flex flex-col h-full w-full">
+            <!-- Stats Bar -->
+            <div class="flex justify-between text-xs uppercase tracking-widest mb-2 opacity-70">
+                <span id="q-counter">01 / 30</span>
+                <span id="q-category-display">Category</span>
             </div>
-            <div class="space-y-4">
-                <input type="text" id="user-name" placeholder="Your Name" class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-xl text-white placeholder-white/30 focus:outline-none focus:border-pink-400 transition-colors">
-                <button onclick="lockUser()" class="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl transition-all uppercase tracking-wider text-sm">Enter</button>
-            </div>
-        </section>
-
-        <!-- VIEW 3: Quiz Interface -->
-        <section id="view-quiz" class="hidden flex flex-col h-full">
+            
             <!-- Progress -->
-            <div class="w-full bg-white/10 h-1 rounded-full mb-8 overflow-hidden">
-                <div id="progress-bar" class="progress-fill bg-gradient-to-r from-pink-400 to-purple-400 h-full w-0"></div>
+            <div class="w-full bg-white/10 h-2 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="progress-fill h-full w-0 rounded-full"></div>
             </div>
 
-            <!-- Question Card -->
-            <div class="flex-grow flex flex-col justify-center">
-                <span id="q-category" class="text-xs font-bold tracking-[0.2em] text-pink-300 uppercase mb-4 block">Category</span>
-                <h3 id="q-text" class="text-2xl md:text-3xl font-light leading-snug mb-8 min-h-[80px]">Question text goes here?</h3>
+            <!-- Question -->
+            <div class="flex-grow flex flex-col justify-center mb-4">
+                <h3 id="q-text" class="text-xl md:text-2xl font-light leading-relaxed mb-6 min-h-[100px] flex items-center justify-center text-center">
+                    Loading neural imprint...
+                </h3>
 
-                <!-- Options -->
-                <div class="grid gap-4">
-                    <button onclick="selectOption(2)" class="option-card group relative w-full p-5 rounded-xl border border-white/10 text-left flex items-center justify-between">
-                        <span class="text-lg font-light">Yes, absolutely.</span>
-                        <div class="check-icon opacity-0 transform scale-50 transition-all duration-300 text-pink-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                    </button>
-
-                    <button onclick="selectOption(1)" class="option-card group relative w-full p-5 rounded-xl border border-white/10 text-left flex items-center justify-between">
-                        <span class="text-lg font-light">Maybe / Sometimes</span>
-                        <div class="check-icon opacity-0 transform scale-50 transition-all duration-300 text-pink-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                    </button>
-
-                    <button onclick="selectOption(0)" class="option-card group relative w-full p-5 rounded-xl border border-white/10 text-left flex items-center justify-between">
-                        <span class="text-lg font-light">No, not really.</span>
-                        <div class="check-icon opacity-0 transform scale-50 transition-all duration-300 text-pink-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                    </button>
+                <!-- Dynamic Options -->
+                <div id="options-container" class="grid gap-3">
+                    <!-- Injected via JS -->
                 </div>
             </div>
+
+            <!-- Navigation Hint -->
+            <div class="text-center mt-4">
+                <p class="text-xs opacity-40 tracking-widest">SELECT AN IMPRINT TO CONTINUE</p>
+            </div>
         </section>
 
-        <!-- VIEW 4: Results & Email -->
-        <section id="view-results" class="hidden w-full">
-            <div class="result-reveal text-center">
-                <h2 class="text-3xl md:text-4xl italic mb-2">Your Soul Profile</h2>
-                <p class="text-sm text-pink-200/60 uppercase tracking-widest mb-6">Analysis Complete</p>
+        <!-- VIEW: Processing -->
+        <section id="view-processing" class="hidden text-center space-y-6">
+            <div class="relative w-32 h-32 mx-auto">
+                <div class="absolute inset-0 border-4 border-pink-500/30 rounded-full animate-ping"></div>
+                <div class="absolute inset-4 border-4 border-purple-500/50 rounded-full animate-pulse"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-2xl font-bold serif">AI</span>
+                </div>
+            </div>
+            <h3 class="text-2xl italic animate-pulse">Synthesizing Profile...</h3>
+            <p class="text-sm opacity-60">Analyzing resonance patterns across 4 dimensions</p>
+        </section>
 
-                <!-- Percentage Circle -->
-                <div class="relative w-40 h-40 mx-auto mb-6 flex items-center justify-center">
-                    <svg class="w-full h-full transform -rotate-90">
-                        <circle cx="80" cy="80" r="70" stroke="rgba(255,255,255,0.1)" stroke-width="6" fill="none"/>
-                        <circle id="score-circle" cx="80" cy="80" r="70" stroke="#f472b6" stroke-width="6" fill="none" stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round" class="transition-all duration-2000 ease-out"/>
-                    </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span id="score-percent" class="text-4xl font-bold serif">0%</span>
-                        <span id="score-label" class="text-[10px] uppercase tracking-widest mt-1 text-pink-300">Calculating...</span>
+        <!-- VIEW: Results -->
+        <section id="view-results" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
+            <div class="result-reveal space-y-6">
+                
+                <!-- Header -->
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl italic mb-1">Soul Signature</h2>
+                    <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70">Analysis Complete</p>
+                </div>
+
+                <!-- Main Score -->
+                <div class="flex justify-center items-center gap-8">
+                    <div class="relative w-36 h-36">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="72" cy="72" r="64" stroke="rgba(255,255,255,0.1)" stroke-width="6" fill="none"/>
+                            <circle id="score-circle" cx="72" cy="72" r="64" stroke="#f472b6" stroke-width="6" fill="none" 
+                                    stroke-dasharray="402" stroke-dashoffset="402" stroke-linecap="round" 
+                                    class="transition-all duration-2000 ease-out"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="score-percent" class="text-4xl font-bold serif">0%</span>
+                            <span class="text-[10px] uppercase tracking-widest opacity-70">Harmony</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-left space-y-1">
+                        <p class="text-xs uppercase tracking-widest opacity-50">Profile Type</p>
+                        <p id="profile-type" class="text-xl font-light text-pink-300">---</p>
+                        <p class="text-[10px] opacity-40 mt-2">ID: <span id="result-id" class="signature-hash">---</span></p>
                     </div>
                 </div>
 
-                <div id="result-message" class="max-w-md mx-auto bg-white/5 p-4 rounded-xl border border-white/10 mb-6 text-sm leading-relaxed">
-                    <!-- Dynamic Message -->
+                <!-- Category Breakdown -->
+                <div class="space-y-3 bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest opacity-70 mb-3">Dimensional Analysis</p>
+                    
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Intimacy & Connection</span>
+                            <span id="cat-intimacy-val">0%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                            <div id="cat-intimacy-bar" class="category-bar bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Physicality & Desire</span>
+                            <span id="cat-physical-val">0%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                            <div id="cat-physical-bar" class="category-bar bg-gradient-to-r from-purple-400 to-indigo-400 h-full w-0 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Psychology & Mind</span>
+                            <span id="cat-psych-val">0%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                            <div id="cat-psych-bar" class="category-bar bg-gradient-to-r from-blue-400 to-cyan-400 h-full w-0 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Values & Lifestyle</span>
+                            <span id="cat-values-val">0%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                            <div id="cat-values-bar" class="category-bar bg-gradient-to-r from-amber-400 to-yellow-400 h-full w-0 rounded-full"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Email Form -->
-                <div class="max-w-sm mx-auto mt-8 border-t border-white/10 pt-6">
-                    <p class="text-xs uppercase tracking-widest text-white/50 mb-4">Send Results To</p>
-                    
-                    <form id="email-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-3">
-                        <!-- Web3Forms Access Key (Public key for demo purposes - replace in production) -->
-                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
-                        <input type="hidden" name="subject" id="email-subject" value="Your Soul Profile Results">
-                        <input type="hidden" name="message" id="email-body" value="">
+                <!-- Description -->
+                <div id="result-description" class="text-sm leading-relaxed text-center italic opacity-90 px-4">
+                    <!-- Dynamic -->
+                </div>
 
-                        <input type="email" name="email" required placeholder="Enter email address" class="glass-input w-full p-3 rounded-lg text-sm text-center placeholder-white/30">
+                <!-- Actions -->
+                <div class="space-y-3 pt-4 border-t border-white/10">
+                    <form id="email-form" action="https://api.web3forms.com/submit" method="POST" class="flex gap-2">
+                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                        <input type="hidden" name="subject" id="email-subject">
+                        <input type="hidden" name="message" id="email-body">
                         
-                        <button type="submit" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-3 rounded-lg transition-all text-sm uppercase tracking-wider">
-                            Send Profile
+                        <input type="email" name="email" required placeholder="Send to email..." 
+                               class="flex-1 glass-input rounded-lg p-3 text-sm placeholder-white/30">
+                        <button type="submit" class="bg-pink-600/80 hover:bg-pink-500 text-white px-6 rounded-lg text-sm transition-all">
+                            Send
                         </button>
                     </form>
-                    <div id="form-status" class="text-xs mt-2 h-4 text-green-400"></div>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="copyID()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider transition-all">
+                            Copy ID
+                        </button>
+                        <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider transition-all">
+                            New Session
+                        </button>
+                    </div>
                 </div>
 
-                <button onclick="location.reload()" class="mt-8 text-xs text-white/40 hover:text-white underline underline-offset-4 transition-colors">Start Over</button>
             </div>
         </section>
 
     </main>
 
     <script>
-        // --- Data: The 20 Questions ---
-        const questions = [
-            { text: "Do you believe that silence between two people can be deeply intimate?", category: "Intimacy" },
-            { text: "Is physical touch essential for you to feel loved?", category: "Physicality" },
-            { text: "Do you often daydream about escaping to a foreign country?", category: "Dreams" },
-            { text: "Do you prefer a strict routine over spontaneity?", category: "Habits" },
-            { text: "Is intelligence more attractive to you than physical beauty?", category: "Values" },
-            { text: "Would you choose a stormy night in over a sunny day out?", category: "Habits" },
-            { text: "Do you believe in love at first sight?", category: "Psychology" },
-            { text: "Is sharing similar music taste important in a relationship?", category: "Values" },
-            { text: "Do you recharge your energy by spending time alone?", category: "Psychology" },
-            { text: "Are you generally a risk-taker in life?", category: "Psychology" },
-            { text: "Is financial stability a prerequisite for your happiness?", category: "Values" },
-            { text: "Do you believe that past traumas define who we are?", category: "Psychology" },
-            { text: "Would you rather read a book than watch a movie?", category: "Habits" },
-            { text: "Do you feel a deep connection to nature and the ocean?", category: "Dreams" },
-            { text: "Is it a dealbreaker if a partner does not want children?", category: "Values" },
-            { text: "Do you prefer deep conversations over small talk?", category: "Intimacy" },
-            { text: "Is your ideal vacation an adventure, not a resort?", category: "Dreams" },
-            { text: "Do you trust your gut instinct over logical reasoning?", category: "Psychology" },
-            { text: "Is forgiveness easy for you to grant?", category: "Values" },
-            { text: "Do you believe in destiny or fate?", category: "Dreams" }
+        // --- MASTER QUESTION POOL (45 Questions - 30 Selected Randomly) ---
+        const masterPool = [
+            // PSYCHOLOGY & MIND (Scale: Yes/Maybe/No)
+            { id: 'p1', text: "Do you often feel overwhelmed by your own thoughts?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p2', text: "Is logic more important than intuition in decision making?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p3', text: "Do you recharge by spending time alone?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p4', text: "Are you comfortable with silence in conversation?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p5', text: "Do you believe in analyzing dreams for meaning?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p6', text: "Is it easy for you to forgive betrayal?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p7', text: "Do you often act on impulse rather than planning?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p8', text: "Are you affected by the energy of a room?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p9', text: "Do you prefer deep conversations over small talk?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p10', text: "Is emotional vulnerability a sign of strength?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p11', text: "Do you believe people can fundamentally change?", category: "Psychology", type: "scale", weight: 1 },
+            { id: 'p12', text: "Are you prone to nostalgia and past reminiscing?", category: "Psychology", type: "scale", weight: 1 },
+
+            // INTIMACY & CONNECTION (Scale)
+            { id: 'i1', text: "Is physical touch essential for you to feel loved?", category: "Intimacy", type: "scale", weight: 2 },
+            { id: 'i2', text: "Do you believe in love at first sight?", category: "Intimacy", type: "scale", weight: 1 },
+            { id: 'i3', text: "Is eye contact during intimacy important to you?", category: "Intimacy", type: "scale", weight: 2 },
+            { id: 'i4', text: "Do you need emotional connection before physical intimacy?", category: "Intimacy", type: "scale", weight: 2 },
+            { id: 'i5', text: "Are public displays of affection comfortable for you?", category: "Intimacy", type: "scale", weight: 1 },
+            { id: 'i6', text: "Is monogamy the only natural relationship structure for you?", category: "Intimacy", type: "scale", weight: 2 },
+            { id: 'i7', text: "Do you express desires verbally during intimate moments?", category: "Intimacy", type: "scale", weight: 2 },
+
+            // PHYSICALITY & APPEARANCE (Choice: A/B/C/D)
+            { id: 'ph1', text: "Which body type attracts you most?", category: "Physicality", type: "choice", 
+              options: ["Athletic/Toned", "Soft/Curvy", "Slim/Lean", "Muscular/Strong"], weight: 1 },
+            { id: 'ph2', text: "What feature draws you in first?", category: "Physicality", type: "choice", 
+              options: ["Eyes", "Smile/Lips", "Voice", "Movement/Posture"], weight: 1 },
+            { id: 'ph3', text: "Preferred height dynamic?", category: "Physicality", type: "choice", 
+              options: ["Taller than me", "Shorter than me", "Same height", "Irrelevant"], weight: 1 },
+            { id: 'ph4', text: "Grooming style preference?", category: "Physicality", type: "choice", 
+              options: ["Polished/Styled", "Natural/Casual", "Alternative/Edgy", "Minimalist"], weight: 1 },
+            { id: 'ph5', text: "Style aesthetic that appeals to you?", category: "Physicality", type: "choice", 
+              options: ["Elegant/Classic", "Casual/Comfort", "Bold/Expressive", "Minimal/Clean"], weight: 1 },
+            { id: 'ph6', text: "Physical age appearance preference?", category: "Physicality", type: "choice", 
+              options: ["Younger look", "Mature look", "Ageless/Timeless", "No preference"], weight: 1 },
+
+            // DESIRE & SEXUALITY (Mixed)
+            { id: 'd1', text: "How would you rate your libido intensity?", category: "Desire", type: "priority", 
+              options: ["High Priority", "Medium/ Balanced", "Low/ Selective"], weight: 2 },
+            { id: 'd2', text: "Role in intimacy preference?", category: "Desire", type: "choice", 
+              options: ["Dominant/Leading", "Submissive/Receiving", "Switch/Flexible", "Equal/Sharing"], weight: 2 },
+            { id: 'd3', text: "Comfort with sexting/digital intimacy?", category: "Desire", type: "choice", 
+              options: ["Enjoy it", "Occasional", "Prefer physical only", "Dislike it"], weight: 1 },
+            { id: 'd4', text: "Importance of sexual compatibility?", category: "Desire", type: "priority", 
+              options: ["Dealbreaker", "Important", "Workable", "Secondary"], weight: 2 },
+            { id: 'd5', text: "Timing for intimacy in new relationships?", category: "Desire", type: "choice", 
+              options: ["Immediately", "Few dates", "Emotional bond first", "Marriage/Commitment"], weight: 2 },
+            { id: 'd6', text: "Experimental openness?", category: "Desire", type: "scale", weight: 2 },
+            { id: 'd7', text: "Morning vs Night intimacy?", category: "Desire", type: "choice", 
+              options: ["Morning energy", "Night passion", "Afternoon delight", "Anytime"], weight: 1 },
+            { id: 'd8', text: "Setting importance for mood?", category: "Desire", type: "priority", 
+              options: ["Atmosphere is crucial", "Nice but flexible", "Spontaneous anywhere", "Completely irrelevant"], weight: 1 },
+
+            // VALUES & LIFESTYLE (Scale)
+            { id: 'v1', text: "Is financial stability a prerequisite for commitment?", category: "Values", type: "scale", weight: 1 },
+            { id: 'v2', text: "Do you want children in your future?", category: "Values", type: "scale", weight: 2 },
+            { id: 'v3', text: "Is travel and adventure essential to your happiness?", category: "Values", type: "scale", weight: 1 },
+            { id: 'v4', text: "Do you value career success over personal relationships?", category: "Values", type: "scale", weight: 1 },
+            { id: 'v5', text: "Is spirituality/religion important in a partner?", category: "Values", type: "scale", weight: 1 },
+            { id: 'v6', text: "Do you prefer city life over nature/countryside?", category: "Values", type: "scale", weight: 1 },
+            { id: 'v7', text: "Is political alignment important in a relationship?", category: "Values", type: "scale", weight: 1 },
+            { id: 'v8', text: "Do you believe in maintaining separate friend groups?", category: "Values", type: "scale", weight: 1 }
         ];
 
-        // --- State Management ---
+        // --- State ---
         let state = {
             userName: '',
-            currentQuestionIndex: 0,
-            answers: []
+            sessionId: '',
+            activeQuestions: [], // 30 selected
+            answers: [], // {id, value, category, weight}
+            categoryScores: {
+                Intimacy: { total: 0, max: 0 },
+                Physicality: { total: 0, max: 0 },
+                Psychology: { total: 0, max: 0 },
+                Values: { total: 0, max: 0 },
+                Desire: { total: 0, max: 0 }
+            }
         };
 
-        // --- DOM Elements ---
+        // --- Initialization ---
+        function initParticles() {
+            const container = document.getElementById('particles');
+            for(let i=0; i<20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 15 + 's';
+                p.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        function generateSessionID() {
+            return 'RES-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        // Generate session ID on load
+        state.sessionId = generateSessionID();
+        document.getElementById('session-id').innerText = state.sessionId;
+        initParticles();
+
+        // --- Navigation ---
         const views = {
             intro: document.getElementById('view-intro'),
             user: document.getElementById('view-user'),
             quiz: document.getElementById('view-quiz'),
+            processing: document.getElementById('view-processing'),
             results: document.getElementById('view-results')
         };
 
-        // --- Navigation Functions ---
         function switchView(viewName) {
             Object.values(views).forEach(el => el.classList.add('hidden'));
             views[viewName].classList.remove('hidden');
         }
 
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+        }
+
         function startApp() {
             switchView('user');
+            // Reshuffle for new session
+            state.sessionId = generateSessionID();
         }
 
         function lockUser() {
             const name = document.getElementById('user-name').value.trim();
-            if (!name) {
-                alert("Please enter your name to proceed.");
-                return;
-            }
+            if (!name) { alert("Please enter your designation."); return; }
+            
             state.userName = name;
+            
+            // Randomly select exactly 30 questions from the master pool of 45+
+            const shuffled = [...masterPool].sort(() => 0.5 - Math.random());
+            state.activeQuestions = shuffled.slice(0, 30);
+            
+            // Reset scores
+            state.categoryScores = {
+                Intimacy: { total: 0, max: 0 },
+                Physicality: { total: 0, max: 0 },
+                Psychology: { total: 0, max: 0 },
+                Values: { total: 0, max: 0 },
+                Desire: { total: 0, max: 0 }
+            };
+            
             startQuiz();
         }
 
-        // --- Quiz Logic ---
-
+        // --- Quiz Engine ---
         function startQuiz() {
-            state.currentQuestionIndex = 0;
             state.answers = [];
             switchView('quiz');
-            renderQuestion();
+            renderQuestion(0);
         }
 
-        function renderQuestion() {
-            const q = questions[state.currentQuestionIndex];
-            const progress = ((state.currentQuestionIndex) / questions.length) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-
-            const qText = document.getElementById('q-text');
-            const qCat = document.getElementById('q-category');
+        function renderQuestion(idx) {
+            const q = state.activeQuestions[idx];
             
+            // Update progress
+            const pct = ((idx) / 30) * 100;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('q-counter').innerText = `${String(idx+1).padStart(2,'0')} / 30`;
+            document.getElementById('q-category-display').innerText = q.category;
+            
+            // Animate text
+            const qText = document.getElementById('q-text');
             qText.style.opacity = 0;
             setTimeout(() => {
-                qCat.innerText = q.category;
                 qText.innerText = q.text;
                 qText.style.opacity = 1;
+                renderOptions(q);
             }, 200);
-
-            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
         }
 
-        function selectOption(value) {
-            const cards = document.querySelectorAll('.option-card');
-            cards.forEach(c => c.classList.remove('selected'));
-            const indexMap = {2: 0, 1: 1, 0: 2}; 
-            cards[indexMap[value]].classList.add('selected');
-
-            state.answers.push(value);
-
-            setTimeout(() => {
-                state.currentQuestionIndex++;
-                if (state.currentQuestionIndex < questions.length) {
-                    renderQuestion();
-                } else {
-                    calculateAndShowResults();
-                }
-            }, 400);
-        }
-
-        // --- Calculation Logic ---
-        // Since we removed 2-player comparison, we calculate a "Soul Intensity" score.
-        // Yes = 2pts, Maybe = 1pt, No = 0pts.
-        // Higher score = more "Yes" answers = more defined/strong preferences.
-
-        function calculateAndShowResults() {
-            switchView('results');
-
-            let totalScore = 0;
-            const maxScore = questions.length * 2; // 40
-
-            state.answers.forEach(val => {
-                totalScore += val;
-            });
-
-            const percentage = Math.round((totalScore / maxScore) * 100);
-            displayResults(percentage);
-        }
-
-        function displayResults(score) {
-            // Animate Circle
-            const circle = document.getElementById('score-circle');
-            const radius = circle.r.baseVal.value;
-            const circumference = radius * 2 * Math.PI;
-            const offset = circumference - (score / 100) * circumference;
+        function renderOptions(q) {
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
             
+            let opts = [];
+            
+            if (q.type === 'scale') {
+                opts = [
+                    { val: 2, label: "Yes, absolutely", icon: "◉" },
+                    { val: 1, label: "Maybe / Sometimes", icon: "◐" },
+                    { val: 0, label: "No, not really", icon: "○" }
+                ];
+            } else if (q.type === 'choice') {
+                q.options.forEach((opt, i) => {
+                    const letters = ['A', 'B', 'C', 'D'];
+                    opts.push({ val: i, label: `${letters[i]}. ${opt}`, icon: letters[i] });
+                });
+            } else if (q.type === 'priority') {
+                opts = [
+                    { val: 2, label: "High / Essential", icon: "▲" },
+                    { val: 1, label: "Medium / Flexible", icon: "■" },
+                    { val: 0, label: "Low / Optional", icon: "▼" }
+                ];
+            }
+            
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card w-full p-4 rounded-xl border border-white/10 text-left flex items-center gap-4 bg-white/5';
+                btn.innerHTML = `
+                    <span class="text-pink-400 font-bold w-6 text-center">${opt.icon}</span>
+                    <span class="font-light">${opt.label}</span>
+                `;
+                btn.onclick = () => selectAnswer(opt.val, q, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(val, question, btn) {
+            // Visual select
+            document.querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            
+            // Record with weight
+            state.answers.push({
+                id: question.id,
+                value: val,
+                category: question.category,
+                weight: question.weight || 1
+            });
+            
+            // Update category scores live
+            const cat = question.category;
+            if (state.categoryScores[cat]) {
+                state.categoryScores[cat].total += (val * (question.weight || 1));
+                state.categoryScores[cat].max += (2 * (question.weight || 1)); // Max is 2 per weight unit
+            }
+            
+            // Next
+            setTimeout(() => {
+                if (state.currentQuestionIndex < 29) {
+                    state.currentQuestionIndex++;
+                    renderQuestion(state.currentQuestionIndex);
+                } else {
+                    finishQuiz();
+                }
+            }, 350);
+        }
+
+        function finishQuiz() {
+            switchView('processing');
+            setTimeout(() => {
+                calculateFinalResults();
+                switchView('results');
+            }, 2000);
+        }
+
+        // --- Results Calculation ---
+        function calculateFinalResults() {
+            // Calculate category percentages
+            const cats = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire'];
+            let grandTotal = 0;
+            let grandMax = 0;
+            
+            cats.forEach(cat => {
+                const data = state.categoryScores[cat];
+                const pct = data.max > 0 ? Math.round((data.total / data.max) * 100) : 0;
+                
+                // Update UI bars
+                setTimeout(() => {
+                    document.getElementById(`cat-${cat.toLowerCase().substring(0,4)}-bar`).style.width = `${pct}%`;
+                    document.getElementById(`cat-${cat.toLowerCase().substring(0,4)}-val`).innerText = `${pct}%`;
+                }, 500 + (cats.indexOf(cat) * 200));
+                
+                grandTotal += data.total;
+                grandMax += data.max;
+            });
+            
+            const finalScore = Math.round((grandTotal / grandMax) * 100);
+            
+            // Animate main circle
+            const circle = document.getElementById('score-circle');
+            const circumference = 402;
+            const offset = circumference - (finalScore / 100) * circumference;
             setTimeout(() => {
                 circle.style.strokeDashoffset = offset;
-            }, 100);
-
-            // Animate Number
-            animateValue("score-percent", 0, score, 1500);
-
-            // Determine Profile Type
-            const labelEl = document.getElementById('score-label');
-            const msgEl = document.getElementById('result-message');
-            let category = "";
-            let message = "";
-            let colorClass = "";
-
-            // Logic for single player "Soul Profile"
-            if (score < 25) {
-                category = "The Wandering Mystic";
-                colorClass = "text-blue-300";
-                message = "You are fluid, adaptable, and open to the unknown. You rarely commit to a definitive 'Yes' or 'No', preferring to see where the wind takes you. Your soul is a mist—hard to grasp but beautiful to witness.";
-            } else if (score < 50) {
-                category = "The Balanced Dreamer";
-                colorClass = "text-yellow-300";
-                message = "You walk the middle path. You have strong desires, yet you maintain a healthy flexibility. You are pragmatic but not closed off to magic. This balance makes you a stable, yet intriguing partner.";
-            } else if (score < 75) {
-                category = "The Passionate Seeker";
-                colorClass = "text-pink-400";
-                message = "You know what you want. Your desires are clear, your boundaries are firm, and your passions run hot. You seek depth and are not afraid to demand it. You are a flame—warm to those who deserve it, burning to those who don't.";
-            } else {
-                category = "The Unyielding Force";
-                colorClass = "text-purple-300";
-                message = "You are definitive. You have a clear vision for your life, your love, and your legacy. You do not compromise on your core values. You are a fortress—impenetrable to superficiality, but a sanctuary for true connection.";
-            }
-
-            labelEl.innerText = category;
-            labelEl.className = `text-xs uppercase tracking-widest mt-1 ${colorClass}`;
+            }, 300);
             
-            setTimeout(() => {
-                msgEl.innerHTML = `<p class="text-white/90 italic">"${message}"</p>`;
-            }, 1000);
-
-            // Prepare Email Content
-            prepareEmail(score, category, message);
+            animateValue("score-percent", 0, finalScore, 1500);
+            
+            // Determine profile
+            determineProfile(finalScore);
+            
+            // Generate result ID
+            const hash = btoa(state.answers.map(a => a.value).join('')).substring(0, 12);
+            document.getElementById('result-id').innerText = hash;
+            
+            prepareEmail(finalScore, hash);
         }
 
-        function prepareEmail(score, category, message) {
-            const subject = `Soul Profile Results for ${state.userName}`;
+        function determineProfile(score) {
+            const typeEl = document.getElementById('profile-type');
+            const descEl = document.getElementById('result-description');
+            
+            let type = "";
+            let desc = "";
+            
+            // Complex determination based on dominant category
+            const scores = {
+                Intimacy: state.categoryScores.Intimacy.total / (state.categoryScores.Intimacy.max || 1),
+                Physicality: state.categoryScores.Physicality.total / (state.categoryScores.Physicality.max || 1),
+                Psychology: state.categoryScores.Psychology.total / (state.categoryScores.Psychology.max || 1),
+                Desire: state.categoryScores.Desire.total / (state.categoryScores.Desire.max || 1)
+            };
+            
+            const dominant = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            
+            if (score > 80) {
+                type = "The Radiant Core";
+                desc = `You possess an intense, well-defined soul with high ${dominant} energy. You know exactly what you want and aren't afraid to pursue it. Your clarity is magnetic.`;
+            } else if (score > 60) {
+                type = "The Balanced Spectrum";
+                desc = `You are a harmonious blend of desire and reason. While you have strong preferences in ${dominant}, you maintain healthy flexibility elsewhere.`;
+            } else if (score > 40) {
+                type = "The Seeking Soul";
+                desc = `You are in exploration mode. Some areas like ${dominant} call to you strongly, while others remain open to discovery. You are adaptable and curious.`;
+            } else {
+                type = "The Open Vessel";
+                desc = `You resist definition, preferring to experience without prejudice. Your low specificity makes you universally compatible but mysterious to read.`;
+            }
+            
+            typeEl.innerText = type;
+            descEl.innerText = desc;
+        }
+
+        function prepareEmail(score, hash) {
+            const subject = `Resonance Profile: ${state.userName} [${score}%]`;
             const body = `
-Name: ${state.userName}
-Soul Score: ${score}%
-Profile Type: ${category}
+RESONANCE SOUL MAPPING
+======================
+User: ${state.userName}
+Signature ID: ${hash}
+Harmony Score: ${score}%
+Profile Type: ${document.getElementById('profile-type').innerText}
 
-Analysis:
-${message}
+DIMENSIONAL BREAKDOWN:
+- Intimacy: ${document.getElementById('cat-intimacy-val').innerText}
+- Physicality: ${document.getElementById('cat-physical-val').innerText}
+- Psychology: ${document.getElementById('cat-psych-val').innerText}
+- Values: ${document.getElementById('cat-values-val').innerText}
+- Desire: ${document.getElementById('cat-desire-val')?.innerText || 'N/A'}
 
----
-Generated by Resonance App
+ANALYSIS:
+${document.getElementById('result-description').innerText}
+
+Session: ${state.sessionId}
             `;
             
             document.getElementById('email-subject').value = subject;
             document.getElementById('email-body').value = body;
         }
 
-        // --- Email Handling ---
-        document.getElementById('email-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const status = document.getElementById('form-status');
-            const data = new FormData(form);
-
-            fetch(form.action, {
-                method: "POST",
-                body: data
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    status.innerText = "Profile sent successfully!";
-                    form.reset();
-                    // Keep the hidden inputs values
-                    document.getElementById('email-subject').value = `Soul Profile Results for ${state.userName}`;
-                } else {
-                    status.innerText = "Error sending. Please try again.";
-                    status.classList.replace('text-green-400', 'text-red-400');
-                }
-            })
-            .catch(error => {
-                status.innerText = "Network error. Please try again.";
-                status.classList.replace('text-green-400', 'text-red-400');
+        function copyID() {
+            const id = document.getElementById('result-id').innerText;
+            navigator.clipboard.writeText(id).then(() => {
+                alert('Signature ID copied: ' + id);
             });
-        });
+        }
 
         function animateValue(id, start, end, duration) {
             const obj = document.getElementById(id);
@@ -463,12 +751,27 @@ Generated by Resonance App
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 obj.innerHTML = Math.floor(progress * (end - start) + start) + "%";
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
+                if (progress < 1) window.requestAnimationFrame(step);
             };
             window.requestAnimationFrame(step);
         }
+
+        // Email form handler
+        document.getElementById('email-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const status = document.getElementById('form-status');
+            status.innerText = "Sending...";
+            
+            fetch(this.action, {
+                method: "POST",
+                body: new FormData(this)
+            })
+            .then(r => r.json())
+            .then(data => {
+                status.innerText = data.success ? "Sent successfully!" : "Failed to send";
+                status.className = data.success ? "text-xs mt-2 h-4 text-green-400" : "text-xs mt-2 h-4 text-red-400";
+            });
+        });
     </script>
 </body>
 </html>
