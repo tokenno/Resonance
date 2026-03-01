@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance | Complete Soul Mapping</title>
+    <title>Resonance | Friction & Dimension Matching</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --accent: #f472b6;
         }
         
         body {
@@ -19,18 +18,6 @@
             color: #fce7f3;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: all 0.5s ease;
-        }
-
-        body.light-mode {
-            background: linear-gradient(135deg, #f5e6ff 0%, #ffe6f0 50%, #fff0f5 100%);
-            color: #4a192c;
-        }
-
-        body.light-mode .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            color: #2d1b4e;
         }
 
         h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; }
@@ -40,7 +27,6 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.3s ease;
         }
 
         .particles {
@@ -72,19 +58,6 @@
             position: relative;
             overflow: hidden;
         }
-        .option-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s;
-        }
-        .option-card:hover::before {
-            left: 100%;
-        }
         .option-card:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: translateX(5px);
@@ -106,8 +79,6 @@
 
         .pulse-btn { 
             animation: pulse-glow 2s infinite;
-            position: relative;
-            overflow: hidden;
         }
         @keyframes pulse-glow {
             0% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
@@ -137,115 +108,174 @@
             box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
         }
 
-        .mode-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 50;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
-        }
-        .mode-toggle:hover {
-            transform: rotate(180deg);
+        /* Friction Map Colors */
+        .friction-green { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
+        .friction-yellow { background: rgba(234, 179, 8, 0.2); border-color: rgba(234, 179, 8, 0.5); color: #fde047; }
+        .friction-red { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
+        .friction-blue { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd; }
+
+        .dealbreaker-badge {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: bold;
         }
 
-        .signature-hash {
-            font-family: monospace;
-            letter-spacing: 2px;
-            background: linear-gradient(90deg, #f472b6, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .threshold-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            outline: none;
+        }
+        .threshold-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #f472b6;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .radar-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
 
-    <!-- Theme Toggle -->
-    <div class="mode-toggle" onclick="toggleTheme()" title="Toggle Light/Dark">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-    </div>
-
-    <!-- Particles Background -->
     <div class="particles" id="particles"></div>
 
-    <main id="app" class="glass-panel w-full max-w-3xl rounded-3xl p-6 md:p-12 relative min-h-[700px] flex flex-col justify-center">
+    <main id="app" class="glass-panel w-full max-w-4xl rounded-3xl p-6 md:p-12 relative min-h-[800px] flex flex-col justify-center">
         
         <header class="text-center mb-6">
             <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 mb-2">
                 Resonance
             </h1>
-            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Complete Soul Mapping Protocol</p>
+            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Friction Map & Dimensional Radar</p>
         </header>
 
         <!-- VIEW: Intro -->
         <section id="view-intro" class="text-center space-y-6 result-reveal">
             <div class="space-y-4 text-base font-light leading-relaxed opacity-90 max-w-lg mx-auto">
-                <p>30 questions. Infinite dimensions.</p>
-                <p>Mapping your <span class="text-pink-300">Psychology</span>, <span class="text-purple-300">Physicality</span>, <span class="text-rose-300">Desires</span>, and <span class="text-indigo-300">Soul Signature</span>.</p>
-                <p class="text-sm mt-4">Each session generates a unique question sequence and a shareable compatibility ID.</p>
+                <p>30 questions. 6 dimensions. Infinite friction patterns.</p>
+                <p>Discover your <span class="text-green-400">complements</span>, <span class="text-yellow-400">tensions</span>, and <span class="text-red-400">dealbreakers</span>.</p>
             </div>
             
             <div class="pt-6 space-y-3">
                 <button onclick="startApp()" class="pulse-btn bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-medium py-4 px-12 rounded-full transition-all transform hover:scale-105 shadow-lg tracking-widest uppercase text-sm">
                     Initialize Sequence
                 </button>
-                <p class="text-xs opacity-50">Session ID: <span id="session-id">---</span></p>
             </div>
         </section>
 
-        <!-- VIEW: User Info -->
-        <section id="view-user" class="hidden space-y-6 result-reveal">
+        <!-- VIEW: Mode Selection -->
+        <section id="view-mode" class="hidden space-y-6 result-reveal">
             <div class="text-center mb-8">
-                <h2 class="text-3xl italic mb-2">Identity Protocol</h2>
-                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Begin Transmission</p>
+                <h2 class="text-3xl italic mb-2">Select Protocol</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Choose your path</p>
             </div>
+            
+            <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                <button onclick="setMode('solo')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <h3 class="text-xl mb-2 text-pink-300">Solo Discovery</h3>
+                    <p class="text-sm opacity-70">Map your own dimensions. Generate a shareable ID for future matching.</p>
+                </button>
+                
+                <button onclick="setMode('match')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <h3 class="text-xl mb-2 text-purple-300">Live Matching</h3>
+                    <p class="text-sm opacity-70">Two people, one device. Real-time friction analysis.</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: User Setup -->
+        <section id="view-setup" class="hidden space-y-6 result-reveal">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl italic mb-2" id="setup-title">Identity Protocol</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Configure your thresholds</p>
+            </div>
+            
             <div class="space-y-4 max-w-md mx-auto">
-                <div class="relative">
-                    <input type="text" id="user-name" placeholder="Designation / Name" 
-                           class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                <input type="text" id="user-name" placeholder="Your Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                
+                <div id="partner-input" class="hidden">
+                    <input type="text" id="partner-name" placeholder="Partner's Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30 mt-3">
                 </div>
-                <input type="text" id="partner-ref" placeholder="Compare with ID (Optional)" 
-                       class="w-full glass-input rounded-xl p-3 text-center text-sm placeholder-white/20">
-                <button onclick="lockUser()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
-                    Engage Neural Link
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 mt-6">
+                    <p class="text-xs uppercase tracking-widest mb-4 text-pink-300">Set Your Minimum Thresholds</p>
+                    <p class="text-xs opacity-60 mb-4">Dimensions below these will flag as warnings</p>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs">Intimacy</span>
+                            <input type="range" id="thresh-intimacy" min="0" max="100" value="60" class="threshold-slider w-32">
+                            <span class="text-xs w-8 text-right" id="val-intimacy">60%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs">Physicality</span>
+                            <input type="range" id="thresh-physicality" min="0" max="100" value="50" class="threshold-slider w-32">
+                            <span class="text-xs w-8 text-right" id="val-physicality">50%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs">Psychology</span>
+                            <input type="range" id="thresh-psychology" min="0" max="100" value="70" class="threshold-slider w-32">
+                            <span class="text-xs w-8 text-right" id="val-psychology">70%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs">Values</span>
+                            <input type="range" id="thresh-values" min="0" max="100" value="80" class="threshold-slider w-32">
+                            <span class="text-xs w-8 text-right" id="val-values">80%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs">Desire</span>
+                            <input type="range" id="thresh-desire" min="0" max="100" value="50" class="threshold-slider w-32">
+                            <span class="text-xs w-8 text-right" id="val-desire">50%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs">Lifestyle</span>
+                            <input type="range" id="thresh-lifestyle" min="0" max="100" value="40" class="threshold-slider w-32">
+                            <span class="text-xs w-8 text-right" id="val-lifestyle">40%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
+                    Begin Assessment
                 </button>
             </div>
         </section>
 
         <!-- VIEW: Quiz -->
         <section id="view-quiz" class="hidden flex flex-col h-full w-full">
-            <!-- Stats Bar -->
             <div class="flex justify-between text-xs uppercase tracking-widest mb-2 opacity-70">
                 <span id="q-counter">01 / 30</span>
-                <span id="q-category-display">Category</span>
+                <div class="flex items-center gap-2">
+                    <span id="q-dealbreaker" class="hidden dealbreaker-badge">Dealbreaker</span>
+                    <span id="q-category-display">Category</span>
+                </div>
             </div>
             
-            <!-- Progress -->
             <div class="w-full bg-white/10 h-2 rounded-full mb-6 overflow-hidden">
                 <div id="progress-bar" class="progress-fill h-full w-0 rounded-full"></div>
             </div>
 
-            <!-- Question -->
             <div class="flex-grow flex flex-col justify-center mb-4">
-                <h3 id="q-text" class="text-xl md:text-2xl font-light leading-relaxed mb-6 min-h-[100px] flex items-center justify-center text-center">
-                    Loading neural imprint...
-                </h3>
-
-                <!-- Dynamic Options -->
-                <div id="options-container" class="grid gap-3">
-                    <!-- Injected via JS -->
-                </div>
+                <h3 id="q-text" class="text-xl md:text-2xl font-light leading-relaxed mb-6 min-h-[100px] flex items-center justify-center text-center"></h3>
+                <div id="options-container" class="grid gap-3"></div>
             </div>
 
-            <!-- Navigation Hint -->
             <div class="text-center mt-4">
-                <p class="text-xs opacity-40 tracking-widest">SELECT AN IMPRINT TO CONTINUE</p>
+                <p class="text-xs opacity-40 tracking-widest" id="player-indicator">SELECT AN IMPRINT TO CONTINUE</p>
             </div>
         </section>
 
@@ -258,202 +288,400 @@
                     <span class="text-2xl font-bold serif">AI</span>
                 </div>
             </div>
-            <h3 class="text-2xl italic animate-pulse">Synthesizing Profile...</h3>
-            <p class="text-sm opacity-60">Analyzing resonance patterns across 4 dimensions</p>
+            <h3 class="text-2xl italic animate-pulse">Calculating Friction Matrix...</h3>
+            <p class="text-sm opacity-60">Analyzing complementarity patterns</p>
         </section>
 
-        <!-- VIEW: Results -->
-        <section id="view-results" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
+        <!-- VIEW: Results - Solo -->
+        <section id="view-results-solo" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2">
             <div class="result-reveal space-y-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl italic mb-1">Your Dimensional Map</h2>
+                    <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70">Solo Profile Generated</p>
+                </div>
+
+                <div class="flex justify-center">
+                    <div class="radar-container" id="radar-chart"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 max-w-lg mx-auto">
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <p class="text-xs uppercase opacity-60">Intimacy</p>
+                        <p class="text-xl font-bold text-pink-400" id="solo-intimacy">0%</p>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <p class="text-xs uppercase opacity-60">Physicality</p>
+                        <p class="text-xl font-bold text-purple-400" id="solo-physicality">0%</p>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <p class="text-xs uppercase opacity-60">Psychology</p>
+                        <p class="text-xl font-bold text-blue-400" id="solo-psychology">0%</p>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <p class="text-xs uppercase opacity-60">Values</p>
+                        <p class="text-xl font-bold text-yellow-400" id="solo-values">0%</p>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <p class="text-xs uppercase opacity-60">Desire</p>
+                        <p class="text-xl font-bold text-rose-400" id="solo-desire">0%</p>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <p class="text-xs uppercase opacity-60">Lifestyle</p>
+                        <p class="text-xl font-bold text-emerald-400" id="solo-lifestyle">0%</p>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Your Shareable ID</p>
+                    <p class="text-2xl font-mono text-center signature-hash" id="solo-id">---</p>
+                    <p class="text-xs text-center opacity-60 mt-2">Others can enter this to compare with you</p>
+                </div>
+
+                <div class="flex gap-2 max-w-md mx-auto">
+                    <button onclick="copySoloID()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">Copy ID</button>
+                    <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Session</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: Results - Match -->
+        <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
+            <div class="result-reveal space-y-4">
                 
                 <!-- Header -->
                 <div class="text-center">
-                    <h2 class="text-3xl md:text-4xl italic mb-1">Soul Signature</h2>
-                    <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70">Analysis Complete</p>
+                    <h2 class="text-3xl italic mb-1">Friction Analysis</h2>
+                    <div class="flex justify-center items-center gap-3 text-sm">
+                        <span id="res-p1" class="text-pink-300">You</span>
+                        <span class="opacity-50">×</span>
+                        <span id="res-p2" class="text-purple-300">Partner</span>
+                    </div>
                 </div>
 
-                <!-- Main Score -->
-                <div class="flex justify-center items-center gap-8">
-                    <div class="relative w-36 h-36">
-                        <svg class="w-full h-full transform -rotate-90">
-                            <circle cx="72" cy="72" r="64" stroke="rgba(255,255,255,0.1)" stroke-width="6" fill="none"/>
-                            <circle id="score-circle" cx="72" cy="72" r="64" stroke="#f472b6" stroke-width="6" fill="none" 
-                                    stroke-dasharray="402" stroke-dashoffset="402" stroke-linecap="round" 
-                                    class="transition-all duration-2000 ease-out"/>
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="score-percent" class="text-4xl font-bold serif">0%</span>
-                            <span class="text-[10px] uppercase tracking-widest opacity-70">Harmony</span>
-                        </div>
-                    </div>
+                <!-- Dealbreaker Alert -->
+                <div id="dealbreaker-alert" class="hidden bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
+                    <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Critical Friction Detected</p>
+                    <p class="text-xs opacity-80" id="dealbreaker-text">Fundamental incompatibility in core values</p>
+                </div>
+
+                <!-- Radar Comparison -->
+                <div class="radar-container mx-auto" id="match-radar" style="height: 240px;"></div>
+
+                <!-- Dimensional Friction Map -->
+                <div class="space-y-2">
+                    <p class="text-xs uppercase tracking-widest text-center opacity-60 mb-3">Dimensional Friction Analysis</p>
                     
-                    <div class="text-left space-y-1">
-                        <p class="text-xs uppercase tracking-widest opacity-50">Profile Type</p>
-                        <p id="profile-type" class="text-xl font-light text-pink-300">---</p>
-                        <p class="text-[10px] opacity-40 mt-2">ID: <span id="result-id" class="signature-hash">---</span></p>
+                    <div id="friction-container" class="space-y-2">
+                        <!-- Generated via JS -->
                     </div>
                 </div>
 
-                <!-- Category Breakdown -->
-                <div class="space-y-3 bg-white/5 rounded-xl p-4 border border-white/10">
-                    <p class="text-xs uppercase tracking-widest opacity-70 mb-3">Dimensional Analysis</p>
-                    
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Intimacy & Connection</span>
-                            <span id="cat-inti-val">0%</span>
-                        </div>
-                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-inti-bar" class="category-bar bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Physicality & Desire</span>
-                            <span id="cat-phys-val">0%</span>
-                        </div>
-                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-phys-bar" class="category-bar bg-gradient-to-r from-purple-400 to-indigo-400 h-full w-0 rounded-full"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Psychology & Mind</span>
-                            <span id="cat-psyc-val">0%</span>
-                        </div>
-                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-psyc-bar" class="category-bar bg-gradient-to-r from-blue-400 to-cyan-400 h-full w-0 rounded-full"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Values & Lifestyle</span>
-                            <span id="cat-valu-val">0%</span>
-                        </div>
-                        <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                            <div id="cat-valu-bar" class="category-bar bg-gradient-to-r from-amber-400 to-yellow-400 h-full w-0 rounded-full"></div>
-                        </div>
-                    </div>
+                <!-- Complementarity Score -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                    <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Relationship Potential</p>
+                    <p class="text-3xl font-bold serif" id="potential-score">---</p>
+                    <p class="text-xs mt-2 italic" id="potential-desc">---</p>
                 </div>
 
-                <!-- Description -->
-                <div id="result-description" class="text-sm leading-relaxed text-center italic opacity-90 px-4">
-                    <!-- Dynamic -->
+                <!-- Friction Legend -->
+                <div class="flex justify-center gap-4 text-xs">
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-400/50"></div><span>Harmony</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-blue-400/50"></div><span>Complement</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-yellow-400/50"></div><span>Tension</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-red-400/50"></div><span>Friction</span></div>
                 </div>
 
-                <!-- Actions -->
-                <div class="space-y-3 pt-4 border-t border-white/10">
-                    <form id="email-form" action="https://api.web3forms.com/submit" method="POST" class="flex gap-2">
-                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
-                        <input type="hidden" name="subject" id="email-subject">
-                        <input type="hidden" name="message" id="email-body">
-                        
-                        <input type="email" name="email" required placeholder="Send to email..." 
-                               class="flex-1 glass-input rounded-lg p-3 text-sm placeholder-white/30">
-                        <button type="submit" class="bg-pink-600/80 hover:bg-pink-500 text-white px-6 rounded-lg text-sm transition-all">
-                            Send
-                        </button>
-                    </form>
-                    
-                    <div class="flex gap-2">
-                        <button onclick="copyID()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider transition-all">
-                            Copy ID
-                        </button>
-                        <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider transition-all">
-                            New Session
-                        </button>
-                    </div>
-                </div>
-
+                <button onclick="location.reload()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Analysis</button>
             </div>
         </section>
 
     </main>
 
     <script>
-        // --- MASTER QUESTION POOL (45 Questions - 30 Selected Randomly) ---
+        // --- ENHANCED QUESTION POOL WITH FRICTION MATRICES ---
+        // Each question now has a frictionMap defining how answer pairs interact
         const masterPool = [
-            // PSYCHOLOGY & MIND (Scale: Yes/Maybe/No)
-            { id: 'p1', text: "Do you often feel overwhelmed by your own thoughts?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p2', text: "Is logic more important than intuition in decision making?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p3', text: "Do you recharge by spending time alone?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p4', text: "Are you comfortable with silence in conversation?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p5', text: "Do you believe in analyzing dreams for meaning?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p6', text: "Is it easy for you to forgive betrayal?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p7', text: "Do you often act on impulse rather than planning?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p8', text: "Are you affected by the energy of a room?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p9', text: "Do you prefer deep conversations over small talk?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p10', text: "Is emotional vulnerability a sign of strength?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p11', text: "Do you believe people can fundamentally change?", category: "Psychology", type: "scale", weight: 1 },
-            { id: 'p12', text: "Are you prone to nostalgia and past reminiscing?", category: "Psychology", type: "scale", weight: 1 },
+            // INTIMACY DIMENSION
+            { 
+                id: 'i1', text: "Is physical touch essential for you to feel loved?", 
+                category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'i2', text: "Do you need emotional connection before physical intimacy?", 
+                category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'red',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'i3', text: "Is monogamy the only natural structure for you?", 
+                category: "Intimacy", type: "scale", weight: 3, isDealbreaker: true,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'red', '2-0': 'red',
+                    '1-2': 'red', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'i4', text: "Are public displays of affection comfortable?", 
+                category: "Intimacy", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'blue',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'blue', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'i5', text: "Do you express desires verbally during intimacy?", 
+                category: "Intimacy", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
+                }
+            },
 
-            // INTIMACY & CONNECTION (Scale)
-            { id: 'i1', text: "Is physical touch essential for you to feel loved?", category: "Intimacy", type: "scale", weight: 2 },
-            { id: 'i2', text: "Do you believe in love at first sight?", category: "Intimacy", type: "scale", weight: 1 },
-            { id: 'i3', text: "Is eye contact during intimacy important to you?", category: "Intimacy", type: "scale", weight: 2 },
-            { id: 'i4', text: "Do you need emotional connection before physical intimacy?", category: "Intimacy", type: "scale", weight: 2 },
-            { id: 'i5', text: "Are public displays of affection comfortable for you?", category: "Intimacy", type: "scale", weight: 1 },
-            { id: 'i6', text: "Is monogamy the only natural relationship structure for you?", category: "Intimacy", type: "scale", weight: 2 },
-            { id: 'i7', text: "Do you express desires verbally during intimate moments?", category: "Intimacy", type: "scale", weight: 2 },
+            // PHYSICALITY DIMENSION
+            { 
+                id: 'p1', text: "Preferred body type in a partner?", 
+                category: "Physicality", type: "choice", weight: 1, isDealbreaker: false,
+                options: ["Athletic", "Curvy", "Slim", "Muscular", "Any/All"],
+                frictionMap: 'preference' // Special: any match is green, different is neutral
+            },
+            { 
+                id: 'p2', text: "How important is physical appearance vs personality?", 
+                category: "Physicality", type: "priority", weight: 2, isDealbreaker: false,
+                options: ["Appearance first", "Both equal", "Personality first", "Irrelevant"],
+                frictionMap: {
+                    '0-0': 'green', '0-1': 'yellow', '0-2': 'red', '0-3': 'red',
+                    '1-0': 'yellow', '1-1': 'green', '1-2': 'yellow', '1-3': 'yellow',
+                    '2-0': 'red', '2-1': 'yellow', '2-2': 'green', '2-3': 'blue',
+                    '3-0': 'red', '3-1': 'yellow', '3-2': 'blue', '3-3': 'green'
+                }
+            },
+            { 
+                id: 'p3', text: "Preferred height dynamic?", 
+                category: "Physicality", type: "choice", weight: 1, isDealbreaker: false,
+                options: ["Taller", "Shorter", "Same", "Irrelevant"],
+                frictionMap: 'complement' // Special: Tall+Short = blue (complement), same=same
+            },
 
-            // PHYSICALITY & APPEARANCE (Choice: A/B/C/D)
-            { id: 'ph1', text: "Which body type attracts you most?", category: "Physicality", type: "choice", 
-              options: ["Athletic/Toned", "Soft/Curvy", "Slim/Lean", "Muscular/Strong"], weight: 1 },
-            { id: 'ph2', text: "What feature draws you in first?", category: "Physicality", type: "choice", 
-              options: ["Eyes", "Smile/Lips", "Voice", "Movement/Posture"], weight: 1 },
-            { id: 'ph3', text: "Preferred height dynamic?", category: "Physicality", type: "choice", 
-              options: ["Taller than me", "Shorter than me", "Same height", "Irrelevant"], weight: 1 },
-            { id: 'ph4', text: "Grooming style preference?", category: "Physicality", type: "choice", 
-              options: ["Polished/Styled", "Natural/Casual", "Alternative/Edgy", "Minimalist"], weight: 1 },
-            { id: 'ph5', text: "Style aesthetic that appeals to you?", category: "Physicality", type: "choice", 
-              options: ["Elegant/Classic", "Casual/Comfort", "Bold/Expressive", "Minimal/Clean"], weight: 1 },
-            { id: 'ph6', text: "Physical age appearance preference?", category: "Physicality", type: "choice", 
-              options: ["Younger look", "Mature look", "Ageless/Timeless", "No preference"], weight: 1 },
+            // PSYCHOLOGY DIMENSION
+            { 
+                id: 'ps1', text: "Do you recharge by spending time alone?", 
+                category: "Psychology", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'red',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'red', '0-1': 'blue', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'ps2', text: "Are you comfortable with silence in conversation?", 
+                category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'ps3', text: "Do you prefer deep conversations over small talk?", 
+                category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'ps4', text: "Are you affected by the energy of a room?", 
+                category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'blue',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'blue', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'ps5', text: "Do you often act on impulse?", 
+                category: "Psychology", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'yellow', '2-1': 'blue', '2-0': 'green',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'green', '0-1': 'blue', '0-0': 'green'
+                }
+            },
 
-            // DESIRE & SEXUALITY (Mixed)
-            { id: 'd1', text: "How would you rate your libido intensity?", category: "Desire", type: "priority", 
-              options: ["High Priority", "Medium/ Balanced", "Low/ Selective"], weight: 2 },
-            { id: 'd2', text: "Role in intimacy preference?", category: "Desire", type: "choice", 
-              options: ["Dominant/Leading", "Submissive/Receiving", "Switch/Flexible", "Equal/Sharing"], weight: 2 },
-            { id: 'd3', text: "Comfort with sexting/digital intimacy?", category: "Desire", type: "choice", 
-              options: ["Enjoy it", "Occasional", "Prefer physical only", "Dislike it"], weight: 1 },
-            { id: 'd4', text: "Importance of sexual compatibility?", category: "Desire", type: "priority", 
-              options: ["Dealbreaker", "Important", "Workable", "Secondary"], weight: 2 },
-            { id: 'd5', text: "Timing for intimacy in new relationships?", category: "Desire", type: "choice", 
-              options: ["Immediately", "Few dates", "Emotional bond first", "Marriage/Commitment"], weight: 2 },
-            { id: 'd6', text: "Experimental openness?", category: "Desire", type: "scale", weight: 2 },
-            { id: 'd7', text: "Morning vs Night intimacy?", category: "Desire", type: "choice", 
-              options: ["Morning energy", "Night passion", "Afternoon delight", "Anytime"], weight: 1 },
-            { id: 'd8', text: "Setting importance for mood?", category: "Desire", type: "priority", 
-              options: ["Atmosphere is crucial", "Nice but flexible", "Spontaneous anywhere", "Completely irrelevant"], weight: 1 },
+            // VALUES DIMENSION (High dealbreaker potential)
+            { 
+                id: 'v1', text: "Do you want children in your future?", 
+                category: "Values", type: "scale", weight: 3, isDealbreaker: true,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'red', '2-0': 'red',
+                    '1-2': 'red', '1-1': 'yellow', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'v2', text: "Is financial stability a prerequisite for commitment?", 
+                category: "Values", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'v3', text: "Is travel and adventure essential?", 
+                category: "Values", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'v4', text: "Do you value career over relationships?", 
+                category: "Values", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'yellow', '2-1': 'red', '2-0': 'red',
+                    '1-2': 'red', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'v5', text: "Is spirituality/religion important in a partner?", 
+                category: "Values", type: "scale", weight: 2, isDealbreaker: true,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'red', '2-0': 'red',
+                    '1-2': 'red', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
 
-            // VALUES & LIFESTYLE (Scale)
-            { id: 'v1', text: "Is financial stability a prerequisite for commitment?", category: "Values", type: "scale", weight: 1 },
-            { id: 'v2', text: "Do you want children in your future?", category: "Values", type: "scale", weight: 2 },
-            { id: 'v3', text: "Is travel and adventure essential to your happiness?", category: "Values", type: "scale", weight: 1 },
-            { id: 'v4', text: "Do you value career success over personal relationships?", category: "Values", type: "scale", weight: 1 },
-            { id: 'v5', text: "Is spirituality/religion important in a partner?", category: "Values", type: "scale", weight: 1 },
-            { id: 'v6', text: "Do you prefer city life over nature/countryside?", category: "Values", type: "scale", weight: 1 },
-            { id: 'v7', text: "Is political alignment important in a relationship?", category: "Values", type: "scale", weight: 1 },
-            { id: 'v8', text: "Do you believe in maintaining separate friend groups?", category: "Values", type: "scale", weight: 1 }
+            // DESIRE DIMENSION
+            { 
+                id: 'd1', text: "How would you rate your libido intensity?", 
+                category: "Desire", type: "priority", weight: 2, isDealbreaker: false,
+                options: ["Very High", "High", "Moderate", "Low"],
+                frictionMap: {
+                    '0-0': 'green', '0-1': 'green', '0-2': 'yellow', '0-3': 'red',
+                    '1-0': 'green', '1-1': 'green', '1-2': 'yellow', '1-3': 'red',
+                    '2-0': 'yellow', '2-1': 'yellow', '2-2': 'green', '2-3': 'blue',
+                    '3-0': 'red', '3-1': 'red', '3-2': 'blue', '3-3': 'green'
+                }
+            },
+            { 
+                id: 'd2', text: "Role preference in intimacy?", 
+                category: "Desire", type: "choice", weight: 2, isDealbreaker: false,
+                options: ["Dominant", "Submissive", "Switch", "Vanilla/Equal"],
+                frictionMap: {
+                    '0-0': 'yellow', '0-1': 'blue', '0-2': 'green', '0-3': 'yellow',
+                    '1-0': 'blue', '1-1': 'yellow', '1-2': 'green', '1-3': 'yellow',
+                    '2-0': 'green', '2-1': 'green', '2-2': 'green', '2-3': 'green',
+                    '3-0': 'yellow', '3-1': 'yellow', '3-2': 'green', '3-3': 'green'
+                }
+            },
+            { 
+                id: 'd3', text: "Comfort with sexting/digital intimacy?", 
+                category: "Desire", type: "choice", weight: 1, isDealbreaker: false,
+                options: ["Love it", "Enjoy it", "Neutral", "Dislike it"],
+                frictionMap: 'preference'
+            },
+            { 
+                id: 'd4', text: "Timing for intimacy in new relationships?", 
+                category: "Desire", type: "choice", weight: 2, isDealbreaker: false,
+                options: ["Immediately", "Few dates", "Emotional bond", "Commitment only"],
+                frictionMap: {
+                    '0-0': 'green', '0-1': 'yellow', '0-2': 'red', '0-3': 'red',
+                    '1-0': 'yellow', '1-1': 'green', '1-2': 'yellow', '1-3': 'red',
+                    '2-0': 'red', '2-1': 'yellow', '2-2': 'green', '2-3': 'yellow',
+                    '3-0': 'red', '3-1': 'red', '3-2': 'yellow', '3-3': 'green'
+                }
+            },
+            { 
+                id: 'd5', text: "Experimental openness?", 
+                category: "Desire", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
+                }
+            },
+
+            // LIFESTYLE DIMENSION
+            { 
+                id: 'l1', text: "Do you prefer city life over nature?", 
+                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'l2', text: "Do you prefer strict routine over spontaneity?", 
+                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'red',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'red', '0-1': 'blue', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'l3', text: "Would you rather read than watch movies?", 
+                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'l4', text: "Is political alignment important?", 
+                category: "Lifestyle", type: "scale", weight: 2, isDealbreaker: true,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
+                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
+                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
+                }
+            },
+            { 
+                id: 'l5', text: "Do you maintain separate friend groups in relationships?", 
+                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {
+                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
+                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
+                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
+                }
+            }
         ];
 
-        // --- State ---
+        // --- State Management ---
         let state = {
+            mode: 'solo', // 'solo' or 'match'
             userName: '',
-            sessionId: '',
+            partnerName: '',
+            thresholds: {},
             activeQuestions: [],
-            answers: [],
-            currentQuestionIndex: 0, // Explicitly initialize
+            currentQuestionIndex: 0,
+            p1Answers: [],
+            p2Answers: [],
             categoryScores: {
-                Intimacy: { total: 0, max: 0 },
-                Physicality: { total: 0, max: 0 },
-                Psychology: { total: 0, max: 0 },
-                Values: { total: 0, max: 0 },
-                Desire: { total: 0, max: 0 }
+                Intimacy: { p1: 0, p2: 0, max: 0, friction: [] },
+                Physicality: { p1: 0, p2: 0, max: 0, friction: [] },
+                Psychology: { p1: 0, p2: 0, max: 0, friction: [] },
+                Values: { p1: 0, p2: 0, max: 0, friction: [] },
+                Desire: { p1: 0, p2: 0, max: 0, friction: [] },
+                Lifestyle: { p1: 0, p2: 0, max: 0, friction: [] }
             }
         };
 
@@ -469,22 +697,16 @@
                 container.appendChild(p);
             }
         }
-
-        function generateSessionID() {
-            return 'RES-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
-
-        state.sessionId = generateSessionID();
-        document.getElementById('session-id').innerText = state.sessionId;
         initParticles();
 
-        // --- Navigation ---
         const views = {
             intro: document.getElementById('view-intro'),
-            user: document.getElementById('view-user'),
+            mode: document.getElementById('view-mode'),
+            setup: document.getElementById('view-setup'),
             quiz: document.getElementById('view-quiz'),
             processing: document.getElementById('view-processing'),
-            results: document.getElementById('view-results')
+            resultsSolo: document.getElementById('view-results-solo'),
+            resultsMatch: document.getElementById('view-results-match')
         };
 
         function switchView(viewName) {
@@ -492,94 +714,109 @@
             views[viewName].classList.remove('hidden');
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-
         function startApp() {
-            switchView('user');
-            state.sessionId = generateSessionID();
+            switchView('mode');
         }
 
-        function lockUser() {
-            const name = document.getElementById('user-name').value.trim();
-            if (!name) { alert("Please enter your designation."); return; }
+        function setMode(mode) {
+            state.mode = mode;
+            document.getElementById('setup-title').innerText = mode === 'solo' ? 'Your Profile' : 'Both Profiles';
+            document.getElementById('partner-input').classList.toggle('hidden', mode === 'solo');
+            switchView('setup');
             
+            // Setup threshold listeners
+            ['intimacy', 'physicality', 'psychology', 'values', 'desire', 'lifestyle'].forEach(cat => {
+                const slider = document.getElementById(`thresh-${cat}`);
+                const display = document.getElementById(`val-${cat}`);
+                slider.addEventListener('input', (e) => {
+                    display.innerText = e.target.value + '%';
+                    state.thresholds[cat] = parseInt(e.target.value);
+                });
+                state.thresholds[cat] = parseInt(slider.value);
+            });
+        }
+
+        function beginAssessment() {
+            const name = document.getElementById('user-name').value.trim();
+            if (!name) { alert("Please enter your name"); return; }
             state.userName = name;
             
-            // Randomly select exactly 30 questions
+            if (state.mode === 'match') {
+                const p2name = document.getElementById('partner-name').value.trim();
+                if (!p2name) { alert("Please enter partner's name"); return; }
+                state.partnerName = p2name;
+            }
+
+            // Select 30 random questions
             const shuffled = [...masterPool].sort(() => 0.5 - Math.random());
             state.activeQuestions = shuffled.slice(0, 30);
             
-            // CRITICAL FIX: Reset the question index
+            // Reset all state
             state.currentQuestionIndex = 0;
-            
-            // Reset scores
+            state.p1Answers = [];
+            state.p2Answers = [];
             state.categoryScores = {
-                Intimacy: { total: 0, max: 0 },
-                Physicality: { total: 0, max: 0 },
-                Psychology: { total: 0, max: 0 },
-                Values: { total: 0, max: 0 },
-                Desire: { total: 0, max: 0 }
+                Intimacy: { p1: 0, p2: 0, max: 0, friction: [] },
+                Physicality: { p1: 0, p2: 0, max: 0, friction: [] },
+                Psychology: { p1: 0, p2: 0, max: 0, friction: [] },
+                Values: { p1: 0, p2: 0, max: 0, friction: [] },
+                Desire: { p1: 0, p2: 0, max: 0, friction: [] },
+                Lifestyle: { p1: 0, p2: 0, max: 0, friction: [] }
             };
-            
+
             startQuiz();
         }
 
         // --- Quiz Engine ---
         function startQuiz() {
-            state.answers = [];
-            // Safety reset
-            state.currentQuestionIndex = 0;
             switchView('quiz');
-            renderQuestion(0);
+            renderQuestion(0, 1);
         }
 
-        function renderQuestion(idx) {
-            // Update global index to match rendered index
+        function renderQuestion(idx, player) {
             state.currentQuestionIndex = idx;
-            
             const q = state.activeQuestions[idx];
             
-            // Update progress
             const pct = ((idx) / 30) * 100;
             document.getElementById('progress-bar').style.width = `${pct}%`;
             document.getElementById('q-counter').innerText = `${String(idx+1).padStart(2,'0')} / 30`;
             document.getElementById('q-category-display').innerText = q.category;
             
-            // Animate text
+            const dealbreakerBadge = document.getElementById('q-dealbreaker');
+            dealbreakerBadge.classList.toggle('hidden', !q.isDealbreaker);
+            
+            const indicator = document.getElementById('player-indicator');
+            if (state.mode === 'match') {
+                indicator.innerText = `${player === 1 ? state.userName : state.partnerName}'s Turn • Select Answer`;
+            } else {
+                indicator.innerText = 'SELECT AN IMPRINT TO CONTINUE';
+            }
+
             const qText = document.getElementById('q-text');
             qText.style.opacity = 0;
             setTimeout(() => {
                 qText.innerText = q.text;
                 qText.style.opacity = 1;
-                renderOptions(q);
+                renderOptions(q, player);
             }, 200);
         }
 
-        function renderOptions(q) {
+        function renderOptions(q, player) {
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
             let opts = [];
-            
             if (q.type === 'scale') {
                 opts = [
                     { val: 2, label: "Yes, absolutely", icon: "◉" },
                     { val: 1, label: "Maybe / Sometimes", icon: "◐" },
                     { val: 0, label: "No, not really", icon: "○" }
                 ];
-            } else if (q.type === 'choice') {
+            } else if (q.type === 'choice' || q.type === 'priority') {
+                const labels = q.type === 'choice' ? ['A', 'B', 'C', 'D', 'E'] : ['▲', '■', '●', '▼'];
                 q.options.forEach((opt, i) => {
-                    const letters = ['A', 'B', 'C', 'D'];
-                    opts.push({ val: i, label: `${letters[i]}. ${opt}`, icon: letters[i] });
+                    opts.push({ val: i, label: `${labels[i]}. ${opt}`, icon: labels[i] });
                 });
-            } else if (q.type === 'priority') {
-                opts = [
-                    { val: 2, label: "High / Essential", icon: "▲" },
-                    { val: 1, label: "Medium / Flexible", icon: "■" },
-                    { val: 0, label: "Low / Optional", icon: "▼" }
-                ];
             }
             
             opts.forEach(opt => {
@@ -589,38 +826,52 @@
                     <span class="text-pink-400 font-bold w-6 text-center">${opt.icon}</span>
                     <span class="font-light">${opt.label}</span>
                 `;
-                btn.onclick = () => selectAnswer(opt.val, q, btn);
+                btn.onclick = () => selectAnswer(opt.val, q, player, btn);
                 container.appendChild(btn);
             });
         }
 
-        function selectAnswer(val, question, btn) {
-            // Visual select
+        function selectAnswer(val, question, player, btn) {
             document.querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            
-            // Record with weight
-            state.answers.push({
-                id: question.id,
+
+            // Store answer
+            const answerData = {
+                questionId: question.id,
                 value: val,
                 category: question.category,
-                weight: question.weight || 1
-            });
-            
-            // Update category scores
-            const cat = question.category;
-            if (state.categoryScores[cat]) {
-                state.categoryScores[cat].total += (val * (question.weight || 1));
-                state.categoryScores[cat].max += (2 * (question.weight || 1));
+                weight: question.weight || 1,
+                isDealbreaker: question.isDealbreaker,
+                frictionMap: question.frictionMap
+            };
+
+            if (player === 1) {
+                state.p1Answers.push(answerData);
+            } else {
+                state.p2Answers.push(answerData);
             }
-            
-            // Navigate next
+
             setTimeout(() => {
-                const nextIdx = state.currentQuestionIndex + 1;
-                if (nextIdx < 30) {
-                    renderQuestion(nextIdx);
+                if (state.mode === 'solo') {
+                    const nextIdx = state.currentQuestionIndex + 1;
+                    if (nextIdx < 30) {
+                        renderQuestion(nextIdx, 1);
+                    } else {
+                        finishQuiz();
+                    }
                 } else {
-                    finishQuiz();
+                    // Match mode: same question, player 2, or next
+                    if (player === 1) {
+                        // Show same question for player 2
+                        renderQuestion(state.currentQuestionIndex, 2);
+                    } else {
+                        const nextIdx = state.currentQuestionIndex + 1;
+                        if (nextIdx < 30) {
+                            renderQuestion(nextIdx, 1);
+                        } else {
+                            finishQuiz();
+                        }
+                    }
                 }
             }, 350);
         }
@@ -628,163 +879,292 @@
         function finishQuiz() {
             switchView('processing');
             setTimeout(() => {
-                calculateFinalResults();
-                switchView('results');
+                if (state.mode === 'solo') {
+                    calculateSoloResults();
+                    switchView('resultsSolo');
+                } else {
+                    calculateMatchResults();
+                    switchView('resultsMatch');
+                }
             }, 2000);
         }
 
-        // --- Results Calculation ---
-        function calculateFinalResults() {
-            // Calculate category percentages
-            const cats = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire'];
-            let grandTotal = 0;
-            let grandMax = 0;
-            
-            // Map category names to DOM IDs
-            const catMap = {
-                'Intimacy': 'inti',
-                'Physicality': 'phys',
-                'Psychology': 'psyc',
-                'Values': 'valu',
-                'Desire': 'desi'
-            };
-            
-            cats.forEach(cat => {
-                const data = state.categoryScores[cat];
-                const pct = data.max > 0 ? Math.round((data.total / data.max) * 100) : 0;
-                
-                const shortName = catMap[cat];
-                if (shortName) {
-                    setTimeout(() => {
-                        const bar = document.getElementById(`cat-${shortName}-bar`);
-                        const val = document.getElementById(`cat-${shortName}-val`);
-                        if (bar) bar.style.width = `${pct}%`;
-                        if (val) val.innerText = `${pct}%`;
-                    }, 500 + (cats.indexOf(cat) * 200));
+        // --- SOLO RESULTS: Dimensional Radar ---
+        function calculateSoloResults() {
+            // Calculate scores per category
+            state.p1Answers.forEach(ans => {
+                const cat = ans.category;
+                if (state.categoryScores[cat]) {
+                    state.categoryScores[cat].p1 += (ans.value * ans.weight);
+                    state.categoryScores[cat].max += (2 * ans.weight);
                 }
-                
-                grandTotal += data.total;
-                grandMax += data.max;
             });
-            
-            const finalScore = Math.round((grandTotal / grandMax) * 100);
-            
-            // Animate main circle
-            const circle = document.getElementById('score-circle');
-            const circumference = 402;
-            const offset = circumference - (finalScore / 100) * circumference;
-            setTimeout(() => {
-                circle.style.strokeDashoffset = offset;
-            }, 300);
-            
-            animateValue("score-percent", 0, finalScore, 1500);
-            
-            determineProfile(finalScore);
-            
-            // Generate result ID
-            const hash = btoa(state.answers.map(a => a.value).join('')).substring(0, 12);
-            document.getElementById('result-id').innerText = hash;
-            
-            prepareEmail(finalScore, hash);
+
+            const dims = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire', 'Lifestyle'];
+            const percentages = {};
+
+            dims.forEach(dim => {
+                const data = state.categoryScores[dim];
+                const pct = data.max > 0 ? Math.round((data.p1 / data.max) * 100) : 0;
+                percentages[dim.toLowerCase()] = pct;
+                document.getElementById(`solo-${dim.toLowerCase()}`).innerText = pct + '%';
+            });
+
+            // Generate ID
+            const hash = btoa(state.p1Answers.map(a => a.value).join('')).substring(0, 16);
+            document.getElementById('solo-id').innerText = hash;
+
+            // Draw simple radar using concentric circles
+            drawRadar('radar-chart', percentages, true);
         }
 
-        function determineProfile(score) {
-            const typeEl = document.getElementById('profile-type');
-            const descEl = document.getElementById('result-description');
+        function drawRadar(containerId, data, solo) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
             
-            let type = "";
-            let desc = "";
+            const size = 240;
+            const center = size / 2;
+            const radius = 90;
             
-            // Find dominant category
-            const scores = {
-                Intimacy: state.categoryScores.Intimacy.total / (state.categoryScores.Intimacy.max || 1),
-                Physicality: state.categoryScores.Physicality.total / (state.categoryScores.Physicality.max || 1),
-                Psychology: state.categoryScores.Psychology.total / (state.categoryScores.Psychology.max || 1),
-                Desire: state.categoryScores.Desire.total / (state.categoryScores.Desire.max || 1)
-            };
+            // Create SVG
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', size);
+            svg.setAttribute('height', size);
+            svg.style.position = 'absolute';
+            svg.style.top = '20px';
+            svg.style.left = '20px';
+
+            // Background circles
+            [0.2, 0.4, 0.6, 0.8, 1].forEach(r => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', center);
+                circle.setAttribute('cy', center);
+                circle.setAttribute('r', radius * r);
+                circle.setAttribute('fill', 'none');
+                circle.setAttribute('stroke', 'rgba(255,255,255,0.1)');
+                circle.setAttribute('stroke-width', '1');
+                svg.appendChild(circle);
+            });
+
+            // Dimensions
+            const dims = ['intimacy', 'physicality', 'psychology', 'values', 'desire', 'lifestyle'];
+            const colors = ['#f472b6', '#a855f7', '#3b82f6', '#eab308', '#f43f5e', '#10b981'];
             
-            const dominant = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-            
-            if (score > 80) {
-                type = "The Radiant Core";
-                desc = `You possess an intense, well-defined soul with high ${dominant} energy. You know exactly what you want and aren't afraid to pursue it. Your clarity is magnetic.`;
-            } else if (score > 60) {
-                type = "The Balanced Spectrum";
-                desc = `You are a harmonious blend of desire and reason. While you have strong preferences in ${dominant}, you maintain healthy flexibility elsewhere.`;
-            } else if (score > 40) {
-                type = "The Seeking Soul";
-                desc = `You are in exploration mode. Some areas like ${dominant} call to you strongly, while others remain open to discovery. You are adaptable and curious.`;
-            } else {
-                type = "The Open Vessel";
-                desc = `You resist definition, preferring to experience without prejudice. Your low specificity makes you universally compatible but mysterious to read.`;
+            // Calculate points
+            const angleStep = (Math.PI * 2) / 6;
+            let points1 = [];
+            let points2 = [];
+
+            dims.forEach((dim, i) => {
+                const angle = i * angleStep - Math.PI / 2;
+                const val1 = (data[dim] || 0) / 100;
+                const x1 = center + Math.cos(angle) * radius * val1;
+                const y1 = center + Math.sin(angle) * radius * val1;
+                points1.push(`${x1},${y1}`);
+
+                if (!solo && data[`${dim}2`]) {
+                    const val2 = data[`${dim}2`] / 100;
+                    const x2 = center + Math.cos(angle) * radius * val2;
+                    const y2 = center + Math.sin(angle) * radius * val2;
+                    points2.push(`${x2},${y2}`);
+                }
+
+                // Label
+                const labelRadius = radius + 20;
+                const lx = center + Math.cos(angle) * labelRadius;
+                const ly = center + Math.sin(angle) * labelRadius;
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', lx);
+                text.setAttribute('y', ly);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('fill', colors[i]);
+                text.setAttribute('font-size', '10');
+                text.textContent = dim.substring(0, 3).toUpperCase();
+                svg.appendChild(text);
+            });
+
+            // Draw polygons
+            if (!solo && points2.length > 0) {
+                const poly2 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                poly2.setAttribute('points', points2.join(' '));
+                poly2.setAttribute('fill', 'rgba(168, 85, 247, 0.3)');
+                poly2.setAttribute('stroke', '#a855f7');
+                poly2.setAttribute('stroke-width', '2');
+                svg.appendChild(poly2);
             }
-            
-            typeEl.innerText = type;
-            descEl.innerText = desc;
+
+            const poly1 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            poly1.setAttribute('points', points1.join(' '));
+            poly1.setAttribute('fill', solo ? 'rgba(244, 114, 182, 0.3)' : 'rgba(244, 114, 182, 0.2)');
+            poly1.setAttribute('stroke', '#f472b6');
+            poly1.setAttribute('stroke-width', '2');
+            svg.appendChild(poly1);
+
+            container.appendChild(svg);
         }
 
-        function prepareEmail(score, hash) {
-            const subject = `Resonance Profile: ${state.userName} [${score}%]`;
-            const body = `
-RESONANCE SOUL MAPPING
-======================
-User: ${state.userName}
-Signature ID: ${hash}
-Harmony Score: ${score}%
-Profile Type: ${document.getElementById('profile-type').innerText}
-
-DIMENSIONAL BREAKDOWN:
-- Intimacy: ${document.getElementById('cat-inti-val').innerText}
-- Physicality: ${document.getElementById('cat-phys-val').innerText}
-- Psychology: ${document.getElementById('cat-psyc-val').innerText}
-- Values: ${document.getElementById('cat-valu-val').innerText}
-
-ANALYSIS:
-${document.getElementById('result-description').innerText}
-
-Session: ${state.sessionId}
-            `;
+        // --- MATCH RESULTS: Friction Analysis ---
+        function calculateMatchResults() {
+            // Calculate per-category scores and friction
+            const categories = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire', 'Lifestyle'];
             
-            document.getElementById('email-subject').value = subject;
-            document.getElementById('email-body').value = body;
-        }
-
-        function copyID() {
-            const id = document.getElementById('result-id').innerText;
-            navigator.clipboard.writeText(id).then(() => {
-                alert('Signature ID copied: ' + id);
+            // Pair answers by question ID
+            const pairedAnswers = [];
+            state.p1Answers.forEach(p1ans => {
+                const p2ans = state.p2Answers.find(a => a.questionId === p1ans.questionId);
+                if (p2ans) {
+                    pairedAnswers.push({ p1: p1ans, p2: p2ans });
+                }
             });
+
+            // Process each pair
+            let dealbreakers = [];
+            let totalFriction = { green: 0, blue: 0, yellow: 0, red: 0 };
+
+            pairedAnswers.forEach(pair => {
+                const cat = pair.p1.category;
+                const map = pair.p1.frictionMap;
+                let friction = 'green';
+
+                // Special friction maps
+                if (map === 'preference') {
+                    friction = pair.p1.value === pair.p2.value ? 'green' : 'yellow';
+                } else if (map === 'complement') {
+                    // For height: 0=taller, 1=shorter, 2=same, 3=irrelevant
+                    if (pair.p1.value === 3 || pair.p2.value === 3) friction = 'green';
+                    else if (pair.p1.value === 0 && pair.p2.value === 1) friction = 'blue'; // Tall + Short
+                    else if (pair.p1.value === 1 && pair.p2.value === 0) friction = 'blue';
+                    else if (pair.p1.value === pair.p2.value) friction = 'green';
+                    else friction = 'yellow';
+                } else {
+                    // Standard matrix lookup
+                    const key = `${pair.p1.value}-${pair.p2.value}`;
+                    friction = map[key] || 'green';
+                }
+
+                // Check dealbreaker
+                if (pair.p1.isDealbreaker && friction === 'red') {
+                    dealbreakers.push({
+                        category: cat,
+                        text: state.activeQuestions.find(q => q.id === pair.p1.questionId).text
+                    });
+                }
+
+                // Accumulate
+                if (state.categoryScores[cat]) {
+                    state.categoryScores[cat].p1 += (pair.p1.value * pair.p1.weight);
+                    state.categoryScores[cat].p2 += (pair.p2.value * pair.p2.weight);
+                    state.categoryScores[cat].max += (2 * pair.p1.weight);
+                    state.categoryScores[cat].friction.push(friction);
+                }
+
+                totalFriction[friction]++;
+            });
+
+            // Calculate category percentages
+            const dimData = {};
+            categories.forEach(cat => {
+                const data = state.categoryScores[cat];
+                const p1pct = data.max > 0 ? Math.round((data.p1 / data.max) * 100) : 0;
+                const p2pct = data.max > 0 ? Math.round((data.p2 / data.max) * 100) : 0;
+                
+                // Determine dominant friction for category
+                const frictionCounts = { green: 0, blue: 0, yellow: 0, red: 0 };
+                data.friction.forEach(f => frictionCounts[f]++);
+                const dominantFriction = Object.entries(frictionCounts)
+                    .sort((a, b) => b[1] - a[1])[0][0];
+
+                dimData[cat.toLowerCase()] = p1pct;
+                dimData[`${cat.toLowerCase()}2`] = p2pct;
+
+                // Check against thresholds
+                const threshold = state.thresholds[cat.toLowerCase()] || 50;
+                const avgScore = (p1pct + p2pct) / 2;
+                const belowThreshold = avgScore < threshold;
+
+                renderFrictionBar(cat, p1pct, p2pct, dominantFriction, belowThreshold);
+            });
+
+            // Draw radar
+            drawRadar('match-radar', dimData, false);
+
+            // Dealbreaker alert
+            const alertBox = document.getElementById('dealbreaker-alert');
+            if (dealbreakers.length > 0) {
+                alertBox.classList.remove('hidden');
+                document.getElementById('dealbreaker-text').innerText = 
+                    `${dealbreakers.length} fundamental incompatibility(s) detected in: ${dealbreakers.map(d => d.category).join(', ')}`;
+            } else {
+                alertBox.classList.add('hidden');
+            }
+
+            // Overall potential score
+            const total = totalFriction.green + totalFriction.blue + totalFriction.yellow + totalFriction.red;
+            const potential = Math.round(((totalFriction.green * 2) + totalFriction.blue - (totalFriction.red * 2)) / (total * 2) * 100);
+            const clampedPotential = Math.max(0, Math.min(100, potential + 50)); // Normalize
+
+            document.getElementById('potential-score').innerText = clampedPotential + '%';
+            
+            // Description
+            let desc = "";
+            if (dealbreakers.length > 0) {
+                desc = "Critical friction detected. Fundamental values misalignment suggests significant challenges.";
+            } else if (clampedPotential > 80) {
+                desc = "Exceptional compatibility. Your patterns show strong harmony with productive complementarity.";
+            } else if (clampedPotential > 60) {
+                desc = "Solid foundation. Good balance of similarity and growth-oriented differences.";
+            } else if (clampedPotential > 40) {
+                desc = "Moderate potential. Requires conscious navigation of tension points, but growth possible.";
+            } else {
+                desc = "Challenging alignment. High friction suggests either transformation or incompatibility.";
+            }
+            document.getElementById('potential-desc').innerText = desc;
+
+            // Set names
+            document.getElementById('res-p1').innerText = state.userName;
+            document.getElementById('res-p2').innerText = state.partnerName;
         }
 
-        function animateValue(id, start, end, duration) {
-            const obj = document.getElementById(id);
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start) + "%";
-                if (progress < 1) window.requestAnimationFrame(step);
+        function renderFrictionBar(category, p1score, p2score, friction, belowThreshold) {
+            const container = document.getElementById('friction-container');
+            
+            const frictionLabels = {
+                green: { text: 'Harmony', class: 'friction-green' },
+                blue: { text: 'Complement', class: 'friction-blue' },
+                yellow: { text: 'Tension', class: 'friction-yellow' },
+                red: { text: 'Friction', class: 'friction-red' }
             };
-            window.requestAnimationFrame(step);
+
+            const f = frictionLabels[friction];
+            const warningIcon = belowThreshold ? '⚠ ' : '';
+
+            const div = document.createElement('div');
+            div.className = `flex items-center justify-between p-3 rounded-lg border ${f.class}`;
+            div.innerHTML = `
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider">${warningIcon}${category}</span>
+                        <span class="text-xs opacity-80">${f.text}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="text-pink-300">${p1score}%</span>
+                        <div class="flex-1 h-2 bg-black/20 rounded-full overflow-hidden">
+                            <div class="h-full bg-white/50 rounded-full" style="width: ${(p1score + p2score) / 2}%"></div>
+                        </div>
+                        <span class="text-purple-300">${p2score}%</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
         }
 
-        // Email form handler
-        document.getElementById('email-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const status = document.createElement('div');
-            status.className = 'text-xs mt-2 text-green-400';
-            this.appendChild(status);
-            status.innerText = "Sending...";
-            
-            fetch(this.action, {
-                method: "POST",
-                body: new FormData(this)
-            })
-            .then(r => r.json())
-            .then(data => {
-                status.innerText = data.success ? "Sent successfully!" : "Failed to send";
+        function copySoloID() {
+            const id = document.getElementById('solo-id').innerText;
+            navigator.clipboard.writeText(id).then(() => {
+                alert('ID copied: ' + id);
             });
-        });
+        }
     </script>
 </body>
 </html>
