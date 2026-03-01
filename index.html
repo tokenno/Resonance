@@ -1,0 +1,478 @@
+Here is the updated, single-file application. It has been refactored to a single-player experience where one user completes the 20 questions. Upon completion, it reveals their unique "Soul Profile" and provides a functional form to send the results to an email address using the Web3Forms API (no backend required).
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resonance | Soul Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Sensual Aesthetic */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #4a192c 100%);
+            color: #fce7f3;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Glassmorphism Card */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Animated Background Blobs */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+        }
+        .blob-1 { top: 10%; left: 10%; width: 300px; height: 300px; background: #7c3aed; animation-delay: 0s; }
+        .blob-2 { bottom: 20%; right: 10%; width: 350px; height: 350px; background: #be185d; animation-delay: 2s; }
+        .blob-3 { top: 40%; left: 40%; width: 200px; height: 200px; background: #4f46e5; animation-delay: 4s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* Custom Radio Inputs */
+        .option-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .option-card.selected {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: #f472b6;
+            box-shadow: 0 0 15px rgba(244, 114, 182, 0.3);
+        }
+        .option-card.selected .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Progress Bar */
+        .progress-fill {
+            transition: width 0.5s ease-out;
+        }
+
+        /* Results Animation */
+        .result-reveal {
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Pulse effect for button */
+        .pulse-btn {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 114, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
+        }
+
+        /* Input styling */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #f472b6;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <!-- Background Elements -->
+    <div class="blob blob-1 rounded-full"></div>
+    <div class="blob blob-2 rounded-full"></div>
+    <div class="blob blob-3 rounded-full"></div>
+
+    <!-- Main Application Container -->
+    <main id="app" class="glass-panel w-full max-w-2xl rounded-3xl p-8 md:p-12 relative overflow-hidden min-h-[600px] flex flex-col justify-center">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-5xl md:text-6xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-200 to-purple-200 mb-2">
+                Resonance
+            </h1>
+            <p class="text-sm tracking-[0.3em] uppercase text-pink-200/70">Discover Your Soul Profile</p>
+        </header>
+
+        <!-- VIEW 1: Intro Screen -->
+        <section id="view-intro" class="text-center space-y-8">
+            <div class="space-y-4 text-lg font-light leading-relaxed text-gray-200">
+                <p>20 questions designed to map the depths of your psyche.</p>
+                <p>Uncover your resonance score and share your unique profile.</p>
+            </div>
+            
+            <div class="pt-8">
+                <button onclick="startApp()" class="pulse-btn bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-lg tracking-widest uppercase text-sm">
+                    Begin Assessment
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: User Info Input -->
+        <section id="view-user" class="hidden space-y-6">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl italic mb-2">Your Identity</h2>
+                <p class="text-sm text-pink-200/60 uppercase tracking-widest">Enter the Void</p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="user-name" placeholder="Your Name" class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-xl text-white placeholder-white/30 focus:outline-none focus:border-pink-400 transition-colors">
+                <button onclick="lockUser()" class="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl transition-all uppercase tracking-wider text-sm">Enter</button>
+            </div>
+        </section>
+
+        <!-- VIEW 3: Quiz Interface -->
+        <section id="view-quiz" class="hidden flex flex-col h-full">
+            <!-- Progress -->
+            <div class="w-full bg-white/10 h-1 rounded-full mb-8 overflow-hidden">
+                <div id="progress-bar" class="progress-fill bg-gradient-to-r from-pink-400 to-purple-400 h-full w-0"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="flex-grow flex flex-col justify-center">
+                <span id="q-category" class="text-xs font-bold tracking-[0.2em] text-pink-300 uppercase mb-4 block">Category</span>
+                <h3 id="q-text" class="text-2xl md:text-3xl font-light leading-snug mb-8 min-h-[80px]">Question text goes here?</h3>
+
+                <!-- Options -->
+                <div class="grid gap-4">
+                    <button onclick="selectOption(2)" class="option-card group relative w-full p-5 rounded-xl border border-white/10 text-left flex items-center justify-between">
+                        <span class="text-lg font-light">Yes, absolutely.</span>
+                        <div class="check-icon opacity-0 transform scale-50 transition-all duration-300 text-pink-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                    </button>
+
+                    <button onclick="selectOption(1)" class="option-card group relative w-full p-5 rounded-xl border border-white/10 text-left flex items-center justify-between">
+                        <span class="text-lg font-light">Maybe / Sometimes</span>
+                        <div class="check-icon opacity-0 transform scale-50 transition-all duration-300 text-pink-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                    </button>
+
+                    <button onclick="selectOption(0)" class="option-card group relative w-full p-5 rounded-xl border border-white/10 text-left flex items-center justify-between">
+                        <span class="text-lg font-light">No, not really.</span>
+                        <div class="check-icon opacity-0 transform scale-50 transition-all duration-300 text-pink-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: Results & Email -->
+        <section id="view-results" class="hidden w-full">
+            <div class="result-reveal text-center">
+                <h2 class="text-3xl md:text-4xl italic mb-2">Your Soul Profile</h2>
+                <p class="text-sm text-pink-200/60 uppercase tracking-widest mb-6">Analysis Complete</p>
+
+                <!-- Percentage Circle -->
+                <div class="relative w-40 h-40 mx-auto mb-6 flex items-center justify-center">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="80" cy="80" r="70" stroke="rgba(255,255,255,0.1)" stroke-width="6" fill="none"/>
+                        <circle id="score-circle" cx="80" cy="80" r="70" stroke="#f472b6" stroke-width="6" fill="none" stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round" class="transition-all duration-2000 ease-out"/>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="score-percent" class="text-4xl font-bold serif">0%</span>
+                        <span id="score-label" class="text-[10px] uppercase tracking-widest mt-1 text-pink-300">Calculating...</span>
+                    </div>
+                </div>
+
+                <div id="result-message" class="max-w-md mx-auto bg-white/5 p-4 rounded-xl border border-white/10 mb-6 text-sm leading-relaxed">
+                    <!-- Dynamic Message -->
+                </div>
+
+                <!-- Email Form -->
+                <div class="max-w-sm mx-auto mt-8 border-t border-white/10 pt-6">
+                    <p class="text-xs uppercase tracking-widest text-white/50 mb-4">Send Results To</p>
+                    
+                    <form id="email-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-3">
+                        <!-- Web3Forms Access Key (Public key for demo purposes - replace in production) -->
+                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                        <input type="hidden" name="subject" id="email-subject" value="Your Soul Profile Results">
+                        <input type="hidden" name="message" id="email-body" value="">
+
+                        <input type="email" name="email" required placeholder="Enter email address" class="glass-input w-full p-3 rounded-lg text-sm text-center placeholder-white/30">
+                        
+                        <button type="submit" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-3 rounded-lg transition-all text-sm uppercase tracking-wider">
+                            Send Profile
+                        </button>
+                    </form>
+                    <div id="form-status" class="text-xs mt-2 h-4 text-green-400"></div>
+                </div>
+
+                <button onclick="location.reload()" class="mt-8 text-xs text-white/40 hover:text-white underline underline-offset-4 transition-colors">Start Over</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Data: The 20 Questions ---
+        const questions = [
+            { text: "Do you believe that silence between two people can be deeply intimate?", category: "Intimacy" },
+            { text: "Is physical touch essential for you to feel loved?", category: "Physicality" },
+            { text: "Do you often daydream about escaping to a foreign country?", category: "Dreams" },
+            { text: "Do you prefer a strict routine over spontaneity?", category: "Habits" },
+            { text: "Is intelligence more attractive to you than physical beauty?", category: "Values" },
+            { text: "Would you choose a stormy night in over a sunny day out?", category: "Habits" },
+            { text: "Do you believe in love at first sight?", category: "Psychology" },
+            { text: "Is sharing similar music taste important in a relationship?", category: "Values" },
+            { text: "Do you recharge your energy by spending time alone?", category: "Psychology" },
+            { text: "Are you generally a risk-taker in life?", category: "Psychology" },
+            { text: "Is financial stability a prerequisite for your happiness?", category: "Values" },
+            { text: "Do you believe that past traumas define who we are?", category: "Psychology" },
+            { text: "Would you rather read a book than watch a movie?", category: "Habits" },
+            { text: "Do you feel a deep connection to nature and the ocean?", category: "Dreams" },
+            { text: "Is it a dealbreaker if a partner does not want children?", category: "Values" },
+            { text: "Do you prefer deep conversations over small talk?", category: "Intimacy" },
+            { text: "Is your ideal vacation an adventure, not a resort?", category: "Dreams" },
+            { text: "Do you trust your gut instinct over logical reasoning?", category: "Psychology" },
+            { text: "Is forgiveness easy for you to grant?", category: "Values" },
+            { text: "Do you believe in destiny or fate?", category: "Dreams" }
+        ];
+
+        // --- State Management ---
+        let state = {
+            userName: '',
+            currentQuestionIndex: 0,
+            answers: []
+        };
+
+        // --- DOM Elements ---
+        const views = {
+            intro: document.getElementById('view-intro'),
+            user: document.getElementById('view-user'),
+            quiz: document.getElementById('view-quiz'),
+            results: document.getElementById('view-results')
+        };
+
+        // --- Navigation Functions ---
+        function switchView(viewName) {
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+        }
+
+        function startApp() {
+            switchView('user');
+        }
+
+        function lockUser() {
+            const name = document.getElementById('user-name').value.trim();
+            if (!name) {
+                alert("Please enter your name to proceed.");
+                return;
+            }
+            state.userName = name;
+            startQuiz();
+        }
+
+        // --- Quiz Logic ---
+
+        function startQuiz() {
+            state.currentQuestionIndex = 0;
+            state.answers = [];
+            switchView('quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[state.currentQuestionIndex];
+            const progress = ((state.currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            const qText = document.getElementById('q-text');
+            const qCat = document.getElementById('q-category');
+            
+            qText.style.opacity = 0;
+            setTimeout(() => {
+                qCat.innerText = q.category;
+                qText.innerText = q.text;
+                qText.style.opacity = 1;
+            }, 200);
+
+            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+        }
+
+        function selectOption(value) {
+            const cards = document.querySelectorAll('.option-card');
+            cards.forEach(c => c.classList.remove('selected'));
+            const indexMap = {2: 0, 1: 1, 0: 2}; 
+            cards[indexMap[value]].classList.add('selected');
+
+            state.answers.push(value);
+
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                if (state.currentQuestionIndex < questions.length) {
+                    renderQuestion();
+                } else {
+                    calculateAndShowResults();
+                }
+            }, 400);
+        }
+
+        // --- Calculation Logic ---
+        // Since we removed 2-player comparison, we calculate a "Soul Intensity" score.
+        // Yes = 2pts, Maybe = 1pt, No = 0pts.
+        // Higher score = more "Yes" answers = more defined/strong preferences.
+
+        function calculateAndShowResults() {
+            switchView('results');
+
+            let totalScore = 0;
+            const maxScore = questions.length * 2; // 40
+
+            state.answers.forEach(val => {
+                totalScore += val;
+            });
+
+            const percentage = Math.round((totalScore / maxScore) * 100);
+            displayResults(percentage);
+        }
+
+        function displayResults(score) {
+            // Animate Circle
+            const circle = document.getElementById('score-circle');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            const offset = circumference - (score / 100) * circumference;
+            
+            setTimeout(() => {
+                circle.style.strokeDashoffset = offset;
+            }, 100);
+
+            // Animate Number
+            animateValue("score-percent", 0, score, 1500);
+
+            // Determine Profile Type
+            const labelEl = document.getElementById('score-label');
+            const msgEl = document.getElementById('result-message');
+            let category = "";
+            let message = "";
+            let colorClass = "";
+
+            // Logic for single player "Soul Profile"
+            if (score < 25) {
+                category = "The Wandering Mystic";
+                colorClass = "text-blue-300";
+                message = "You are fluid, adaptable, and open to the unknown. You rarely commit to a definitive 'Yes' or 'No', preferring to see where the wind takes you. Your soul is a mist—hard to grasp but beautiful to witness.";
+            } else if (score < 50) {
+                category = "The Balanced Dreamer";
+                colorClass = "text-yellow-300";
+                message = "You walk the middle path. You have strong desires, yet you maintain a healthy flexibility. You are pragmatic but not closed off to magic. This balance makes you a stable, yet intriguing partner.";
+            } else if (score < 75) {
+                category = "The Passionate Seeker";
+                colorClass = "text-pink-400";
+                message = "You know what you want. Your desires are clear, your boundaries are firm, and your passions run hot. You seek depth and are not afraid to demand it. You are a flame—warm to those who deserve it, burning to those who don't.";
+            } else {
+                category = "The Unyielding Force";
+                colorClass = "text-purple-300";
+                message = "You are definitive. You have a clear vision for your life, your love, and your legacy. You do not compromise on your core values. You are a fortress—impenetrable to superficiality, but a sanctuary for true connection.";
+            }
+
+            labelEl.innerText = category;
+            labelEl.className = `text-xs uppercase tracking-widest mt-1 ${colorClass}`;
+            
+            setTimeout(() => {
+                msgEl.innerHTML = `<p class="text-white/90 italic">"${message}"</p>`;
+            }, 1000);
+
+            // Prepare Email Content
+            prepareEmail(score, category, message);
+        }
+
+        function prepareEmail(score, category, message) {
+            const subject = `Soul Profile Results for ${state.userName}`;
+            const body = `
+Name: ${state.userName}
+Soul Score: ${score}%
+Profile Type: ${category}
+
+Analysis:
+${message}
+
+---
+Generated by Resonance App
+            `;
+            
+            document.getElementById('email-subject').value = subject;
+            document.getElementById('email-body').value = body;
+        }
+
+        // --- Email Handling ---
+        document.getElementById('email-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const status = document.getElementById('form-status');
+            const data = new FormData(form);
+
+            fetch(form.action, {
+                method: "POST",
+                body: data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    status.innerText = "Profile sent successfully!";
+                    form.reset();
+                    // Keep the hidden inputs values
+                    document.getElementById('email-subject').value = `Soul Profile Results for ${state.userName}`;
+                } else {
+                    status.innerText = "Error sending. Please try again.";
+                    status.classList.replace('text-green-400', 'text-red-400');
+                }
+            })
+            .catch(error => {
+                status.innerText = "Network error. Please try again.";
+                status.classList.replace('text-green-400', 'text-red-400');
+            });
+        });
+
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start) + "%";
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
+```
