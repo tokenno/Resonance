@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="html">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -148,6 +148,21 @@
             height: 280px;
             margin: 0 auto;
         }
+
+        .id-display {
+            font-family: monospace;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .compatibility-instant {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
@@ -184,20 +199,85 @@
                 <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Choose your path</p>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
                 <button onclick="setMode('solo')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
                     <h3 class="text-xl mb-2 text-pink-300">Solo Discovery</h3>
-                    <p class="text-sm opacity-70">Map your own dimensions. Generate a shareable ID for future matching.</p>
+                    <p class="text-sm opacity-70">Map your dimensions. Generate a shareable ID.</p>
                 </button>
                 
                 <button onclick="setMode('match')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
                     <h3 class="text-xl mb-2 text-purple-300">Live Matching</h3>
-                    <p class="text-sm opacity-70">Two people, one device. Real-time friction analysis.</p>
+                    <p class="text-sm opacity-70">Two people, one device. Real-time analysis.</p>
+                </button>
+
+                <button onclick="setMode('check')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-green-500/20 text-green-300 text-[10px] px-2 py-1 rounded-bl-lg uppercase tracking-wider">New</div>
+                    <h3 class="text-xl mb-2 text-emerald-300">Check Compatibility</h3>
+                    <p class="text-sm opacity-70">Enter someone's ID. Instant friction analysis.</p>
                 </button>
             </div>
         </section>
 
-        <!-- VIEW: User Setup -->
+        <!-- VIEW: Check Compatibility (ID Input) -->
+        <section id="view-check" class="hidden space-y-6 result-reveal">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl italic mb-2">Compatibility Check</h2>
+                <p class="text-xs text-emerald-200/60 uppercase tracking-[0.3em]">Enter their Resonance ID</p>
+            </div>
+            
+            <div class="space-y-4 max-w-md mx-auto">
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 1: Your Profile</p>
+                    <input type="text" id="check-your-name" placeholder="Your Name" class="w-full glass-input rounded-lg p-3 text-center mb-3 placeholder-white/30">
+                    
+                    <div class="flex gap-2">
+                        <button onclick="startCheckNew()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-2 rounded-lg text-xs uppercase tracking-wider">
+                            Create New
+                        </button>
+                        <button onclick="startCheckExisting()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2 rounded-lg text-xs uppercase tracking-wider">
+                            I Have an ID
+                        </button>
+                    </div>
+                </div>
+
+                <div id="check-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 2: Their Resonance ID</p>
+                    <input type="text" id="check-partner-id" placeholder="Enter their ID (e.g., MTIzNDU2Nzg5MD...)" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
+                    <button onclick="runCompatibilityCheck()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white py-3 rounded-lg mt-3 text-sm uppercase tracking-wider">
+                        Analyze Friction
+                    </button>
+                </div>
+
+                <p id="check-error" class="text-red-400 text-xs text-center hidden"></p>
+            </div>
+
+            <button onclick="switchView('mode')" class="text-xs text-white/40 hover:text-white underline underline-offset-4">← Back</button>
+        </section>
+
+        <!-- VIEW: Your Profile Setup (for Check mode) -->
+        <section id="view-check-setup" class="hidden space-y-6 result-reveal">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl italic mb-2">Your Dimensional Map</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Complete your profile first</p>
+            </div>
+            
+            <div class="space-y-4 max-w-md mx-auto">
+                <input type="text" id="check-user-name" placeholder="Your Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-4 text-pink-300">Set Your Minimum Thresholds</p>
+                    <div class="space-y-3" id="check-thresholds">
+                        <!-- Threshold sliders injected here -->
+                    </div>
+                </div>
+
+                <button onclick="beginCheckAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm border border-white/10">
+                    Begin Assessment
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: User Setup (Solo/Match modes) -->
         <section id="view-setup" class="hidden space-y-6 result-reveal">
             <div class="text-center mb-6">
                 <h2 class="text-3xl italic mb-2" id="setup-title">Identity Protocol</h2>
@@ -215,37 +295,8 @@
                     <p class="text-xs uppercase tracking-widest mb-4 text-pink-300">Set Your Minimum Thresholds</p>
                     <p class="text-xs opacity-60 mb-4">Dimensions below these will flag as warnings</p>
                     
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs">Intimacy</span>
-                            <input type="range" id="thresh-intimacy" min="0" max="100" value="60" class="threshold-slider w-32">
-                            <span class="text-xs w-8 text-right" id="val-intimacy">60%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs">Physicality</span>
-                            <input type="range" id="thresh-physicality" min="0" max="100" value="50" class="threshold-slider w-32">
-                            <span class="text-xs w-8 text-right" id="val-physicality">50%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs">Psychology</span>
-                            <input type="range" id="thresh-psychology" min="0" max="100" value="70" class="threshold-slider w-32">
-                            <span class="text-xs w-8 text-right" id="val-psychology">70%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs">Values</span>
-                            <input type="range" id="thresh-values" min="0" max="100" value="80" class="threshold-slider w-32">
-                            <span class="text-xs w-8 text-right" id="val-values">80%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs">Desire</span>
-                            <input type="range" id="thresh-desire" min="0" max="100" value="50" class="threshold-slider w-32">
-                            <span class="text-xs w-8 text-right" id="val-desire">50%</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs">Lifestyle</span>
-                            <input type="range" id="thresh-lifestyle" min="0" max="100" value="40" class="threshold-slider w-32">
-                            <span class="text-xs w-8 text-right" id="val-lifestyle">40%</span>
-                        </div>
+                    <div class="space-y-3" id="thresholds-container">
+                        <!-- Injected via JS -->
                     </div>
                 </div>
 
@@ -288,8 +339,7 @@
                     <span class="text-2xl font-bold serif">AI</span>
                 </div>
             </div>
-            <h3 class="text-2xl italic animate-pulse">Calculating Friction Matrix...</h3>
-            <p class="text-sm opacity-60">Analyzing complementarity patterns</p>
+            <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Profile...</h3>
         </section>
 
         <!-- VIEW: Results - Solo -->
@@ -333,7 +383,7 @@
 
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Your Shareable ID</p>
-                    <p class="text-2xl font-mono text-center signature-hash" id="solo-id">---</p>
+                    <p class="text-2xl text-center id-display" id="solo-id">---</p>
                     <p class="text-xs text-center opacity-60 mt-2">Others can enter this to compare with you</p>
                 </div>
 
@@ -347,8 +397,6 @@
         <!-- VIEW: Results - Match -->
         <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="result-reveal space-y-4">
-                
-                <!-- Header -->
                 <div class="text-center">
                     <h2 class="text-3xl italic mb-1">Friction Analysis</h2>
                     <div class="flex justify-center items-center gap-3 text-sm">
@@ -358,32 +406,24 @@
                     </div>
                 </div>
 
-                <!-- Dealbreaker Alert -->
                 <div id="dealbreaker-alert" class="hidden bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
                     <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Critical Friction Detected</p>
-                    <p class="text-xs opacity-80" id="dealbreaker-text">Fundamental incompatibility in core values</p>
+                    <p class="text-xs opacity-80" id="dealbreaker-text">Fundamental incompatibility</p>
                 </div>
 
-                <!-- Radar Comparison -->
                 <div class="radar-container mx-auto" id="match-radar" style="height: 240px;"></div>
 
-                <!-- Dimensional Friction Map -->
                 <div class="space-y-2">
                     <p class="text-xs uppercase tracking-widest text-center opacity-60 mb-3">Dimensional Friction Analysis</p>
-                    
-                    <div id="friction-container" class="space-y-2">
-                        <!-- Generated via JS -->
-                    </div>
+                    <div id="friction-container" class="space-y-2"></div>
                 </div>
 
-                <!-- Complementarity Score -->
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
                     <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Relationship Potential</p>
                     <p class="text-3xl font-bold serif" id="potential-score">---</p>
                     <p class="text-xs mt-2 italic" id="potential-desc">---</p>
                 </div>
 
-                <!-- Friction Legend -->
                 <div class="flex justify-center gap-4 text-xs">
                     <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-400/50"></div><span>Harmony</span></div>
                     <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-blue-400/50"></div><span>Complement</span></div>
@@ -395,279 +435,133 @@
             </div>
         </section>
 
+        <!-- VIEW: Results - Instant Check -->
+        <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
+            <div class="result-reveal space-y-4">
+                <div class="text-center">
+                    <h2 class="text-3xl italic mb-1">Instant Compatibility</h2>
+                    <div class="flex justify-center items-center gap-3 text-sm">
+                        <span id="check-res-p1" class="text-pink-300">You</span>
+                        <span class="opacity-50">×</span>
+                        <span id="check-res-p2" class="text-emerald-300">Their Profile</span>
+                    </div>
+                    <p class="text-xs opacity-60 mt-1">Analysis via Resonance ID</p>
+                </div>
+
+                <div class="compatibility-instant rounded-xl p-4 text-center">
+                    <p class="text-xs uppercase tracking-widest text-emerald-300 mb-2">Compatibility Verdict</p>
+                    <p class="text-4xl font-bold serif mb-2" id="check-verdict">---</p>
+                    <p class="text-sm" id="check-verdict-sub">---</p>
+                </div>
+
+                <div id="check-dealbreaker-alert" class="hidden bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
+                    <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Dealbreaker Detected</p>
+                    <p class="text-xs opacity-80" id="check-dealbreaker-text">---</p>
+                </div>
+
+                <div class="radar-container mx-auto" id="check-radar" style="height: 240px;"></div>
+
+                <div class="space-y-2">
+                    <p class="text-xs uppercase tracking-widest text-center opacity-60 mb-3">Dimensional Comparison</p>
+                    <div id="check-friction-container" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                    <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Friction Score</p>
+                    <p class="text-3xl font-bold serif" id="check-friction-score">---</p>
+                    <p class="text-xs mt-2 italic" id="check-friction-desc">---</p>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Check</button>
+                    <button onclick="switchToFullProfile()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg text-xs uppercase tracking-wider text-emerald-300">
+                        See Full Details
+                    </button>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
         // --- ENHANCED QUESTION POOL WITH FRICTION MATRICES ---
-        // Each question now has a frictionMap defining how answer pairs interact
         const masterPool = [
-            // INTIMACY DIMENSION
-            { 
-                id: 'i1', text: "Is physical touch essential for you to feel loved?", 
-                category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'i2', text: "Do you need emotional connection before physical intimacy?", 
-                category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'red',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'i3', text: "Is monogamy the only natural structure for you?", 
-                category: "Intimacy", type: "scale", weight: 3, isDealbreaker: true,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'red', '2-0': 'red',
-                    '1-2': 'red', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'i4', text: "Are public displays of affection comfortable?", 
-                category: "Intimacy", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'blue',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'blue', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'i5', text: "Do you express desires verbally during intimacy?", 
-                category: "Intimacy", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
-                }
-            },
+            // INTIMACY
+            { id: 'i1', text: "Is physical touch essential for you to feel loved?", category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'red', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'i2', text: "Do you need emotional connection before physical intimacy?", category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'red', '1-2': 'blue', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'i3', text: "Is monogamy the only natural structure for you?", category: "Intimacy", type: "scale", weight: 3, isDealbreaker: true,
+                frictionMap: {'2-2': 'green', '2-1': 'red', '2-0': 'red', '1-2': 'red', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'i4', text: "Are public displays of affection comfortable?", category: "Intimacy", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'blue', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'blue', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'i5', text: "Do you express desires verbally during intimacy?", category: "Intimacy", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} },
 
-            // PHYSICALITY DIMENSION
-            { 
-                id: 'p1', text: "Preferred body type in a partner?", 
-                category: "Physicality", type: "choice", weight: 1, isDealbreaker: false,
-                options: ["Athletic", "Curvy", "Slim", "Muscular", "Any/All"],
-                frictionMap: 'preference' // Special: any match is green, different is neutral
-            },
-            { 
-                id: 'p2', text: "How important is physical appearance vs personality?", 
-                category: "Physicality", type: "priority", weight: 2, isDealbreaker: false,
+            // PHYSICALITY
+            { id: 'p1', text: "Preferred body type in a partner?", category: "Physicality", type: "choice", weight: 1, isDealbreaker: false,
+                options: ["Athletic", "Curvy", "Slim", "Muscular", "Any/All"], frictionMap: 'preference' },
+            { id: 'p2', text: "How important is physical appearance vs personality?", category: "Physicality", type: "priority", weight: 2, isDealbreaker: false,
                 options: ["Appearance first", "Both equal", "Personality first", "Irrelevant"],
-                frictionMap: {
-                    '0-0': 'green', '0-1': 'yellow', '0-2': 'red', '0-3': 'red',
-                    '1-0': 'yellow', '1-1': 'green', '1-2': 'yellow', '1-3': 'yellow',
-                    '2-0': 'red', '2-1': 'yellow', '2-2': 'green', '2-3': 'blue',
-                    '3-0': 'red', '3-1': 'yellow', '3-2': 'blue', '3-3': 'green'
-                }
-            },
-            { 
-                id: 'p3', text: "Preferred height dynamic?", 
-                category: "Physicality", type: "choice", weight: 1, isDealbreaker: false,
-                options: ["Taller", "Shorter", "Same", "Irrelevant"],
-                frictionMap: 'complement' // Special: Tall+Short = blue (complement), same=same
-            },
+                frictionMap: {'0-0': 'green', '0-1': 'yellow', '0-2': 'red', '0-3': 'red', '1-0': 'yellow', '1-1': 'green', '1-2': 'yellow', '1-3': 'yellow', '2-0': 'red', '2-1': 'yellow', '2-2': 'green', '2-3': 'blue', '3-0': 'red', '3-1': 'yellow', '3-2': 'blue', '3-3': 'green'} },
+            { id: 'p3', text: "Preferred height dynamic?", category: "Physicality", type: "choice", weight: 1, isDealbreaker: false,
+                options: ["Taller", "Shorter", "Same", "Irrelevant"], frictionMap: 'complement' },
 
-            // PSYCHOLOGY DIMENSION
-            { 
-                id: 'ps1', text: "Do you recharge by spending time alone?", 
-                category: "Psychology", type: "scale", weight: 2, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'red',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'red', '0-1': 'blue', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'ps2', text: "Are you comfortable with silence in conversation?", 
-                category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'ps3', text: "Do you prefer deep conversations over small talk?", 
-                category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'ps4', text: "Are you affected by the energy of a room?", 
-                category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'blue',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'blue', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'ps5', text: "Do you often act on impulse?", 
-                category: "Psychology", type: "scale", weight: 2, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'yellow', '2-1': 'blue', '2-0': 'green',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'green', '0-1': 'blue', '0-0': 'green'
-                }
-            },
+            // PSYCHOLOGY
+            { id: 'ps1', text: "Do you recharge by spending time alone?", category: "Psychology", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'red', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'red', '0-1': 'blue', '0-0': 'green'} },
+            { id: 'ps2', text: "Are you comfortable with silence in conversation?", category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'red', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'ps3', text: "Do you prefer deep conversations over small talk?", category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} },
+            { id: 'ps4', text: "Are you affected by the energy of a room?", category: "Psychology", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'blue', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'blue', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'ps5', text: "Do you often act on impulse?", category: "Psychology", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {'2-2': 'yellow', '2-1': 'blue', '2-0': 'green', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'green', '0-1': 'blue', '0-0': 'green'} },
 
-            // VALUES DIMENSION (High dealbreaker potential)
-            { 
-                id: 'v1', text: "Do you want children in your future?", 
-                category: "Values", type: "scale", weight: 3, isDealbreaker: true,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'red', '2-0': 'red',
-                    '1-2': 'red', '1-1': 'yellow', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'v2', text: "Is financial stability a prerequisite for commitment?", 
-                category: "Values", type: "scale", weight: 2, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'v3', text: "Is travel and adventure essential?", 
-                category: "Values", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'v4', text: "Do you value career over relationships?", 
-                category: "Values", type: "scale", weight: 2, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'yellow', '2-1': 'red', '2-0': 'red',
-                    '1-2': 'red', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'v5', text: "Is spirituality/religion important in a partner?", 
-                category: "Values", type: "scale", weight: 2, isDealbreaker: true,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'red', '2-0': 'red',
-                    '1-2': 'red', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
+            // VALUES
+            { id: 'v1', text: "Do you want children in your future?", category: "Values", type: "scale", weight: 3, isDealbreaker: true,
+                frictionMap: {'2-2': 'green', '2-1': 'red', '2-0': 'red', '1-2': 'red', '1-1': 'yellow', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'v2', text: "Is financial stability a prerequisite for commitment?", category: "Values", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'red', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'v3', text: "Is travel and adventure essential?", category: "Values", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} },
+            { id: 'v4', text: "Do you value career over relationships?", category: "Values", type: "scale", weight: 2, isDealbreaker: false,
+                frictionMap: {'2-2': 'yellow', '2-1': 'red', '2-0': 'red', '1-2': 'red', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'v5', text: "Is spirituality/religion important in a partner?", category: "Values", type: "scale", weight: 2, isDealbreaker: true,
+                frictionMap: {'2-2': 'green', '2-1': 'red', '2-0': 'red', '1-2': 'red', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
 
-            // DESIRE DIMENSION
-            { 
-                id: 'd1', text: "How would you rate your libido intensity?", 
-                category: "Desire", type: "priority", weight: 2, isDealbreaker: false,
+            // DESIRE
+            { id: 'd1', text: "How would you rate your libido intensity?", category: "Desire", type: "priority", weight: 2, isDealbreaker: false,
                 options: ["Very High", "High", "Moderate", "Low"],
-                frictionMap: {
-                    '0-0': 'green', '0-1': 'green', '0-2': 'yellow', '0-3': 'red',
-                    '1-0': 'green', '1-1': 'green', '1-2': 'yellow', '1-3': 'red',
-                    '2-0': 'yellow', '2-1': 'yellow', '2-2': 'green', '2-3': 'blue',
-                    '3-0': 'red', '3-1': 'red', '3-2': 'blue', '3-3': 'green'
-                }
-            },
-            { 
-                id: 'd2', text: "Role preference in intimacy?", 
-                category: "Desire", type: "choice", weight: 2, isDealbreaker: false,
+                frictionMap: {'0-0': 'green', '0-1': 'green', '0-2': 'yellow', '0-3': 'red', '1-0': 'green', '1-1': 'green', '1-2': 'yellow', '1-3': 'red', '2-0': 'yellow', '2-1': 'yellow', '2-2': 'green', '2-3': 'blue', '3-0': 'red', '3-1': 'red', '3-2': 'blue', '3-3': 'green'} },
+            { id: 'd2', text: "Role preference in intimacy?", category: "Desire", type: "choice", weight: 2, isDealbreaker: false,
                 options: ["Dominant", "Submissive", "Switch", "Vanilla/Equal"],
-                frictionMap: {
-                    '0-0': 'yellow', '0-1': 'blue', '0-2': 'green', '0-3': 'yellow',
-                    '1-0': 'blue', '1-1': 'yellow', '1-2': 'green', '1-3': 'yellow',
-                    '2-0': 'green', '2-1': 'green', '2-2': 'green', '2-3': 'green',
-                    '3-0': 'yellow', '3-1': 'yellow', '3-2': 'green', '3-3': 'green'
-                }
-            },
-            { 
-                id: 'd3', text: "Comfort with sexting/digital intimacy?", 
-                category: "Desire", type: "choice", weight: 1, isDealbreaker: false,
-                options: ["Love it", "Enjoy it", "Neutral", "Dislike it"],
-                frictionMap: 'preference'
-            },
-            { 
-                id: 'd4', text: "Timing for intimacy in new relationships?", 
-                category: "Desire", type: "choice", weight: 2, isDealbreaker: false,
+                frictionMap: {'0-0': 'yellow', '0-1': 'blue', '0-2': 'green', '0-3': 'yellow', '1-0': 'blue', '1-1': 'yellow', '1-2': 'green', '1-3': 'yellow', '2-0': 'green', '2-1': 'green', '2-2': 'green', '2-3': 'green', '3-0': 'yellow', '3-1': 'yellow', '3-2': 'green', '3-3': 'green'} },
+            { id: 'd3', text: "Comfort with sexting/digital intimacy?", category: "Desire", type: "choice", weight: 1, isDealbreaker: false,
+                options: ["Love it", "Enjoy it", "Neutral", "Dislike it"], frictionMap: 'preference' },
+            { id: 'd4', text: "Timing for intimacy in new relationships?", category: "Desire", type: "choice", weight: 2, isDealbreaker: false,
                 options: ["Immediately", "Few dates", "Emotional bond", "Commitment only"],
-                frictionMap: {
-                    '0-0': 'green', '0-1': 'yellow', '0-2': 'red', '0-3': 'red',
-                    '1-0': 'yellow', '1-1': 'green', '1-2': 'yellow', '1-3': 'red',
-                    '2-0': 'red', '2-1': 'yellow', '2-2': 'green', '2-3': 'yellow',
-                    '3-0': 'red', '3-1': 'red', '3-2': 'yellow', '3-3': 'green'
-                }
-            },
-            { 
-                id: 'd5', text: "Experimental openness?", 
-                category: "Desire", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
-                }
-            },
+                frictionMap: {'0-0': 'green', '0-1': 'yellow', '0-2': 'red', '0-3': 'red', '1-0': 'yellow', '1-1': 'green', '1-2': 'yellow', '1-3': 'red', '2-0': 'red', '2-1': 'yellow', '2-2': 'green', '2-3': 'yellow', '3-0': 'red', '3-1': 'red', '3-2': 'yellow', '3-3': 'green'} },
+            { id: 'd5', text: "Experimental openness?", category: "Desire", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} },
 
-            // LIFESTYLE DIMENSION
-            { 
-                id: 'l1', text: "Do you prefer city life over nature?", 
-                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'l2', text: "Do you prefer strict routine over spontaneity?", 
-                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'red',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'red', '0-1': 'blue', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'l3', text: "Would you rather read than watch movies?", 
-                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'l4', text: "Is political alignment important?", 
-                category: "Lifestyle", type: "scale", weight: 2, isDealbreaker: true,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'yellow', '2-0': 'red',
-                    '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow',
-                    '0-2': 'red', '0-1': 'yellow', '0-0': 'green'
-                }
-            },
-            { 
-                id: 'l5', text: "Do you maintain separate friend groups in relationships?", 
-                category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
-                frictionMap: {
-                    '2-2': 'green', '2-1': 'blue', '2-0': 'yellow',
-                    '1-2': 'blue', '1-1': 'green', '1-0': 'blue',
-                    '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'
-                }
-            }
+            // LIFESTYLE
+            { id: 'l1', text: "Do you prefer city life over nature?", category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'red', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'l2', text: "Do you prefer strict routine over spontaneity?", category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'red', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'red', '0-1': 'blue', '0-0': 'green'} },
+            { id: 'l3', text: "Would you rather read than watch movies?", category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} },
+            { id: 'l4', text: "Is political alignment important?", category: "Lifestyle", type: "scale", weight: 2, isDealbreaker: true,
+                frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'red', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
+            { id: 'l5', text: "Do you maintain separate friend groups in relationships?", category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
+                frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} }
         ];
 
         // --- State Management ---
         let state = {
-            mode: 'solo', // 'solo' or 'match'
+            mode: 'solo',
             userName: '',
             partnerName: '',
             thresholds: {},
@@ -675,6 +569,8 @@
             currentQuestionIndex: 0,
             p1Answers: [],
             p2Answers: [],
+            storedProfiles: {}, // Cache for ID-based lookups
+            checkPartnerData: null, // For compatibility check mode
             categoryScores: {
                 Intimacy: { p1: 0, p2: 0, max: 0, friction: [] },
                 Physicality: { p1: 0, p2: 0, max: 0, friction: [] },
@@ -703,10 +599,13 @@
             intro: document.getElementById('view-intro'),
             mode: document.getElementById('view-mode'),
             setup: document.getElementById('view-setup'),
+            check: document.getElementById('view-check'),
+            checkSetup: document.getElementById('view-check-setup'),
             quiz: document.getElementById('view-quiz'),
             processing: document.getElementById('view-processing'),
             resultsSolo: document.getElementById('view-results-solo'),
-            resultsMatch: document.getElementById('view-results-match')
+            resultsMatch: document.getElementById('view-results-match'),
+            resultsCheck: document.getElementById('view-results-check')
         };
 
         function switchView(viewName) {
@@ -720,21 +619,295 @@
 
         function setMode(mode) {
             state.mode = mode;
-            document.getElementById('setup-title').innerText = mode === 'solo' ? 'Your Profile' : 'Both Profiles';
-            document.getElementById('partner-input').classList.toggle('hidden', mode === 'solo');
-            switchView('setup');
+            if (mode === 'check') {
+                switchView('check');
+            } else {
+                document.getElementById('setup-title').innerText = mode === 'solo' ? 'Your Profile' : 'Both Profiles';
+                document.getElementById('partner-input').classList.toggle('hidden', mode === 'solo');
+                switchView('setup');
+                renderThresholds('thresholds-container');
+            }
+        }
+
+        function renderThresholds(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const cats = [
+                { id: 'intimacy', label: 'Intimacy', val: 60 },
+                { id: 'physicality', label: 'Physicality', val: 50 },
+                { id: 'psychology', label: 'Psychology', val: 70 },
+                { id: 'values', label: 'Values', val: 80 },
+                { id: 'desire', label: 'Desire', val: 50 },
+                { id: 'lifestyle', label: 'Lifestyle', val: 40 }
+            ];
             
-            // Setup threshold listeners
-            ['intimacy', 'physicality', 'psychology', 'values', 'desire', 'lifestyle'].forEach(cat => {
-                const slider = document.getElementById(`thresh-${cat}`);
-                const display = document.getElementById(`val-${cat}`);
-                slider.addEventListener('input', (e) => {
-                    display.innerText = e.target.value + '%';
-                    state.thresholds[cat] = parseInt(e.target.value);
-                });
-                state.thresholds[cat] = parseInt(slider.value);
+            cats.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between';
+                div.innerHTML = `
+                    <span class="text-xs">${cat.label}</span>
+                    <input type="range" id="thresh-${cat.id}" min="0" max="100" value="${cat.val}" 
+                           class="threshold-slider w-32" oninput="updateThreshold('${cat.id}', this.value)">
+                    <span class="text-xs w-8 text-right" id="val-${cat.id}">${cat.val}%</span>
+                `;
+                container.appendChild(div);
+                state.thresholds[cat.id] = cat.val;
             });
         }
+
+        function updateThreshold(cat, val) {
+            state.thresholds[cat] = parseInt(val);
+            document.getElementById(`val-${cat}`).innerText = val + '%';
+        }
+
+        // --- COMPATIBILITY CHECK SYSTEM ---
+
+        function startCheckNew() {
+            const name = document.getElementById('check-your-name').value.trim();
+            if (!name) { alert("Please enter your name"); return; }
+            state.userName = name;
+            state.mode = 'check-new';
+            switchView('checkSetup');
+            renderThresholds('check-thresholds');
+        }
+
+        function startCheckExisting() {
+            const name = document.getElementById('check-your-name').value.trim();
+            if (!name) { alert("Please enter your name"); return; }
+            state.userName = name;
+            
+            // Try to load existing profile from localStorage or prompt for ID
+            const savedId = prompt("Enter your existing Resonance ID:");
+            if (!savedId) return;
+            
+            // For demo: we'll just proceed to partner ID input
+            // In real implementation, this would validate and load the profile
+            document.getElementById('check-id-section').classList.remove('hidden');
+        }
+
+        function runCompatibilityCheck() {
+            const partnerId = document.getElementById('check-partner-id').value.trim();
+            const errorEl = document.getElementById('check-error');
+            
+            if (!partnerId || partnerId.length < 10) {
+                errorEl.innerText = "Please enter a valid Resonance ID";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            errorEl.classList.add('hidden');
+
+            // Decode partner's profile from ID
+            try {
+                const decoded = decodeProfileFromID(partnerId);
+                if (!decoded) {
+                    errorEl.innerText = "Invalid ID format. Please check and try again.";
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                state.checkPartnerData = decoded;
+                
+                // If we have our own profile ready, run comparison
+                if (state.p1Answers.length === 30) {
+                    runInstantComparison();
+                } else {
+                    // Need to complete our profile first
+                    switchView('checkSetup');
+                    renderThresholds('check-thresholds');
+                }
+            } catch (e) {
+                errorEl.innerText = "Error decoding ID. Please verify the ID is correct.";
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function decodeProfileFromID(id) {
+            // Reverse the encoding process
+            try {
+                // Pad if needed for base64
+                const padded = id.padEnd(id.length + (4 - id.length % 4) % 4, '=');
+                const decoded = atob(padded);
+                
+                // Parse the answer string format: "cat:val:weight,cat:val:weight..."
+                // Or simple sequence: values are in fixed order matching masterPool
+                const answers = decoded.split(',').map((val, idx) => {
+                    if (idx >= masterPool.length) return null;
+                    const q = masterPool[idx];
+                    return {
+                        questionId: q.id,
+                        value: parseInt(val),
+                        category: q.category,
+                        weight: q.weight,
+                        isDealbreaker: q.isDealbreaker,
+                        frictionMap: q.frictionMap
+                    };
+                }).filter(a => a !== null);
+
+                // Calculate dimensional scores
+                const scores = { Intimacy: 0, Physicality: 0, Psychology: 0, Values: 0, Desire: 0, Lifestyle: 0 };
+                const maxs = { Intimacy: 0, Physicality: 0, Psychology: 0, Values: 0, Desire: 0, Lifestyle: 0 };
+                
+                answers.forEach(ans => {
+                    scores[ans.category] += (ans.value * ans.weight);
+                    maxs[ans.category] += (2 * ans.weight);
+                });
+
+                const percentages = {};
+                Object.keys(scores).forEach(cat => {
+                    percentages[cat.toLowerCase()] = maxs[cat] > 0 ? Math.round((scores[cat] / maxs[cat]) * 100) : 0;
+                });
+
+                return { answers, scores: percentages, raw: decoded };
+            } catch (e) {
+                console.error("Decode error:", e);
+                return null;
+            }
+        }
+
+        function beginCheckAssessment() {
+            const name = document.getElementById('check-user-name').value.trim();
+            if (!name) { alert("Please enter your name"); return; }
+            state.userName = name;
+            
+            // Use same 30 questions that partner used (from their data)
+            if (state.checkPartnerData && state.checkPartnerData.answers) {
+                // Reconstruct question order from partner's answers
+                state.activeQuestions = state.checkPartnerData.answers.map(a => 
+                    masterPool.find(q => q.id === a.questionId)
+                ).filter(q => q);
+            } else {
+                // Fallback: random selection
+                const shuffled = [...masterPool].sort(() => 0.5 - Math.random());
+                state.activeQuestions = shuffled.slice(0, 30);
+            }
+            
+            resetState();
+            switchView('quiz');
+            renderQuestion(0, 1);
+        }
+
+        function runInstantComparison() {
+            // Both profiles ready: compare
+            state.p2Answers = state.checkPartnerData.answers;
+            state.partnerName = "Their Profile";
+            
+            // Ensure questions align
+            state.activeQuestions = state.p1Answers.map(a => masterPool.find(q => q.id === a.questionId));
+            
+            switchView('processing');
+            document.getElementById('processing-text').innerText = "Comparing Dimensional Maps...";
+            
+            setTimeout(() => {
+                calculateCheckResults();
+                switchView('resultsCheck');
+            }, 1500);
+        }
+
+        function calculateCheckResults() {
+            const categories = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire', 'Lifestyle'];
+            
+            // Pair answers
+            const paired = [];
+            state.p1Answers.forEach((p1, idx) => {
+                const p2 = state.p2Answers.find(a => a.questionId === p1.questionId) || state.p2Answers[idx];
+                if (p2) paired.push({ p1, p2 });
+            });
+
+            let dealbreakers = [];
+            let frictionCount = { green: 0, blue: 0, yellow: 0, red: 0 };
+
+            paired.forEach(pair => {
+                const map = pair.p1.frictionMap;
+                let friction = 'green';
+                
+                if (map === 'preference') {
+                    friction = pair.p1.value === pair.p2.value ? 'green' : 'yellow';
+                } else if (map === 'complement') {
+                    if (pair.p1.value === 3 || pair.p2.value === 3) friction = 'green';
+                    else if ((pair.p1.value === 0 && pair.p2.value === 1) || (pair.p1.value === 1 && pair.p2.value === 0)) friction = 'blue';
+                    else if (pair.p1.value === pair.p2.value) friction = 'green';
+                    else friction = 'yellow';
+                } else {
+                    const key = `${pair.p1.value}-${pair.p2.value}`;
+                    friction = map[key] || 'green';
+                }
+
+                if (pair.p1.isDealbreaker && friction === 'red') {
+                    dealbreakers.push(pair.p1.category);
+                }
+                
+                frictionCount[friction]++;
+            });
+
+            // Calculate scores
+            const dimData = {};
+            categories.forEach(cat => {
+                const p1Answers = paired.filter(p => p.p1.category === cat);
+                const p2Answers = paired.filter(p => p.p2.category === cat);
+                
+                const p1score = p1Answers.length > 0 ? 
+                    Math.round(p1Answers.reduce((a, p) => a + (p.p1.value * p.p1.weight), 0) / 
+                    p1Answers.reduce((a, p) => a + (2 * p.p1.weight), 0) * 100) : 0;
+                const p2score = p2Answers.length > 0 ? 
+                    Math.round(p2Answers.reduce((a, p) => a + (p.p2.value * p.p2.weight), 0) / 
+                    p2Answers.reduce((a, p) => a + (2 * p.p2.weight), 0) * 100) : 0;
+                
+                dimData[cat.toLowerCase()] = p1score;
+                dimData[`${cat.toLowerCase()}2`] = p2score;
+            });
+
+            // Draw radar
+            drawRadar('check-radar', dimData, false);
+
+            // Friction bars
+            const container = document.getElementById('check-friction-container');
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                const p1 = dimData[cat.toLowerCase()];
+                const p2 = dimData[`${cat.toLowerCase()}2`];
+                const diff = Math.abs(p1 - p2);
+                let friction = diff < 20 ? 'green' : diff < 40 ? 'blue' : diff < 60 ? 'yellow' : 'red';
+                
+                renderFrictionBar(cat, p1, p2, friction, false, 'check-friction-container');
+            });
+
+            // Verdict
+            const total = frictionCount.green + frictionCount.blue + frictionCount.yellow + frictionCount.red;
+            const score = Math.round(((frictionCount.green * 2) + frictionCount.blue - (frictionCount.red * 2)) / (total * 2) * 100 + 50);
+            const clamped = Math.max(0, Math.min(100, score));
+
+            document.getElementById('check-friction-score').innerText = clamped + '%';
+            
+            let verdict = "", sub = "";
+            if (dealbreakers.length > 0) {
+                verdict = "Incompatible";
+                sub = `Fundamental misalignment in: ${[...new Set(dealbreakers)].join(', ')}`;
+                document.getElementById('check-dealbreaker-alert').classList.remove('hidden');
+                document.getElementById('check-dealbreaker-text').innerText = sub;
+            } else if (clamped > 75) {
+                verdict = "Highly Compatible";
+                sub = "Strong harmony with productive differences";
+            } else if (clamped > 50) {
+                verdict = "Moderate Potential";
+                sub = "Workable with conscious communication";
+            } else {
+                verdict = "Challenging";
+                sub = "Significant friction points detected";
+            }
+            
+            document.getElementById('check-verdict').innerText = verdict;
+            document.getElementById('check-verdict-sub').innerText = sub;
+            document.getElementById('check-friction-desc').innerText = sub;
+            document.getElementById('check-res-p1').innerText = state.userName;
+            document.getElementById('check-res-p2').innerText = "Their Profile";
+
+            if (dealbreakers.length === 0) {
+                document.getElementById('check-dealbreaker-alert').classList.add('hidden');
+            }
+        }
+
+        // --- STANDARD QUIZ & RESULTS (Solo/Match modes) ---
 
         function beginAssessment() {
             const name = document.getElementById('user-name').value.trim();
@@ -747,11 +920,13 @@
                 state.partnerName = p2name;
             }
 
-            // Select 30 random questions
             const shuffled = [...masterPool].sort(() => 0.5 - Math.random());
             state.activeQuestions = shuffled.slice(0, 30);
-            
-            // Reset all state
+            resetState();
+            startQuiz();
+        }
+
+        function resetState() {
             state.currentQuestionIndex = 0;
             state.p1Answers = [];
             state.p2Answers = [];
@@ -763,11 +938,8 @@
                 Desire: { p1: 0, p2: 0, max: 0, friction: [] },
                 Lifestyle: { p1: 0, p2: 0, max: 0, friction: [] }
             };
-
-            startQuiz();
         }
 
-        // --- Quiz Engine ---
         function startQuiz() {
             switchView('quiz');
             renderQuestion(0, 1);
@@ -781,13 +953,12 @@
             document.getElementById('progress-bar').style.width = `${pct}%`;
             document.getElementById('q-counter').innerText = `${String(idx+1).padStart(2,'0')} / 30`;
             document.getElementById('q-category-display').innerText = q.category;
-            
-            const dealbreakerBadge = document.getElementById('q-dealbreaker');
-            dealbreakerBadge.classList.toggle('hidden', !q.isDealbreaker);
+            document.getElementById('q-dealbreaker').classList.toggle('hidden', !q.isDealbreaker);
             
             const indicator = document.getElementById('player-indicator');
-            if (state.mode === 'match') {
-                indicator.innerText = `${player === 1 ? state.userName : state.partnerName}'s Turn • Select Answer`;
+            if (state.mode === 'match' || state.mode === 'check-new') {
+                const pName = player === 1 ? state.userName : (state.partnerName || "Partner");
+                indicator.innerText = `${pName}'s Turn • Select Answer`;
             } else {
                 indicator.innerText = 'SELECT AN IMPRINT TO CONTINUE';
             }
@@ -812,9 +983,9 @@
                     { val: 1, label: "Maybe / Sometimes", icon: "◐" },
                     { val: 0, label: "No, not really", icon: "○" }
                 ];
-            } else if (q.type === 'choice' || q.type === 'priority') {
+            } else {
                 const labels = q.type === 'choice' ? ['A', 'B', 'C', 'D', 'E'] : ['▲', '■', '●', '▼'];
-                q.options.forEach((opt, i) => {
+                (q.options || []).forEach((opt, i) => {
                     opts.push({ val: i, label: `${labels[i]}. ${opt}`, icon: labels[i] });
                 });
             }
@@ -835,7 +1006,6 @@
             document.querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
 
-            // Store answer
             const answerData = {
                 questionId: question.id,
                 value: val,
@@ -845,32 +1015,32 @@
                 frictionMap: question.frictionMap
             };
 
-            if (player === 1) {
-                state.p1Answers.push(answerData);
-            } else {
-                state.p2Answers.push(answerData);
-            }
+            if (player === 1) state.p1Answers.push(answerData);
+            else state.p2Answers.push(answerData);
 
             setTimeout(() => {
-                if (state.mode === 'solo') {
+                if (state.mode === 'check-new') {
+                    // After completing our profile, run comparison
                     const nextIdx = state.currentQuestionIndex + 1;
                     if (nextIdx < 30) {
                         renderQuestion(nextIdx, 1);
                     } else {
-                        finishQuiz();
+                        runInstantComparison();
                     }
+                    return;
+                }
+
+                if (state.mode === 'solo') {
+                    const nextIdx = state.currentQuestionIndex + 1;
+                    if (nextIdx < 30) renderQuestion(nextIdx, 1);
+                    else finishQuiz();
                 } else {
-                    // Match mode: same question, player 2, or next
-                    if (player === 1) {
-                        // Show same question for player 2
-                        renderQuestion(state.currentQuestionIndex, 2);
-                    } else {
+                    // Match mode
+                    if (player === 1) renderQuestion(state.currentQuestionIndex, 2);
+                    else {
                         const nextIdx = state.currentQuestionIndex + 1;
-                        if (nextIdx < 30) {
-                            renderQuestion(nextIdx, 1);
-                        } else {
-                            finishQuiz();
-                        }
+                        if (nextIdx < 30) renderQuestion(nextIdx, 1);
+                        else finishQuiz();
                     }
                 }
             }, 350);
@@ -889,34 +1059,102 @@
             }, 2000);
         }
 
-        // --- SOLO RESULTS: Dimensional Radar ---
-        function calculateSoloResults() {
-            // Calculate scores per category
-            state.p1Answers.forEach(ans => {
-                const cat = ans.category;
-                if (state.categoryScores[cat]) {
-                    state.categoryScores[cat].p1 += (ans.value * ans.weight);
-                    state.categoryScores[cat].max += (2 * ans.weight);
-                }
-            });
+        // --- RESULTS CALCULATIONS ---
 
+        function calculateSoloResults() {
             const dims = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire', 'Lifestyle'];
             const percentages = {};
 
             dims.forEach(dim => {
-                const data = state.categoryScores[dim];
-                const pct = data.max > 0 ? Math.round((data.p1 / data.max) * 100) : 0;
+                const answers = state.p1Answers.filter(a => a.category === dim);
+                const total = answers.reduce((a, ans) => a + (ans.value * ans.weight), 0);
+                const max = answers.reduce((a, ans) => a + (2 * ans.weight), 0);
+                const pct = max > 0 ? Math.round((total / max) * 100) : 0;
                 percentages[dim.toLowerCase()] = pct;
                 document.getElementById(`solo-${dim.toLowerCase()}`).innerText = pct + '%';
             });
 
-            // Generate ID
-            const hash = btoa(state.p1Answers.map(a => a.value).join('')).substring(0, 16);
-            document.getElementById('solo-id').innerText = hash;
+            // Generate encoded ID
+            const answerString = state.p1Answers.map(a => a.value).join(',');
+            const encoded = btoa(answerString).substring(0, 20);
+            document.getElementById('solo-id').innerText = encoded;
+            state.storedProfiles[encoded] = { answers: state.p1Answers, scores: percentages };
 
-            // Draw simple radar using concentric circles
             drawRadar('radar-chart', percentages, true);
         }
+
+        function calculateMatchResults() {
+            const categories = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire', 'Lifestyle'];
+            const paired = [];
+            
+            state.p1Answers.forEach(p1 => {
+                const p2 = state.p2Answers.find(a => a.questionId === p1.questionId);
+                if (p2) paired.push({ p1, p2 });
+            });
+
+            let dealbreakers = [];
+            let frictionCount = { green: 0, blue: 0, yellow: 0, red: 0 };
+
+            paired.forEach(pair => {
+                const map = pair.p1.frictionMap;
+                let friction = 'green';
+                
+                if (map === 'preference') friction = pair.p1.value === pair.p2.value ? 'green' : 'yellow';
+                else if (map === 'complement') {
+                    if (pair.p1.value === 3 || pair.p2.value === 3) friction = 'green';
+                    else if ((pair.p1.value === 0 && pair.p2.value === 1) || (pair.p1.value === 1 && pair.p2.value === 0)) friction = 'blue';
+                    else if (pair.p1.value === pair.p2.value) friction = 'green';
+                    else friction = 'yellow';
+                } else {
+                    friction = map[`${pair.p1.value}-${pair.p2.value}`] || 'green';
+                }
+
+                if (pair.p1.isDealbreaker && friction === 'red') dealbreakers.push(pair.p1.category);
+                frictionCount[friction]++;
+            });
+
+            const dimData = {};
+            categories.forEach(cat => {
+                const p1a = paired.filter(p => p.p1.category === cat);
+                const p2a = paired.filter(p => p.p2.category === cat);
+                const p1s = p1a.length ? Math.round(p1a.reduce((a,p) => a + p.p1.value * p.p1.weight, 0) / p1a.reduce((a,p) => a + 2 * p.p1.weight, 0) * 100) : 0;
+                const p2s = p2a.length ? Math.round(p2a.reduce((a,p) => a + p.p2.value * p.p2.weight, 0) / p2a.reduce((a,p) => a + 2 * p.p2.weight, 0) * 100) : 0;
+                dimData[cat.toLowerCase()] = p1s;
+                dimData[`${cat.toLowerCase()}2`] = p2s;
+            });
+
+            drawRadar('match-radar', dimData, false);
+
+            const container = document.getElementById('friction-container');
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                const diff = Math.abs(dimData[cat.toLowerCase()] - dimData[`${cat.toLowerCase()}2`]);
+                const friction = diff < 20 ? 'green' : diff < 40 ? 'blue' : diff < 60 ? 'yellow' : 'red';
+                renderFrictionBar(cat, dimData[cat.toLowerCase()], dimData[`${cat.toLowerCase()}2`], friction, false, 'friction-container');
+            });
+
+            document.getElementById('dealbreaker-alert').classList.toggle('hidden', dealbreakers.length === 0);
+            document.getElementById('dealbreaker-text').innerText = dealbreakers.length ? 
+                `${dealbreakers.length} fundamental incompatibility(s) in: ${[...new Set(dealbreakers)].join(', ')}` : '';
+
+            const total = frictionCount.green + frictionCount.blue + frictionCount.yellow + frictionCount.red;
+            const potential = Math.round(((frictionCount.green * 2) + frictionCount.blue - (frictionCount.red * 2)) / (total * 2) * 100 + 50);
+            const clamped = Math.max(0, Math.min(100, potential));
+
+            document.getElementById('potential-score').innerText = clamped + '%';
+            let desc = "";
+            if (dealbreakers.length) desc = "Critical friction detected. Fundamental values misalignment.";
+            else if (clamped > 80) desc = "Exceptional compatibility. Strong harmony with productive complementarity.";
+            else if (clamped > 60) desc = "Solid foundation. Good balance of similarity and growth-oriented differences.";
+            else if (clamped > 40) desc = "Moderate potential. Requires conscious navigation of tension points.";
+            else desc = "Challenging alignment. High friction suggests either transformation or incompatibility.";
+            document.getElementById('potential-desc').innerText = desc;
+
+            document.getElementById('res-p1').innerText = state.userName;
+            document.getElementById('res-p2').innerText = state.partnerName;
+        }
+
+        // --- UTILITY FUNCTIONS ---
 
         function drawRadar(containerId, data, solo) {
             const container = document.getElementById(containerId);
@@ -926,7 +1164,6 @@
             const center = size / 2;
             const radius = 90;
             
-            // Create SVG
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', size);
             svg.setAttribute('height', size);
@@ -934,7 +1171,6 @@
             svg.style.top = '20px';
             svg.style.left = '20px';
 
-            // Background circles
             [0.2, 0.4, 0.6, 0.8, 1].forEach(r => {
                 const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 circle.setAttribute('cx', center);
@@ -946,14 +1182,10 @@
                 svg.appendChild(circle);
             });
 
-            // Dimensions
             const dims = ['intimacy', 'physicality', 'psychology', 'values', 'desire', 'lifestyle'];
             const colors = ['#f472b6', '#a855f7', '#3b82f6', '#eab308', '#f43f5e', '#10b981'];
-            
-            // Calculate points
             const angleStep = (Math.PI * 2) / 6;
-            let points1 = [];
-            let points2 = [];
+            let points1 = [], points2 = [];
 
             dims.forEach((dim, i) => {
                 const angle = i * angleStep - Math.PI / 2;
@@ -969,7 +1201,6 @@
                     points2.push(`${x2},${y2}`);
                 }
 
-                // Label
                 const labelRadius = radius + 20;
                 const lx = center + Math.cos(angle) * labelRadius;
                 const ly = center + Math.sin(angle) * labelRadius;
@@ -984,7 +1215,6 @@
                 svg.appendChild(text);
             });
 
-            // Draw polygons
             if (!solo && points2.length > 0) {
                 const poly2 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
                 poly2.setAttribute('points', points2.join(' '));
@@ -1004,148 +1234,18 @@
             container.appendChild(svg);
         }
 
-        // --- MATCH RESULTS: Friction Analysis ---
-        function calculateMatchResults() {
-            // Calculate per-category scores and friction
-            const categories = ['Intimacy', 'Physicality', 'Psychology', 'Values', 'Desire', 'Lifestyle'];
+        function renderFrictionBar(category, p1score, p2score, friction, belowThreshold, containerId) {
+            const container = document.getElementById(containerId);
+            const labels = { green: 'Harmony', blue: 'Complement', yellow: 'Tension', red: 'Friction' };
+            const classes = { green: 'friction-green', blue: 'friction-blue', yellow: 'friction-yellow', red: 'friction-red' };
             
-            // Pair answers by question ID
-            const pairedAnswers = [];
-            state.p1Answers.forEach(p1ans => {
-                const p2ans = state.p2Answers.find(a => a.questionId === p1ans.questionId);
-                if (p2ans) {
-                    pairedAnswers.push({ p1: p1ans, p2: p2ans });
-                }
-            });
-
-            // Process each pair
-            let dealbreakers = [];
-            let totalFriction = { green: 0, blue: 0, yellow: 0, red: 0 };
-
-            pairedAnswers.forEach(pair => {
-                const cat = pair.p1.category;
-                const map = pair.p1.frictionMap;
-                let friction = 'green';
-
-                // Special friction maps
-                if (map === 'preference') {
-                    friction = pair.p1.value === pair.p2.value ? 'green' : 'yellow';
-                } else if (map === 'complement') {
-                    // For height: 0=taller, 1=shorter, 2=same, 3=irrelevant
-                    if (pair.p1.value === 3 || pair.p2.value === 3) friction = 'green';
-                    else if (pair.p1.value === 0 && pair.p2.value === 1) friction = 'blue'; // Tall + Short
-                    else if (pair.p1.value === 1 && pair.p2.value === 0) friction = 'blue';
-                    else if (pair.p1.value === pair.p2.value) friction = 'green';
-                    else friction = 'yellow';
-                } else {
-                    // Standard matrix lookup
-                    const key = `${pair.p1.value}-${pair.p2.value}`;
-                    friction = map[key] || 'green';
-                }
-
-                // Check dealbreaker
-                if (pair.p1.isDealbreaker && friction === 'red') {
-                    dealbreakers.push({
-                        category: cat,
-                        text: state.activeQuestions.find(q => q.id === pair.p1.questionId).text
-                    });
-                }
-
-                // Accumulate
-                if (state.categoryScores[cat]) {
-                    state.categoryScores[cat].p1 += (pair.p1.value * pair.p1.weight);
-                    state.categoryScores[cat].p2 += (pair.p2.value * pair.p2.weight);
-                    state.categoryScores[cat].max += (2 * pair.p1.weight);
-                    state.categoryScores[cat].friction.push(friction);
-                }
-
-                totalFriction[friction]++;
-            });
-
-            // Calculate category percentages
-            const dimData = {};
-            categories.forEach(cat => {
-                const data = state.categoryScores[cat];
-                const p1pct = data.max > 0 ? Math.round((data.p1 / data.max) * 100) : 0;
-                const p2pct = data.max > 0 ? Math.round((data.p2 / data.max) * 100) : 0;
-                
-                // Determine dominant friction for category
-                const frictionCounts = { green: 0, blue: 0, yellow: 0, red: 0 };
-                data.friction.forEach(f => frictionCounts[f]++);
-                const dominantFriction = Object.entries(frictionCounts)
-                    .sort((a, b) => b[1] - a[1])[0][0];
-
-                dimData[cat.toLowerCase()] = p1pct;
-                dimData[`${cat.toLowerCase()}2`] = p2pct;
-
-                // Check against thresholds
-                const threshold = state.thresholds[cat.toLowerCase()] || 50;
-                const avgScore = (p1pct + p2pct) / 2;
-                const belowThreshold = avgScore < threshold;
-
-                renderFrictionBar(cat, p1pct, p2pct, dominantFriction, belowThreshold);
-            });
-
-            // Draw radar
-            drawRadar('match-radar', dimData, false);
-
-            // Dealbreaker alert
-            const alertBox = document.getElementById('dealbreaker-alert');
-            if (dealbreakers.length > 0) {
-                alertBox.classList.remove('hidden');
-                document.getElementById('dealbreaker-text').innerText = 
-                    `${dealbreakers.length} fundamental incompatibility(s) detected in: ${dealbreakers.map(d => d.category).join(', ')}`;
-            } else {
-                alertBox.classList.add('hidden');
-            }
-
-            // Overall potential score
-            const total = totalFriction.green + totalFriction.blue + totalFriction.yellow + totalFriction.red;
-            const potential = Math.round(((totalFriction.green * 2) + totalFriction.blue - (totalFriction.red * 2)) / (total * 2) * 100);
-            const clampedPotential = Math.max(0, Math.min(100, potential + 50)); // Normalize
-
-            document.getElementById('potential-score').innerText = clampedPotential + '%';
-            
-            // Description
-            let desc = "";
-            if (dealbreakers.length > 0) {
-                desc = "Critical friction detected. Fundamental values misalignment suggests significant challenges.";
-            } else if (clampedPotential > 80) {
-                desc = "Exceptional compatibility. Your patterns show strong harmony with productive complementarity.";
-            } else if (clampedPotential > 60) {
-                desc = "Solid foundation. Good balance of similarity and growth-oriented differences.";
-            } else if (clampedPotential > 40) {
-                desc = "Moderate potential. Requires conscious navigation of tension points, but growth possible.";
-            } else {
-                desc = "Challenging alignment. High friction suggests either transformation or incompatibility.";
-            }
-            document.getElementById('potential-desc').innerText = desc;
-
-            // Set names
-            document.getElementById('res-p1').innerText = state.userName;
-            document.getElementById('res-p2').innerText = state.partnerName;
-        }
-
-        function renderFrictionBar(category, p1score, p2score, friction, belowThreshold) {
-            const container = document.getElementById('friction-container');
-            
-            const frictionLabels = {
-                green: { text: 'Harmony', class: 'friction-green' },
-                blue: { text: 'Complement', class: 'friction-blue' },
-                yellow: { text: 'Tension', class: 'friction-yellow' },
-                red: { text: 'Friction', class: 'friction-red' }
-            };
-
-            const f = frictionLabels[friction];
-            const warningIcon = belowThreshold ? '⚠ ' : '';
-
             const div = document.createElement('div');
-            div.className = `flex items-center justify-between p-3 rounded-lg border ${f.class}`;
+            div.className = `flex items-center justify-between p-3 rounded-lg border ${classes[friction]}`;
             div.innerHTML = `
                 <div class="flex-1">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-xs font-bold uppercase tracking-wider">${warningIcon}${category}</span>
-                        <span class="text-xs opacity-80">${f.text}</span>
+                        <span class="text-xs font-bold uppercase tracking-wider">${belowThreshold ? '⚠ ' : ''}${category}</span>
+                        <span class="text-xs opacity-80">${labels[friction]}</span>
                     </div>
                     <div class="flex items-center gap-2 text-xs">
                         <span class="text-pink-300">${p1score}%</span>
@@ -1161,9 +1261,13 @@
 
         function copySoloID() {
             const id = document.getElementById('solo-id').innerText;
-            navigator.clipboard.writeText(id).then(() => {
-                alert('ID copied: ' + id);
-            });
+            navigator.clipboard.writeText(id).then(() => alert('ID copied: ' + id));
+        }
+
+        function switchToFullProfile() {
+            // Transition from check results to detailed view
+            calculateMatchResults();
+            switchView('resultsMatch');
         }
     </script>
 </body>
