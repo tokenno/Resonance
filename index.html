@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance · Relationship Compatibility Test</title>
+    <title>Resonance · find your frequency</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -65,9 +65,6 @@
         .progress-fill { 
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             background: linear-gradient(90deg, #f472b6, #a855f7);
-        }
-        .category-bar {
-            transition: width 1s ease-out;
         }
         .pulse-btn { 
             animation: pulse-glow 2s infinite;
@@ -155,7 +152,6 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        /* Bar chart */
         .bar-chart {
             display: flex;
             flex-direction: column;
@@ -240,15 +236,6 @@
             border-color: #f472b6;
             background: rgba(244, 114, 182, 0.1);
         }
-        .question-depth-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #a855f7;
-        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
@@ -261,7 +248,7 @@
             <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 mb-2">
                 Resonance
             </h1>
-            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Find Your Frequency · Tune Your Partner In</p>
+            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Find your frequency</p>
         </header>
 
         <!-- VIEW: Intro -->
@@ -505,6 +492,7 @@
                     <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Overall Compatibility</p>
                     <p class="text-3xl font-bold serif" id="potential-score">---</p>
                     <p class="text-xs mt-2 italic" id="potential-desc">---</p>
+                    <p class="text-xs opacity-50" id="confidence-display"></p>
                 </div>
                 <button onclick="location.reload()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Analysis</button>
             </div>
@@ -549,6 +537,7 @@
                     <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Friction Score</p>
                     <p class="text-3xl font-bold serif" id="check-friction-score">---</p>
                     <p class="text-xs mt-2 italic" id="check-friction-desc">---</p>
+                    <p class="text-xs opacity-50" id="check-confidence-display"></p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Check</button>
@@ -562,9 +551,9 @@
     </main>
 
     <script>
-        // ------------------------------------------------------------
-        //  EXPANDED QUESTION POOLS WITH MATCH TYPES AND DEALBREAKER LOGIC
-        // ------------------------------------------------------------
+        // ============================================================
+        //  QUESTION POOLS WITH MATCH TYPES AND COMPLEMENTARY MAPS
+        // ============================================================
         function q(id, text, category, type = "scale", weight = 1, options = null, 
                    isDealbreaker = false, isDeep = false, isExtreme = false, 
                    hiddenTrait = null, traitMapping = null, 
@@ -601,7 +590,7 @@
             q("l2","Do you prefer strict routine over spontaneity?","Lifestyle","scale",1),
             q("l3","Would you rather read than watch movies?","Lifestyle","scale",1),
             q("d1","How would you rate your libido intensity?","Desire","priority",2, ["Very High","High","Moderate","Low"], false, false, false, null, null, 'tolerance', null, 1),
-            q("d2","Role preference in intimacy?","Desire","choice",2, ["Dominant","Submissive","Switch","Vanilla/Equal"], false, false, false, null, null, 'complementary', {0:1,1:0,2:2,3:3}), // Dom-Sub complementary
+            q("d2","Role preference in intimacy?","Desire","choice",2, ["Dominant","Submissive","Switch","Vanilla/Equal"], false, false, false, null, null, 'complementary', {0:1,1:0,2:2,3:3}),
             q("d3","Comfort with sexting/digital intimacy?","Desire","choice",1, ["Love it","Enjoy it","Neutral","Dislike it"], false, false, false, null, null, 'tolerance', null, 1),
             q("p1","Preferred body type in a partner?","Physicality","choice",1, ["Athletic","Curvy","Slim","Muscular","Any/All"], false, false, false, null, null, 'tolerance', null, 1),
             q("p2","How important is physical appearance vs personality?","Physicality","priority",2, ["Appearance first","Both equal","Personality first","Irrelevant"], false, false, false, null, null, 'similarity'),
@@ -686,7 +675,7 @@
             q("x8","I have fantasies about dominating a willing partner.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
             q("x9","I am aroused by specific non-sexual body parts (feet, hands, etc.).","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
             q("x10","I am interested in latex/leather/rubber clothing.","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x11","I enjoy being watched or watching others (voyeurism/exhibitionism).","Fetish","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}), // complementary if one likes watch and other likes being watched
+            q("x11","I enjoy being watched or watching others (voyeurism/exhibitionism).","Fetish","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
             q("x12","I am curious about group sex or swinging.","Fetish","scale",2, null, false,true,true, null, null, 'similarity'),
             q("x13","I am turned on by power exchange dynamics outside the bedroom.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
             q("x14","I enjoy giving or receiving pain in a consensual context.","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
@@ -714,7 +703,9 @@
         const deepMaster = [...standardMaster, ...deep.sort((a,b) => a.id.localeCompare(b.id))];
         const extremeMaster = [...deepMaster, ...extreme.sort((a,b) => a.id.localeCompare(b.id))];
 
-        // State
+        // ============================================================
+        //  STATE
+        // ============================================================
         let state = {
             questionCount: 30,
             mode: 'solo',
@@ -825,7 +816,239 @@
             document.getElementById(`val-${cat}`).innerText = val + '%';
         }
 
-        // --- CHECK MODE ---
+        // ============================================================
+        //  ENHANCED MATCHING ALGORITHMS
+        // ============================================================
+        function computeMatchScore(q, v1, v2) {
+            if (v1 === undefined || v2 === undefined) return 0.5;
+            
+            if (q.isDealbreaker) {
+                return computeDealbreakerScore(q, v1, v2);
+            }
+            
+            switch(q.matchType) {
+                case 'similarity':
+                    return computeSimilarityScore(q, v1, v2);
+                case 'complementary':
+                    return computeComplementaryScore(q, v1, v2);
+                case 'tolerance':
+                    return computeToleranceScore(q, v1, v2);
+                default:
+                    return computeSimilarityScore(q, v1, v2);
+            }
+        }
+
+        function computeSimilarityScore(q, v1, v2) {
+            const maxDistance = getMaxDistance(q);
+            const distance = Math.abs(v1 - v2);
+            const score = Math.exp(-Math.pow(distance / (maxDistance * 0.6), 2));
+            return score;
+        }
+
+        function computeComplementaryScore(q, v1, v2) {
+            if (!q.complementaryMap) {
+                return computeSimilarityScore(q, v1, v2);
+            }
+            const idealMatch = q.complementaryMap[v1];
+            const distanceFromIdeal = Math.abs(v2 - idealMatch);
+            const maxDistance = getMaxDistance(q);
+            
+            if (distanceFromIdeal === 0) return 1.0;
+            
+            const complementaryScore = Math.max(0, 1 - (distanceFromIdeal / maxDistance) * 0.7);
+            const intensityMatch = 1 - Math.abs(getIntensity(v1) - getIntensity(v2)) * 0.3;
+            
+            return (complementaryScore * 0.7) + (intensityMatch * 0.3);
+        }
+
+        function computeToleranceScore(q, v1, v2) {
+            const distance = Math.abs(v1 - v2);
+            const threshold = q.toleranceThreshold || 1;
+            const maxDistance = getMaxDistance(q);
+            
+            if (distance <= threshold) {
+                return 0.9 + (0.1 * (1 - distance / (threshold + 1)));
+            }
+            
+            const excessDistance = distance - threshold;
+            const remainingRange = maxDistance - threshold;
+            return Math.max(0, 0.5 * (1 - excessDistance / remainingRange));
+        }
+
+        function computeDealbreakerScore(q, v1, v2) {
+            const baseScore = computeSimilarityScore(q, v1, v2);
+            if (baseScore < 0.3) {
+                return baseScore * 0.5;
+            }
+            return baseScore;
+        }
+
+        function getMaxDistance(q) {
+            if (q.type === 'scale') return 2;
+            return (q.options?.length || 3) - 1;
+        }
+
+        function getIntensity(value) {
+            return value;
+        }
+
+        // ============================================================
+        //  CATEGORY AGGREGATION WITH CONSISTENCY BONUS
+        // ============================================================
+        function calculateCategoryAlignment(p1Map, p2Map, masterQuestions) {
+            const categories = {};
+            const catQuestions = {};
+            
+            masterQuestions.forEach(q => {
+                if (!catQuestions[q.category]) catQuestions[q.category] = [];
+                catQuestions[q.category].push(q);
+            });
+            
+            for (const [cat, questions] of Object.entries(catQuestions)) {
+                let totalScore = 0;
+                let totalWeight = 0;
+                let dealbreakerCount = 0;
+                let dealbreakerFailed = 0;
+                
+                questions.forEach(q => {
+                    const v1 = p1Map.get(q.id) !== undefined ? p1Map.get(q.id) : 0;
+                    const v2 = p2Map.get(q.id) !== undefined ? p2Map.get(q.id) : 0;
+                    
+                    const rawScore = computeMatchScore(q, v1, v2);
+                    const weight = q.weight || 1;
+                    const effectiveWeight = Math.pow(weight, 1.5);
+                    
+                    totalScore += rawScore * effectiveWeight;
+                    totalWeight += effectiveWeight;
+                    
+                    if (q.isDealbreaker) {
+                        dealbreakerCount++;
+                        if (rawScore < 0.3) dealbreakerFailed++;
+                    }
+                });
+                
+                const rawAlignment = totalWeight > 0 ? totalScore / totalWeight : 0;
+                const consistencyBonus = calculateConsistencyBonus(questions, p1Map, p2Map);
+                
+                categories[cat] = {
+                    alignment: Math.round(rawAlignment * 100),
+                    weightedScore: totalScore,
+                    totalWeight: totalWeight,
+                    dealbreakerRisk: dealbreakerCount > 0 ? dealbreakerFailed / dealbreakerCount : 0,
+                    consistency: consistencyBonus,
+                    questionCount: questions.length
+                };
+            }
+            
+            return categories;
+        }
+
+        function calculateConsistencyBonus(questions, p1Map, p2Map) {
+            const scores = questions.map(q => {
+                const v1 = p1Map.get(q.id);
+                const v2 = p2Map.get(q.id);
+                if (v1 === undefined || v2 === undefined) return null;
+                return computeMatchScore(q, v1, v2);
+            }).filter(s => s !== null);
+            
+            if (scores.length < 2) return 1.0;
+            
+            const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+            const variance = scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / scores.length;
+            
+            return 1 + (0.2 * (1 - variance * 4));
+        }
+
+        // ============================================================
+        //  FINAL COMPATIBILITY SCORE
+        // ============================================================
+        function calculateFinalCompatibility(categoryScores, thresholds) {
+            const userThresholds = thresholds || {};
+            
+            let totalWeightedScore = 0;
+            let totalWeight = 0;
+            let criticalFailures = 0;
+            const dimensionReports = [];
+            
+            for (const [cat, data] of Object.entries(categoryScores)) {
+                const threshold = userThresholds[cat.toLowerCase()] || 50;
+                const alignment = data.alignment;
+                const meetsThreshold = alignment >= threshold;
+                const thresholdGap = (threshold - alignment) / 100;
+                
+                let categoryWeight = Math.sqrt(data.totalWeight);
+                
+                if (!meetsThreshold) {
+                    categoryWeight *= (1 + thresholdGap * 2);
+                    criticalFailures++;
+                }
+                
+                const adjustedScore = alignment * data.consistency;
+                
+                totalWeightedScore += adjustedScore * categoryWeight;
+                totalWeight += categoryWeight;
+                
+                dimensionReports.push({
+                    category: cat,
+                    alignment: alignment,
+                    meetsThreshold: meetsThreshold,
+                    threshold: threshold,
+                    dealbreakerRisk: Math.round(data.dealbreakerRisk * 100),
+                    weight: categoryWeight,
+                    questionCount: data.questionCount
+                });
+            }
+            
+            let finalScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
+            
+            if (criticalFailures > 0) {
+                const failurePenalty = 1 - (criticalFailures * 0.08);
+                finalScore *= Math.max(0.6, failurePenalty);
+            }
+            
+            return {
+                overall: Math.round(Math.max(0, Math.min(100, finalScore))),
+                dimensions: dimensionReports,
+                criticalFailures: criticalFailures,
+                confidence: calculateConfidence(dimensionReports)
+            };
+        }
+
+        function calculateConfidence(dimensionReports) {
+            const totalQuestions = dimensionReports.reduce((sum, d) => sum + (d.questionCount || 0), 0);
+            const coverage = dimensionReports.filter(d => d.questionCount > 0).length / dimensionReports.length;
+            return Math.min(100, (totalQuestions / 30) * coverage * 100);
+        }
+
+        // ============================================================
+        //  ID ENCODING/DECODING (unchanged)
+        // ============================================================
+        function decodeId(id) {
+            try {
+                const decoded = atob(id);
+                const parts = decoded.split(':');
+                if (parts.length < 3) return null;
+                const version = parseInt(parts[0]);
+                const depth = parseInt(parts[1]);
+                const answerValues = parts[2].split(',').map(Number);
+                if (answerValues.length !== depth) return null;
+                return { version, depth, answers: answerValues };
+            } catch { return null; }
+        }
+
+        function encodeAnswers(answers, depth) {
+            const master = (depth === 30) ? standardMaster : (depth === 60 ? deepMaster : extremeMaster);
+            const answerMap = new Map(answers.map(a => [a.questionId, a.value]));
+            const ordered = master.map(q => answerMap.get(q.id) !== undefined ? answerMap.get(q.id) : 0);
+            const version = 1;
+            const answerString = ordered.join(',');
+            const payload = `${version}:${depth}:${answerString}`;
+            return btoa(payload);
+        }
+
+        // ============================================================
+        //  CHECK MODE FUNCTIONS
+        // ============================================================
         function startCheckNew() {
             const name = document.getElementById('check-your-name').value.trim();
             if (!name) { alert("Please enter your name"); return; }
@@ -858,46 +1081,6 @@
             document.getElementById('check-error').classList.add('hidden');
         }
 
-        function decodeId(id) {
-            try {
-                const decoded = atob(id);
-                const parts = decoded.split(':');
-                if (parts.length < 3) return null;
-                const version = parseInt(parts[0]);
-                const depth = parseInt(parts[1]);
-                const answerValues = parts[2].split(',').map(Number);
-                if (answerValues.length !== depth) return null;
-                return { version, depth, answers: answerValues };
-            } catch { return null; }
-        }
-
-        function encodeAnswers(answers, depth) {
-            const master = (depth === 30) ? standardMaster : (depth === 60 ? deepMaster : extremeMaster);
-            const answerMap = new Map(answers.map(a => [a.questionId, a.value]));
-            const ordered = master.map(q => answerMap.get(q.id) !== undefined ? answerMap.get(q.id) : 0);
-            const version = 1;
-            const answerString = ordered.join(',');
-            const payload = `${version}:${depth}:${answerString}`;
-            return btoa(payload);
-        }
-
-        // New scoring function
-        function computeMatchScore(q, v1, v2) {
-            if (q.isDealbreaker && v1 !== v2) return 0; // severe penalty
-            if (q.matchType === 'similarity') {
-                return v1 === v2 ? 1 : 0;
-            } else if (q.matchType === 'complementary') {
-                if (q.complementaryMap && q.complementaryMap[v1] === v2) return 1;
-                return v1 === v2 ? 0.5 : 0; // partial if same but not complementary
-            } else if (q.matchType === 'tolerance') {
-                const diff = Math.abs(v1 - v2);
-                if (diff <= q.toleranceThreshold) return 1;
-                if (diff === q.toleranceThreshold + 1) return 0.5;
-                return 0;
-            }
-            return 0;
-        }
-
         function runCompatibilityCheck() {
             const partnerId = document.getElementById('check-partner-id').value.trim();
             if (!partnerId) { alert("Enter partner's ID"); return; }
@@ -928,56 +1111,53 @@
             const master = (userDepth === 30) ? standardMaster : (userDepth === 60 ? deepMaster : extremeMaster);
             const partnerVals = partnerDecoded.answers;
 
-            let totalWeight = 0;
-            let weightedScore = 0;
-            let dealbreakerHit = false;
-            const catScore = {};
-            const catWeight = {};
+            // Build maps for category alignment
+            const p1Map = new Map();
+            const p2Map = new Map();
+            master.forEach((q, idx) => {
+                p1Map.set(q.id, userAnsVals[idx]);
+                p2Map.set(q.id, partnerVals[idx]);
+            });
 
-            for (let i=0; i<master.length; i++) {
-                const q = master[i];
-                const v1 = userAnsVals[i];
-                const v2 = partnerVals[i];
-                const weight = q.weight || 1;
-                totalWeight += weight;
-                const match = computeMatchScore(q, v1, v2);
-                weightedScore += weight * match;
-                if (q.isDealbreaker && v1 !== v2) dealbreakerHit = true;
+            const categoryScores = calculateCategoryAlignment(p1Map, p2Map, master);
+            const compatibility = calculateFinalCompatibility(categoryScores, state.thresholds);
 
-                const cat = q.category;
-                if (!catScore[cat]) { catScore[cat] = 0; catWeight[cat] = 0; }
-                catScore[cat] += weight * match;
-                catWeight[cat] += weight;
-            }
+            document.getElementById('check-verdict').innerText = compatibility.overall + '%';
+            document.getElementById('check-verdict-sub').innerText = 
+                compatibility.overall > 70 ? 'High resonance' : 
+                (compatibility.overall > 40 ? 'Moderate friction' : 'Significant divergence');
+            document.getElementById('check-friction-score').innerText = compatibility.overall + '%';
+            document.getElementById('check-friction-desc').innerText = 
+                compatibility.overall > 80 ? 'Smooth connection' : 
+                (compatibility.overall > 50 ? 'Workable differences' : 'Challenging dynamic');
+            document.getElementById('check-confidence-display').innerText = 
+                `Confidence: ${Math.round(compatibility.confidence)}%`;
 
-            let overall = (weightedScore / totalWeight) * 100;
-            if (dealbreakerHit) overall *= 0.5; // severe penalty
-
-            overall = Math.round(overall);
-            document.getElementById('check-verdict').innerText = overall + '%';
-            document.getElementById('check-verdict-sub').innerText = overall > 70 ? 'High resonance' : (overall > 40 ? 'Moderate friction' : 'Significant divergence');
-            document.getElementById('check-friction-score').innerText = overall + '%';
-            document.getElementById('check-friction-desc').innerText = overall > 80 ? 'Smooth connection' : (overall > 50 ? 'Workable differences' : 'Challenging dynamic');
-
-            // Per-category alignment
-            const frictionContainer = document.getElementById('check-friction-container');
-            frictionContainer.innerHTML = '';
+            // Bar data
             const barData = {};
-            for (let cat in catScore) {
-                const pct = Math.round((catScore[cat] / catWeight[cat]) * 100);
-                barData[cat.toLowerCase()] = pct;
-                const item = document.createElement('div');
-                item.className = 'friction-item';
-                item.innerHTML = `<span class="bar-label">${cat}</span><span class="text-xs">${pct}% alignment</span>`;
-                frictionContainer.appendChild(item);
+            for (let cat in categoryScores) {
+                barData[cat.toLowerCase()] = categoryScores[cat].alignment;
             }
-
             drawBarChart('check-radar', barData);
 
+            // Friction container
+            const frictionContainer = document.getElementById('check-friction-container');
+            frictionContainer.innerHTML = '';
+            compatibility.dimensions.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'friction-item';
+                item.innerHTML = `<span class="bar-label">${d.category}</span>
+                                  <span class="text-xs">${d.alignment}% alignment 
+                                  ${!d.meetsThreshold ? '⬇ below threshold' : ''}</span>`;
+                frictionContainer.appendChild(item);
+            });
+
             // Dealbreaker alert
-            if (dealbreakerHit) {
+            const anyHighRisk = compatibility.dimensions.some(d => d.dealbreakerRisk > 50);
+            if (anyHighRisk) {
                 document.getElementById('check-dealbreaker-alert').classList.remove('hidden');
-                document.getElementById('check-dealbreaker-text').innerText = "One or more dealbreaker questions are mismatched. Compatibility severely impacted.";
+                document.getElementById('check-dealbreaker-text').innerText = 
+                    "High dealbreaker risk in some areas. Consider discussing these dimensions.";
             } else {
                 document.getElementById('check-dealbreaker-alert').classList.add('hidden');
             }
@@ -985,26 +1165,27 @@
             // Bridge recommendations
             const bridgeContainer = document.getElementById('check-bridge-container');
             bridgeContainer.innerHTML = '';
-            const lowCats = Object.keys(catScore).filter(cat => (catScore[cat]/catWeight[cat]) < 0.5);
-            lowCats.forEach(cat => {
-                const rec = document.createElement('div');
-                rec.className = 'text-xs p-2 bg-white/5 rounded';
-                if (cat === 'BDSM') rec.innerText = `🌉 ${cat}: Explore gentle power exchange or sensory play as a starting point.`;
-                else if (cat === 'Fetish') rec.innerText = `🌉 ${cat}: Discuss fantasies without pressure; try a shared fantasy journal.`;
-                else rec.innerText = `🌉 ${cat}: Focus on active listening and finding shared activities.`;
-                bridgeContainer.appendChild(rec);
-            });
+            compatibility.dimensions
+                .filter(d => d.alignment < 50)
+                .forEach(d => {
+                    const rec = document.createElement('div');
+                    rec.className = 'text-xs p-2 bg-white/5 rounded';
+                    if (d.category === 'BDSM') rec.innerText = `🌉 ${d.category}: Explore gentle power exchange or sensory play.`;
+                    else if (d.category === 'Fetish') rec.innerText = `🌉 ${d.category}: Discuss fantasies without pressure.`;
+                    else rec.innerText = `🌉 ${d.category}: Focus on shared activities and open communication.`;
+                    bridgeContainer.appendChild(rec);
+                });
 
-            // Collision report for hidden traits (if any)
-            if (state.hiddenTraits && Object.keys(state.hiddenTraits).length > 0) {
+            // Collision report (simplified)
+            if (Object.keys(state.hiddenTraits).length > 0) {
                 document.getElementById('check-collision-report').classList.remove('hidden');
                 const collContainer = document.getElementById('check-collision-container');
                 collContainer.innerHTML = '';
-                // simplified collision logic
                 for (let [trait, value] of Object.entries(state.hiddenTraits)) {
                     const item = document.createElement('div');
                     item.className = 'hidden-trait';
-                    item.innerHTML = `<p class="text-xs text-red-300">${trait}: ${value}</p><p class="text-xs opacity-70">May cause friction if partner has opposing style.</p>`;
+                    item.innerHTML = `<p class="text-xs text-red-300">${trait}: ${value}</p>
+                                      <p class="text-xs opacity-70">May cause friction if partner has opposing style.</p>`;
                     collContainer.appendChild(item);
                 }
             } else {
@@ -1014,7 +1195,9 @@
             switchView('resultsCheck');
         }
 
-        // --- ASSESSMENT ---
+        // ============================================================
+        //  ASSESSMENT FLOW
+        // ============================================================
         function beginAssessment() {
             const name = document.getElementById('user-name').value.trim();
             if (!name) { alert("Please enter your name"); return; }
@@ -1120,7 +1303,6 @@
             if (player === 1) state.p1Answers.push(answerData);
             else state.p2Answers.push(answerData);
 
-            // Record hidden trait (for deep/extreme)
             if (question.hiddenTrait && question.traitMapping && player === 1) {
                 const trait = question.traitMapping[val];
                 if (trait) state.hiddenTraits[question.hiddenTrait] = trait;
@@ -1152,7 +1334,7 @@
                     calculateMatchResults();
                     switchView('resultsMatch');
                 } else if (state.mode === 'check' && state.isCheckQuiz) {
-                    state.userAnswers = null; // will be encoded when running check
+                    state.userAnswers = null;
                     state.isCheckQuiz = false;
                     document.getElementById('check-step1').classList.add('hidden');
                     document.getElementById('check-user-id-section').classList.add('hidden');
@@ -1162,7 +1344,9 @@
             }, 1500);
         }
 
-        // --- BAR CHART ---
+        // ============================================================
+        //  RESULTS
+        // ============================================================
         function drawBarChart(containerId, data) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -1219,11 +1403,9 @@
                 grid.appendChild(div);
             });
 
-            // Hidden traits
-            const traitsDiv = document.getElementById('hidden-traits');
-            const traitsContainer = document.getElementById('traits-container');
             if (state.questionCount >= 60 && Object.keys(state.hiddenTraits).length > 0) {
-                traitsDiv.classList.remove('hidden');
+                document.getElementById('hidden-traits').classList.remove('hidden');
+                const traitsContainer = document.getElementById('traits-container');
                 traitsContainer.innerHTML = '';
                 Object.entries(state.hiddenTraits).forEach(([trait, value]) => {
                     const div = document.createElement('div');
@@ -1232,7 +1414,7 @@
                     traitsContainer.appendChild(div);
                 });
             } else {
-                traitsDiv.classList.add('hidden');
+                document.getElementById('hidden-traits').classList.add('hidden');
             }
 
             const encoded = encodeAnswers(state.p1Answers, state.questionCount);
@@ -1248,72 +1430,55 @@
             const p2Map = new Map(state.p2Answers.map(a => [a.questionId, a.value]));
             const master = state.activeMaster;
 
-            let totalWeight = 0, weightedScore = 0;
-            let dealbreakerHit = false;
-            const catScore = {}, catWeight = {};
+            const categoryScores = calculateCategoryAlignment(p1Map, p2Map, master);
+            const compatibility = calculateFinalCompatibility(categoryScores, state.thresholds);
 
-            master.forEach(q => {
-                const v1 = p1Map.get(q.id) !== undefined ? p1Map.get(q.id) : 0;
-                const v2 = p2Map.get(q.id) !== undefined ? p2Map.get(q.id) : 0;
-                const weight = q.weight || 1;
-                totalWeight += weight;
-                const match = computeMatchScore(q, v1, v2);
-                weightedScore += weight * match;
-                if (q.isDealbreaker && v1 !== v2) dealbreakerHit = true;
+            document.getElementById('potential-score').innerText = compatibility.overall + '%';
+            document.getElementById('potential-desc').innerText = 
+                compatibility.overall > 70 ? 'Strong alignment' : 
+                (compatibility.overall > 40 ? 'Moderate friction' : 'High tension');
+            document.getElementById('confidence-display').innerText = 
+                `Confidence: ${Math.round(compatibility.confidence)}%`;
 
-                const cat = q.category;
-                if (!catScore[cat]) { catScore[cat] = 0; catWeight[cat] = 0; }
-                catScore[cat] += weight * match;
-                catWeight[cat] += weight;
-            });
-
-            let overall = (weightedScore / totalWeight) * 100;
-            if (dealbreakerHit) overall *= 0.5;
-
-            overall = Math.round(overall);
-            document.getElementById('potential-score').innerText = overall + '%';
-            document.getElementById('potential-desc').innerText = overall > 70 ? 'Strong alignment' : (overall > 40 ? 'Moderate friction' : 'High tension');
-
-            // Bar data
             const barData = {};
-            for (let cat in catScore) {
-                barData[cat.toLowerCase()] = Math.round((catScore[cat]/catWeight[cat])*100);
+            for (let cat in categoryScores) {
+                barData[cat.toLowerCase()] = categoryScores[cat].alignment;
             }
             drawBarChart('match-radar', barData);
 
             const frictionContainer = document.getElementById('friction-container');
             frictionContainer.innerHTML = '';
-            for (let cat in catScore) {
-                const pct = Math.round((catScore[cat]/catWeight[cat])*100);
+            compatibility.dimensions.forEach(d => {
                 const item = document.createElement('div');
                 item.className = 'friction-item';
-                item.innerHTML = `<span class="bar-label">${cat}</span><span class="text-xs">${pct}% alignment</span>`;
+                item.innerHTML = `<span class="bar-label">${d.category}</span>
+                                  <span class="text-xs">${d.alignment}% alignment 
+                                  ${!d.meetsThreshold ? '⬇ below threshold' : ''}</span>`;
                 frictionContainer.appendChild(item);
-            }
+            });
 
-            // Dealbreaker alert
-            if (dealbreakerHit) {
+            const anyHighRisk = compatibility.dimensions.some(d => d.dealbreakerRisk > 50);
+            if (anyHighRisk) {
                 document.getElementById('dealbreaker-alert').classList.remove('hidden');
-                document.getElementById('dealbreaker-text').innerText = "Critical divergence on dealbreaker question(s).";
+                document.getElementById('dealbreaker-text').innerText = 
+                    "High dealbreaker risk in some areas. Consider discussing these dimensions.";
             } else {
                 document.getElementById('dealbreaker-alert').classList.add('hidden');
             }
 
-            // Bridge recommendations
             const bridgeContainer = document.getElementById('bridge-container');
             bridgeContainer.innerHTML = '';
-            const lowCats = Object.keys(catScore).filter(cat => (catScore[cat]/catWeight[cat]) < 0.5);
-            lowCats.forEach(cat => {
-                const rec = document.createElement('div');
-                rec.className = 'text-xs p-2 bg-white/5 rounded';
-                if (cat === 'BDSM') rec.innerText = `🌉 ${cat}: Explore gentle power exchange or sensory play as a starting point.`;
-                else if (cat === 'Fetish') rec.innerText = `🌉 ${cat}: Discuss fantasies without pressure; try a shared fantasy journal.`;
-                else rec.innerText = `🌉 ${cat}: Focus on active listening and finding shared activities.`;
-                bridgeContainer.appendChild(rec);
-            });
+            compatibility.dimensions
+                .filter(d => d.alignment < 50)
+                .forEach(d => {
+                    const rec = document.createElement('div');
+                    rec.className = 'text-xs p-2 bg-white/5 rounded';
+                    if (d.category === 'BDSM') rec.innerText = `🌉 ${d.category}: Explore gentle power exchange or sensory play.`;
+                    else if (d.category === 'Fetish') rec.innerText = `🌉 ${d.category}: Discuss fantasies without pressure.`;
+                    else rec.innerText = `🌉 ${d.category}: Focus on shared activities and open communication.`;
+                    bridgeContainer.appendChild(rec);
+                });
 
-            // Collision report (if hidden traits exist for both)
-            // For simplicity, just show if user has hidden traits
             if (Object.keys(state.hiddenTraits).length > 0) {
                 document.getElementById('collision-report').classList.remove('hidden');
                 const collContainer = document.getElementById('collision-container');
@@ -1321,7 +1486,8 @@
                 for (let [trait, value] of Object.entries(state.hiddenTraits)) {
                     const item = document.createElement('div');
                     item.className = 'hidden-trait';
-                    item.innerHTML = `<p class="text-xs text-red-300">${trait}: ${value}</p><p class="text-xs opacity-70">May cause friction if partner has opposing style.</p>`;
+                    item.innerHTML = `<p class="text-xs text-red-300">${trait}: ${value}</p>
+                                      <p class="text-xs opacity-70">May cause friction if partner has opposing style.</p>`;
                     collContainer.appendChild(item);
                 }
             } else {
@@ -1336,4 +1502,4 @@
         function switchToFullProfile() { switchView('resultsMatch'); }
     </script>
 </body>
-    </html>
+</html>
