@@ -1064,9 +1064,15 @@
                 } else if (state.mode === 'match') {
                     calculateMatchResults();
                     switchView('resultsMatch');
-                } else if (state.mode === 'check' && state.isCheckQuiz) {
-                    state.userAnswers = null; // will be encoded when running check
-                    state.isCheckQuiz = false;
+        
+} else if (state.mode === 'check' && state.isCheckQuiz) {
+    // Encode answers immediately so they're available for comparison
+    const master = (state.questionCount === 30) ? standardMaster : (state.questionCount === 60 ? deepMaster : extremeMaster);
+    const answerMap = new Map(state.p1Answers.map(a => [a.questionId, a.value]));
+    state.userAnswers = master.map(q => answerMap.get(q.id) !== undefined ? answerMap.get(q.id) : 0);
+    state.userDepth = state.questionCount;
+    state.isCheckQuiz = false;
+
                     document.getElementById('check-step1').classList.add('hidden');
                     document.getElementById('check-user-id-section').classList.add('hidden');
                     document.getElementById('check-id-section').classList.remove('hidden');
