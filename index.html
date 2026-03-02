@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance · bar chart results</title>
+    <title>Resonance · Extreme Analysis (90q)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -136,6 +136,17 @@
             font-weight: bold;
         }
 
+        .extreme-badge {
+            background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+        }
+
         .hidden-trait {
             background: rgba(139, 92, 246, 0.1);
             border: 1px solid rgba(139, 92, 246, 0.3);
@@ -161,7 +172,7 @@
             cursor: pointer;
         }
 
-        /* Bar chart container */
+        /* Bar chart */
         .bar-chart {
             display: flex;
             flex-direction: column;
@@ -200,6 +211,15 @@
             font-weight: 600;
             color: #f472b6;
             text-align: right;
+        }
+
+        .friction-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255,255,255,0.03);
         }
 
         .radar-container {
@@ -263,7 +283,7 @@
             <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 mb-2">
                 Resonance
             </h1>
-            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Standard & Deep Dive Modes</p>
+            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Standard · Deep Dive · Extreme</p>
         </header>
 
         <!-- VIEW: Intro -->
@@ -272,6 +292,7 @@
                 <p>Choose your depth of exploration.</p>
                 <p><span class="text-pink-300">30 questions</span> for essential compatibility.</p>
                 <p><span class="text-purple-300">60 questions</span> for complete soul mapping including hidden psychological patterns.</p>
+                <p><span class="text-red-300">90 questions</span> for extreme analysis – sexuality, BDSM, personal habits, and deep character.</p>
             </div>
             
             <div class="pt-6">
@@ -288,36 +309,49 @@
                 <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">How deep shall we go?</p>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                <button onclick="selectDepth(30)" id="btn-30" class="mode-card p-8 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+            <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <button onclick="selectDepth(30)" id="btn-30" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-2xl text-pink-300">Standard</h3>
                         <span class="text-3xl font-light opacity-50">30</span>
                     </div>
                     <ul class="space-y-2 text-sm opacity-70">
-                        <li>• Core compatibility dimensions</li>
-                        <li>• Essential values & lifestyle</li>
-                        <li>• Basic intimacy preferences</li>
-                        <li>• 10-15 minutes</li>
+                        <li>• Core compatibility</li>
+                        <li>• Values & lifestyle</li>
+                        <li>• Basic intimacy</li>
+                        <li>• 10-15 min</li>
                     </ul>
-                    <p class="text-xs mt-4 text-pink-200/60 uppercase tracking-wider">Recommended for first connections</p>
                 </button>
 
-                <button onclick="selectDepth(60)" id="btn-60" class="mode-card p-8 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
-                    <div class="absolute top-4 right-4 deep-dive-badge">Deep Dive</div>
+                <button onclick="selectDepth(60)" id="btn-60" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
+                    <div class="absolute top-4 right-4 deep-dive-badge">Deep</div>
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl text-purple-300">Complete Mapping</h3>
+                        <h3 class="text-2xl text-purple-300">Deep Dive</h3>
                         <span class="text-3xl font-light opacity-50">60</span>
                     </div>
                     <ul class="space-y-2 text-sm opacity-70">
-                        <li>• All standard dimensions</li>
-                        <li>• Hidden psychological patterns</li>
-                        <li>• Intimacy & sensual preferences</li>
-                        <li>• Life goals & legacy vision</li>
-                        <li>• Attachment style analysis</li>
-                        <li>• 25-30 minutes</li>
+                        <li>• All standard</li>
+                        <li>• Hidden psychology</li>
+                        <li>• Sensual preferences</li>
+                        <li>• Life goals</li>
+                        <li>• 25-30 min</li>
                     </ul>
-                    <p class="text-xs mt-4 text-purple-200/60 uppercase tracking-wider">For serious compatibility analysis</p>
+                </button>
+
+                <button onclick="selectDepth(90)" id="btn-90" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
+                    <div class="absolute top-4 right-4 extreme-badge">Extreme</div>
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl text-red-300">Extreme</h3>
+                        <span class="text-3xl font-light opacity-50">90</span>
+                    </div>
+                    <ul class="space-y-2 text-sm opacity-70">
+                        <li>• All deep dive</li>
+                        <li>• BDSM / kink spectrum</li>
+                        <li>• Personal habits</li>
+                        <li>• Partner archetypes</li>
+                        <li>• Character tests</li>
+                        <li>• 40-50 min</li>
+                    </ul>
                 </button>
             </div>
         </section>
@@ -358,11 +392,9 @@
             </div>
             
             <div class="space-y-4 max-w-md mx-auto">
-                <!-- Step 1: Your profile (create new or existing ID) -->
                 <div id="check-step1" class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 1: Your Profile</p>
                     <input type="text" id="check-your-name" placeholder="Your Name (for new profile)" class="w-full glass-input rounded-lg p-3 text-center mb-3 placeholder-white/30">
-                    
                     <div class="flex gap-2">
                         <button onclick="startCheckNew()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-2 rounded-lg text-xs uppercase tracking-wider">
                             Create New (30q)
@@ -373,7 +405,6 @@
                     </div>
                 </div>
 
-                <!-- Your ID input (when "I Have an ID" clicked) -->
                 <div id="check-user-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Your Resonance ID</p>
                     <input type="text" id="check-user-id" placeholder="Enter your ID" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
@@ -382,7 +413,6 @@
                     </button>
                 </div>
 
-                <!-- Step 2: Their ID (shown after profile loaded) -->
                 <div id="check-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 2: Their Resonance ID</p>
                     <input type="text" id="check-partner-id" placeholder="Enter their ID" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
@@ -429,6 +459,7 @@
                 <span id="q-counter">01 / 30</span>
                 <div class="flex items-center gap-2">
                     <span id="q-deep" class="hidden deep-dive-badge">Deep</span>
+                    <span id="q-extreme" class="hidden extreme-badge">Extreme</span>
                     <span id="q-dealbreaker" class="hidden dealbreaker-badge">Dealbreaker</span>
                     <span id="q-category-display">Category</span>
                 </div>
@@ -468,14 +499,13 @@
                     <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70" id="solo-mode-label">Standard Profile</p>
                 </div>
 
-                <!-- Bar chart replaces radar -->
                 <div class="radar-container" id="radar-chart"></div>
 
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto" id="dimensions-grid">
                     <!-- Dynamically populated -->
                 </div>
 
-                <!-- Hidden Traits (Deep Dive only) -->
+                <!-- Hidden Traits (Deep Dive & Extreme) -->
                 <div id="hidden-traits" class="hidden max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-purple-300">Discovered Psychological Patterns</p>
                     <div class="space-y-2" id="traits-container"></div>
@@ -494,7 +524,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Match (simplified, kept as original) -->
+        <!-- VIEW: Results - Match -->
         <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="result-reveal space-y-4">
                 <div class="text-center">
@@ -509,7 +539,6 @@
                     <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Critical Friction Detected</p>
                     <p class="text-xs opacity-80" id="dealbreaker-text">---</p>
                 </div>
-                <!-- Bar chart replaces radar -->
                 <div class="radar-container mx-auto" id="match-radar" style="min-height:240px;"></div>
                 <div class="space-y-2">
                     <p class="text-xs uppercase tracking-widest text-center opacity-60 mb-3">Dimensional Friction Analysis</p>
@@ -524,7 +553,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Check (populated by ID comparison) -->
+        <!-- VIEW: Results - Check -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="result-reveal space-y-4">
                 <div class="text-center">
@@ -547,7 +576,6 @@
                     <p class="text-xs opacity-80" id="check-dealbreaker-text">---</p>
                 </div>
 
-                <!-- Bar chart replaces radar -->
                 <div class="radar-container mx-auto" id="check-radar" style="min-height:240px;"></div>
 
                 <div class="space-y-2">
@@ -573,8 +601,81 @@
     </main>
 
     <script>
-        // --- COMPLETE QUESTION POOL (unchanged) ---
-        const standardPool = [ /* ... full standardPool ... */ 
+        // ---------- EXTREME ADDITIONAL QUESTIONS (30) ----------
+        const extremePool = [
+            // BDSM / Kink
+            { id: 'x1', text: "Interest in being dominant in the bedroom?", category: "Kink", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                options: ["Very dominant", "Sometimes", "Rarely", "Never / submissive only"], frictionMap: 'preference' },
+            { id: 'x2', text: "Interest in being submissive in the bedroom?", category: "Kink", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                options: ["Very submissive", "Sometimes", "Rarely", "Never / dominant only"], frictionMap: 'preference' },
+            { id: 'x3', text: "Comfort with impact play (spanking, flogging)?", category: "Kink", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                options: ["Essential", "Enjoy occasionally", "Curious", "Hard limit"], frictionMap: 'preference' },
+            { id: 'x4', text: "Attitude toward bondage (rope, cuffs)?", category: "Kink", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                options: ["Essential", "Enjoy occasionally", "Curious", "Hard limit"], frictionMap: 'preference' },
+            { id: 'x5', text: "Interest in sensory deprivation (blindfolds, hoods)?", category: "Kink", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Love it", "Open to try", "Unsure", "Not for me"], frictionMap: 'preference' },
+            { id: 'x6', text: "How important is aftercare after intense scenes?", category: "Kink", type: "scale", weight: 2, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'yellow','2-0':'red','1-2':'yellow','1-1':'green','1-0':'yellow','0-2':'red','0-1':'yellow','0-0':'green'} },
+
+            // Sexuality & Habits
+            { id: 'x7', text: "Preferred frequency of intimacy per week?", category: "Desire", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                options: ["0-1", "2-3", "4-5", "6+"], frictionMap: 'preference' },
+            { id: 'x8', text: "Do you enjoy using toys during intimacy?", category: "Sensuality", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Yes, frequently", "Occasionally", "Rarely", "No preference"], frictionMap: 'preference' },
+            { id: 'x9', text: "Are you comfortable with discussing fantasies openly?", category: "Psychology", type: "scale", weight: 2, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x10', text: "How often do you initiate intimacy?", category: "Desire", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Mostly me", "Both equally", "Mostly partner", "Depends on mood"], frictionMap: 'preference' },
+
+            // Personal habits
+            { id: 'x11', text: "Are you a morning person or night owl?", category: "Lifestyle", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Morning lark", "Night owl", "In between"], frictionMap: 'preference' },
+            { id: 'x12', text: "How tidy do you keep your living space?", category: "Lifestyle", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Extremely tidy", "Moderately tidy", "Slightly messy", "Very messy"], frictionMap: 'preference' },
+            { id: 'x13', text: "Do you prefer to plan vacations meticulously or go with the flow?", category: "Lifestyle", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Meticulous planner", "Some planning", "Loose itinerary", "Totally spontaneous"], frictionMap: 'preference' },
+            { id: 'x14', text: "How important is alone time in a relationship?", category: "Psychology", type: "scale", weight: 2, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+
+            // What looking for in a partner
+            { id: 'x15', text: "Which quality is most important in a partner?", category: "Values", type: "choice", weight: 3, isDealbreaker: true, isExtreme: true,
+                options: ["Loyalty", "Ambition", "Kindness", "Sense of humor", "Intelligence"], frictionMap: 'preference' },
+            { id: 'x16', text: "Preferred love language?", category: "Intimacy", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                options: ["Words of affirmation", "Acts of service", "Receiving gifts", "Quality time", "Physical touch"], frictionMap: 'preference' },
+            { id: 'x17', text: "How important is similar sense of humor?", category: "Values", type: "scale", weight: 2, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x18', text: "Would you date someone with very different political views?", category: "Values", type: "choice", weight: 2, isDealbreaker: true, isExtreme: true,
+                options: ["No, must align", "Can differ if respectful", "Yes, not important"], frictionMap: 'preference' },
+
+            // Psychological character tests
+            { id: 'x19', text: "When stressed, you tend to...", category: "Hidden", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                hiddenTrait: "Stress Response", options: ["Seek support", "Isolate", "Become irritable", "Over-plan"], frictionMap: 'preference' },
+            { id: 'x20', text: "How do you handle conflict with a partner?", category: "Hidden", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                hiddenTrait: "Conflict Resolution", options: ["Discuss calmly", "Need space first", "Raise voice", "Avoid"], frictionMap: 'preference' },
+            { id: 'x21', text: "Are you more introverted or extroverted?", category: "Psychology", type: "choice", weight: 1, isDeep: true, isExtreme: true,
+                options: ["Introvert", "Ambivert", "Extrovert"], frictionMap: 'preference' },
+            { id: 'x22', text: "Do you tend to overthink decisions?", category: "Hidden", type: "scale", weight: 1, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'yellow','2-1':'blue','2-0':'green','1-2':'blue','1-1':'green','1-0':'blue','0-2':'green','0-1':'blue','0-0':'green'} },
+            { id: 'x23', text: "How do you react to unexpected bad news?", category: "Hidden", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                hiddenTrait: "Resilience", options: ["Stay calm, problem-solve", "Get anxious but cope", "Fall apart temporarily", "Become angry"], frictionMap: 'preference' },
+            { id: 'x24', text: "Do you believe people can change?", category: "Values", type: "scale", weight: 1, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x25', text: "Your attachment style is generally...", category: "Hidden", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                hiddenTrait: "Attachment", options: ["Secure", "Anxious", "Avoidant", "Fearful-avoidant"], frictionMap: 'preference' },
+            { id: 'x26', text: "How often do you reflect on your own emotions?", category: "Psychology", type: "scale", weight: 1, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x27', text: "Do you enjoy deep psychological discussions?", category: "Psychology", type: "scale", weight: 1, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x28', text: "How important is personal growth to you?", category: "Values", type: "scale", weight: 2, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x29', text: "Would you consider yourself an empathetic person?", category: "Psychology", type: "scale", weight: 2, isDeep: true, isExtreme: true,
+                frictionMap: {'2-2':'green','2-1':'blue','2-0':'yellow','1-2':'blue','1-1':'green','1-0':'blue','0-2':'yellow','0-1':'blue','0-0':'green'} },
+            { id: 'x30', text: "When a partner is upset, you typically...", category: "Hidden", type: "choice", weight: 2, isDeep: true, isExtreme: true,
+                hiddenTrait: "Empathy Style", options: ["Comfort immediately", "Give space", "Try to solve problem", "Feel overwhelmed"], frictionMap: 'preference' }
+        ];
+
+        // Original pools (standard + deep)
+        const standardPool = [ /* ... 30 standard questions as before ... */ 
             { id: 'i1', text: "Is physical touch essential for you to feel loved?", category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
                 frictionMap: {'2-2': 'green', '2-1': 'yellow', '2-0': 'red', '1-2': 'yellow', '1-1': 'green', '1-0': 'yellow', '0-2': 'red', '0-1': 'yellow', '0-0': 'green'} },
             { id: 'i2', text: "Do you need emotional connection before physical intimacy?", category: "Intimacy", type: "scale", weight: 2, isDealbreaker: false,
@@ -630,7 +731,8 @@
             { id: 'l3', text: "Would you rather read than watch movies?", category: "Lifestyle", type: "scale", weight: 1, isDealbreaker: false,
                 frictionMap: {'2-2': 'green', '2-1': 'blue', '2-0': 'yellow', '1-2': 'blue', '1-1': 'green', '1-0': 'blue', '0-2': 'yellow', '0-1': 'blue', '0-0': 'green'} }
         ];
-        const deepDivePool = [ /* ... full deepDivePool ... */ 
+
+        const deepDivePool = [ /* ... full deepDivePool (same as before) ... */
             { id: 'h1', text: "When plans change last minute, your first instinct is to...", category: "Hidden", type: "choice", weight: 1, isDeep: true,
                 hiddenTrait: "Adaptability vs Control", options: ["Find the opportunity in it", "Feel anxious but adapt", "Reschedule to regain control", "Cancel entirely—too disruptive"],
                 traitMapping: {0: "high_adaptability", 1: "anxious_flexible", 2: "control_seeking", 3: "rigid_structure"}, frictionMap: 'preference' },
@@ -702,11 +804,12 @@
                 hiddenTrait: "Inner Critic vs Supporter", options: ["Encouraging and planning", "Analytical, problem-solving", "Critical, self-doubting", "Chaotic, hard to focus"], frictionMap: 'preference' }
         ];
 
-        // Fixed question orders for deterministic IDs
+        // Fixed orders
         const standardQuestionsFixed = standardPool.sort((a,b) => a.id.localeCompare(b.id));
         const deepQuestionsFixed = [...standardQuestionsFixed, ...deepDivePool.sort((a,b) => a.id.localeCompare(b.id))];
+        const extremeQuestionsFixed = [...deepQuestionsFixed, ...extremePool.sort((a,b) => a.id.localeCompare(b.id))];
 
-        // --- State ---
+        // State
         let state = {
             questionCount: 30,
             mode: 'solo',
@@ -718,13 +821,12 @@
             p1Answers: [],
             p2Answers: [],
             hiddenTraits: {},
-            checkPartnerData: null,
             userAnswers: null,
             userDepth: null,
             isCheckQuiz: false
         };
 
-        // --- Particles ---
+        // Particles
         function initParticles() {
             const container = document.getElementById('particles');
             for(let i=0; i<20; i++) {
@@ -760,8 +862,9 @@
 
         function selectDepth(count) {
             state.questionCount = count;
-            document.getElementById('btn-30').classList.toggle('selected', count === 30);
-            document.getElementById('btn-60').classList.toggle('selected', count === 60);
+            document.getElementById('btn-30')?.classList.toggle('selected', count === 30);
+            document.getElementById('btn-60')?.classList.toggle('selected', count === 60);
+            document.getElementById('btn-90')?.classList.toggle('selected', count === 90);
             document.getElementById('mode-subtitle').innerText = `${count} questions • Choose your path`;
             setTimeout(() => switchView('mode'), 400);
         }
@@ -806,13 +909,13 @@
             document.getElementById(`val-${cat}`).innerText = val + '%';
         }
 
-        // --- CHECK MODE: ID handling ---
+        // --- CHECK MODE ---
         function startCheckNew() {
             const name = document.getElementById('check-your-name').value.trim();
             if (!name) { alert("Please enter your name"); return; }
             state.userName = name;
             state.mode = 'check';
-            state.questionCount = 30;
+            state.questionCount = 30; // default to 30 for quick check
             state.activeQuestions = standardQuestionsFixed;
             state.isCheckQuiz = true;
             resetState();
@@ -833,7 +936,6 @@
             state.userAnswers = decoded.answers;
             state.userDepth = decoded.depth;
             state.userName = "ID Holder";
-            // Hide the ID input, show partner step
             document.getElementById('check-user-id-section').classList.add('hidden');
             document.getElementById('check-id-section').classList.remove('hidden');
             document.getElementById('check-error').classList.add('hidden');
@@ -875,11 +977,11 @@
             if (!userAnsVals) { alert("No user profile loaded. Please create or enter your ID first."); return; }
 
             if (userDepth !== partnerDecoded.depth) {
-                alert("Depth mismatch: Both profiles must use same question set (30 or 60)");
+                alert("Depth mismatch: Both profiles must use same question set (30, 60, or 90)");
                 return;
             }
 
-            const questions = (userDepth === 30) ? standardQuestionsFixed : deepQuestionsFixed;
+            const questions = (userDepth === 30) ? standardQuestionsFixed : (userDepth === 60 ? deepQuestionsFixed : extremeQuestionsFixed);
             const partnerVals = partnerDecoded.answers;
 
             let matchCount = 0;
@@ -892,9 +994,20 @@
             document.getElementById('check-friction-score').innerText = score + '%';
             document.getElementById('check-friction-desc').innerText = score > 80 ? 'Smooth connection' : (score > 50 ? 'Workable differences' : 'Challenging dynamic');
             
-            // Draw bar chart (placeholder data)
-            drawBarChart('check-radar', { intimacy: 60, physicality: 55, psychology: 70, values: 80, desire: 50, lifestyle: 65 });
+            // Build dummy dimension percentages for bar chart
+            const dims = { intimacy: 60, physicality: 55, psychology: 70, values: 80, desire: 50, lifestyle: 65 };
+            drawBarChart('check-radar', dims);
             
+            // Populate friction analysis (just a placeholder)
+            const frictionContainer = document.getElementById('check-friction-container');
+            frictionContainer.innerHTML = '';
+            for (let [key, val] of Object.entries(dims)) {
+                const item = document.createElement('div');
+                item.className = 'friction-item';
+                item.innerHTML = `<span class="bar-label">${key}</span><span class="text-xs">${val}% alignment</span>`;
+                frictionContainer.appendChild(item);
+            }
+
             switchView('resultsCheck');
         }
 
@@ -908,7 +1021,9 @@
                 if (!p2name) { alert("Please enter partner's name"); return; }
                 state.partnerName = p2name;
             }
-            state.activeQuestions = (state.questionCount === 30) ? standardQuestionsFixed : deepQuestionsFixed;
+            if (state.questionCount === 30) state.activeQuestions = standardQuestionsFixed;
+            else if (state.questionCount === 60) state.activeQuestions = deepQuestionsFixed;
+            else state.activeQuestions = extremeQuestionsFixed;
             resetState();
             startQuiz();
         }
@@ -934,7 +1049,8 @@
             document.getElementById('q-counter').innerText = `${String(idx+1).padStart(2,'0')} / ${state.questionCount}`;
             document.getElementById('q-category-display').innerText = q.category;
             document.getElementById('q-dealbreaker').classList.toggle('hidden', !q.isDealbreaker);
-            document.getElementById('q-deep').classList.toggle('hidden', !q.isDeep);
+            document.getElementById('q-deep').classList.toggle('hidden', !q.isDeep && !q.isExtreme);
+            document.getElementById('q-extreme')?.classList.toggle('hidden', !q.isExtreme);
             
             const indicator = document.getElementById('player-indicator');
             if (state.mode === 'match') {
@@ -1030,7 +1146,6 @@
                     state.userAnswers = state.p1Answers.map(a => a.value);
                     state.userDepth = 30;
                     state.isCheckQuiz = false;
-                    // Hide step1 and user-id-section, show partner step
                     document.getElementById('check-step1').classList.add('hidden');
                     document.getElementById('check-user-id-section').classList.add('hidden');
                     document.getElementById('check-id-section').classList.remove('hidden');
@@ -1039,11 +1154,10 @@
             }, 1500);
         }
 
-        // --- RESULTS with BAR CHARTS ---
+        // --- BAR CHART ---
         function drawBarChart(containerId, data) {
             const container = document.getElementById(containerId);
-            container.innerHTML = ''; // clear
-
+            container.innerHTML = '';
             const dimensions = [
                 { key: 'intimacy', label: 'Intimacy' },
                 { key: 'physicality', label: 'Physical' },
@@ -1052,10 +1166,8 @@
                 { key: 'desire', label: 'Desire' },
                 { key: 'lifestyle', label: 'Lifestyle' }
             ];
-
             const chartDiv = document.createElement('div');
             chartDiv.className = 'bar-chart';
-
             dimensions.forEach(dim => {
                 const value = data[dim.key] || 0;
                 const item = document.createElement('div');
@@ -1069,12 +1181,12 @@
                 `;
                 chartDiv.appendChild(item);
             });
-
             container.appendChild(chartDiv);
         }
 
         function calculateSoloResults() {
-            document.getElementById('solo-mode-label').innerText = state.questionCount === 60 ? 'Deep Dive Profile' : 'Standard Profile';
+            document.getElementById('solo-mode-label').innerText = 
+                state.questionCount === 90 ? 'Extreme Profile' : (state.questionCount === 60 ? 'Deep Dive Profile' : 'Standard Profile');
             const percentages = {};
             const cats = [...new Set(state.p1Answers.map(a => a.category))];
             cats.forEach(cat => {
@@ -1083,7 +1195,7 @@
                 const max = answers.reduce((a, ans) => a + (2 * ans.weight), 0);
                 percentages[cat.toLowerCase()] = max ? Math.round((total / max) * 100) : 0;
             });
-            // ensure all core dims exist
+            // ensure core dims
             const coreDims = ['intimacy','physicality','psychology','values','desire','lifestyle'];
             coreDims.forEach(d => { if (!percentages[d]) percentages[d] = 0; });
 
@@ -1097,6 +1209,23 @@
                                  <p class="text-xl font-bold text-pink-300">${percentages[dim.toLowerCase()] || 0}%</p>`;
                 grid.appendChild(div);
             });
+
+            // Hidden traits for deep/extreme
+            const traitsDiv = document.getElementById('hidden-traits');
+            const traitsContainer = document.getElementById('traits-container');
+            if (state.questionCount >= 60 && Object.keys(state.hiddenTraits).length > 0) {
+                traitsDiv.classList.remove('hidden');
+                traitsContainer.innerHTML = '';
+                Object.entries(state.hiddenTraits).forEach(([trait, value]) => {
+                    const div = document.createElement('div');
+                    div.className = 'hidden-trait';
+                    div.innerHTML = `<p class="text-xs uppercase text-purple-300 mb-1">${trait}</p><p class="text-sm">${value.replace(/_/g,' ')}</p>`;
+                    traitsContainer.appendChild(div);
+                });
+            } else {
+                traitsDiv.classList.add('hidden');
+            }
+
             const encoded = encodeAnswers(state.p1Answers, state.questionCount);
             document.getElementById('solo-id').innerText = encoded;
             drawBarChart('radar-chart', percentages);
@@ -1105,9 +1234,21 @@
         function calculateMatchResults() {
             document.getElementById('res-p1').innerText = state.userName;
             document.getElementById('res-p2').innerText = state.partnerName;
+            // Dummy data
+            const dims = { intimacy: 68, physicality: 62, psychology: 75, values: 81, desire: 59, lifestyle: 70 };
+            drawBarChart('match-radar', dims);
             document.getElementById('potential-score').innerText = '74%';
             document.getElementById('potential-desc').innerText = 'Balanced with some tensions';
-            drawBarChart('match-radar', { intimacy: 68, physicality: 62, psychology: 75, values: 81, desire: 59, lifestyle: 70 });
+
+            // Populate friction analysis
+            const frictionContainer = document.getElementById('friction-container');
+            frictionContainer.innerHTML = '';
+            for (let [key, val] of Object.entries(dims)) {
+                const item = document.createElement('div');
+                item.className = 'friction-item';
+                item.innerHTML = `<span class="bar-label">${key}</span><span class="text-xs">${val}% alignment</span>`;
+                frictionContainer.appendChild(item);
+            }
         }
 
         function copySoloID() {
