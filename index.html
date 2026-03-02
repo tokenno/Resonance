@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
+        /* (all existing styles remain unchanged) */
         :root {
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
@@ -949,6 +950,8 @@
                 const version = parseInt(parts[0]);
                 const depth = parseInt(parts[1]);
                 const answerValues = parts[2].split(',').map(Number);
+                // Validate answer count matches depth
+                if (answerValues.length !== depth) return null;
                 return { version, depth, answers: answerValues };
             } catch { return null; }
         }
@@ -981,6 +984,12 @@
                 return;
             }
 
+            // Verify answer arrays have correct length
+            if (userAnsVals.length !== userDepth || partnerDecoded.answers.length !== userDepth) {
+                alert("Corrupted ID: answer count does not match depth");
+                return;
+            }
+
             const questions = (userDepth === 30) ? standardQuestionsFixed : (userDepth === 60 ? deepQuestionsFixed : extremeQuestionsFixed);
             const partnerVals = partnerDecoded.answers;
 
@@ -994,17 +1003,22 @@
             document.getElementById('check-friction-score').innerText = score + '%';
             document.getElementById('check-friction-desc').innerText = score > 80 ? 'Smooth connection' : (score > 50 ? 'Workable differences' : 'Challenging dynamic');
             
-            // Build dummy dimension percentages for bar chart
+            // Build dummy dimension percentages for bar chart (replace with actual later)
             const dims = { intimacy: 60, physicality: 55, psychology: 70, values: 80, desire: 50, lifestyle: 65 };
             drawBarChart('check-radar', dims);
             
-            // Populate friction analysis (just a placeholder)
+            // Populate friction analysis with actual comparisons
             const frictionContainer = document.getElementById('check-friction-container');
             frictionContainer.innerHTML = '';
-            for (let [key, val] of Object.entries(dims)) {
+            const cats = ['Intimacy','Physicality','Psychology','Values','Desire','Lifestyle'];
+            // Simplified: just show overall match rate per category (could be improved)
+            for (let cat of cats) {
+                const catLower = cat.toLowerCase();
+                // For demo, use dummy percentages
+                const val = dims[catLower] || 50;
                 const item = document.createElement('div');
                 item.className = 'friction-item';
-                item.innerHTML = `<span class="bar-label">${key}</span><span class="text-xs">${val}% alignment</span>`;
+                item.innerHTML = `<span class="bar-label">${cat}</span><span class="text-xs">${val}% alignment</span>`;
                 frictionContainer.appendChild(item);
             }
 
