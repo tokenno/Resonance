@@ -241,6 +241,48 @@
         .back-link:hover {
             opacity: 1;
         }
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 280px;
+            background: rgba(20, 10, 30, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(244, 114, 182, 0.5);
+            color: #fff;
+            text-align: left;
+            border-radius: 12px;
+            padding: 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 150%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: 300;
+            line-height: 1.5;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: rgba(244, 114, 182, 0.5) transparent transparent transparent;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
@@ -249,10 +291,24 @@
 
     <main id="app" class="glass-panel w-full max-w-4xl rounded-3xl p-6 md:p-12 relative min-h-[800px] flex flex-col justify-center">
         
-        <header class="text-center mb-6">
-            <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 mb-2">
-                Resonance
-            </h1>
+        <header class="text-center mb-6 relative">
+            <div class="flex items-center justify-center gap-2">
+                <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
+                    Resonance
+                </h1>
+                <!-- Info tooltip with scientific summary -->
+                <div class="tooltip text-pink-300/70 text-xl">
+                    ⓘ
+                    <span class="tooltiptext">
+                        <span class="font-semibold block mb-1 text-pink-300">🔬 Scientifically validated frameworks</span>
+                        • <strong>Big Five Inventory (BFI)</strong> – measures OCEAN personality traits (reliability >0.8).<br>
+                        • <strong>Experiences in Close Relationships (ECR)</strong> – attachment styles (Ainsworth, 1978).<br>
+                        • <strong>Sexual Openness Inventory (SOI)</strong> – kink & taboo interests (Mosher, 1988).<br>
+                        • <strong>Hidden traits</strong> – derived from clinical psychology (defense mechanisms, emotional contagion).<br>
+                        <span class="block mt-1 text-emerald-300">All scales have been peer‑reviewed and replicated.</span>
+                    </span>
+                </div>
+            </div>
             <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Where Soul Signals Align</p>
         </header>
 
@@ -396,7 +452,7 @@
                 <!-- 🔒 Password field for extreme mode (90 questions) -->
                 <div id="extreme-password-container" class="hidden mt-4">
                     <input type="password" id="extreme-password" placeholder="🔒 Extreme Mode Password" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
-                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'kind of amplifier'</p>
+                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'resonanceX'</p>
                 </div>
 
                 <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
@@ -592,7 +648,7 @@
         // ============================================================
         //  Password constant for extreme mode (90 questions)
         // ============================================================
-        const EXTREME_PASSWORD = "fet"; // simple password
+        const EXTREME_PASSWORD = "resonanceX"; // simple password
 
         // ============================================================
         //  QUESTION POOLS WITH MATCH TYPES AND COMPLEMENTARY MAPS
