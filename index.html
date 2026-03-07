@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resonance · Soul Signals</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QR Code Generator Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -100,16 +101,6 @@
         .friction-red { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
         .friction-blue { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd; }
         .friction-purple { background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.5); color: #d8b4fe; }
-        .dealbreaker-badge {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: bold;
-        }
         .deep-dive-badge {
             background: linear-gradient(135deg, #7c3aed, #4f46e5);
             color: white;
@@ -301,6 +292,15 @@
             display: block;
             border-radius: 1rem;
             background: rgba(0,0,0,0.2);
+        }
+        .personality-summary {
+            background: rgba(255,255,255,0.03);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border-left: 3px solid #f472b6;
+            margin: 1rem 0;
         }
     </style>
 </head>
@@ -523,7 +523,7 @@
                 <div class="flex items-center gap-2">
                     <span id="q-deep" class="hidden deep-dive-badge">Deep</span>
                     <span id="q-extreme" class="hidden extreme-badge">Extreme</span>
-                    <span id="q-dealbreaker" class="hidden dealbreaker-badge">Dealbreaker</span>
+                    <span id="q-dealbreaker" class="hidden">Dealbreaker</span> <!-- badge kept but no alert -->
                     <span id="q-category-display">Category</span>
                 </div>
             </div>
@@ -558,7 +558,7 @@
             <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Profile...</h3>
         </section>
 
-        <!-- VIEW: Results - Solo (with percentages, QR code, legend, and visual) -->
+        <!-- VIEW: Results - Solo (with percentages, QR code, legend, visual, and personality summary) -->
         <section id="view-results-solo" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -569,6 +569,9 @@
                     <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70" id="solo-mode-label">Standard Profile</p>
                 </div>
                 
+                <!-- Personality summary (will be filled by JS) -->
+                <div id="solo-personality-summary" class="personality-summary"></div>
+
                 <!-- Bar chart for category percentages -->
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300">Personality Percentiles</p>
@@ -613,7 +616,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Match (with percentages, compatibility, legend, dynamic recommendations, sound, and visual) -->
+        <!-- VIEW: Results - Match (with percentages, compatibility, legend, dynamic recommendations, sound, visual, and personality summaries) -->
         <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -627,6 +630,10 @@
                         <span id="res-p2" class="text-purple-300">Partner</span>
                     </div>
                 </div>
+
+                <!-- Personality summaries -->
+                <div id="match-personality-summary1" class="personality-summary"></div>
+                <div id="match-personality-summary2" class="personality-summary"></div>
 
                 <!-- Compatibility score -->
                 <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-4 text-center border border-purple-500/30">
@@ -681,7 +688,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Check (with legend, dynamic recommendations, sound, and visual) -->
+        <!-- VIEW: Results - Check (with legend, dynamic recommendations, sound, visual, and personality summaries) -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -695,6 +702,11 @@
                         <span id="check-res-p2" class="text-emerald-300">Their Profile</span>
                     </div>
                 </div>
+
+                <!-- Personality summaries -->
+                <div id="check-personality-summary1" class="personality-summary"></div>
+                <div id="check-personality-summary2" class="personality-summary"></div>
+
                 <div class="compatibility-instant rounded-xl p-4 text-center bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30">
                     <p class="text-xs uppercase tracking-widest text-emerald-300 mb-2">Compatibility Verdict</p>
                     <p class="text-4xl font-bold serif mb-2" id="check-verdict">82%</p>
@@ -1206,6 +1218,72 @@
         }
 
         // ============================================================
+        //  Personality summary generator (tailored to scores)
+        // ============================================================
+        function generatePersonalityDescription(scores, name) {
+            if (!name) name = "You";
+            const parts = [];
+            
+            // Helper to add description for a trait
+            const big5 = ["Openness", "Conscientiousness", "Extraversion", "Agreeableness", "Neuroticism"];
+            const traitDescriptions = {
+                "Openness": { low: "practical and prefer routine", high: "curious and open to new experiences" },
+                "Conscientiousness": { low: "flexible and spontaneous", high: "organized and disciplined" },
+                "Extraversion": { low: "introverted and enjoy solitude", high: "outgoing and energetic" },
+                "Agreeableness": { low: "competitive and direct", high: "compassionate and cooperative" },
+                "Neuroticism": { low: "emotionally stable and calm", high: "sensitive and prone to stress" }
+            };
+
+            // Build description for each Big5 trait present
+            big5.forEach(trait => {
+                if (scores[trait] !== undefined) {
+                    const level = scores[trait];
+                    let desc;
+                    if (level < 33) desc = traitDescriptions[trait].low;
+                    else if (level > 66) desc = traitDescriptions[trait].high;
+                    else desc = "moderately " + (trait === "Neuroticism" ? "balanced" : "average");
+                    parts.push(desc);
+                }
+            });
+
+            // Add values/libido etc. if present
+            if (scores["Values"] !== undefined) {
+                const v = scores["Values"];
+                if (v > 66) parts.push("value-driven and idealistic");
+                else if (v < 33) parts.push("pragmatic about values");
+                else parts.push("balanced in values");
+            }
+            if (scores["Desire"] !== undefined) {
+                const d = scores["Desire"];
+                if (d > 66) parts.push("high libido");
+                else if (d < 33) parts.push("low libido");
+                else parts.push("moderate libido");
+            }
+            if (scores["Physicality"] !== undefined) {
+                const p = scores["Physicality"];
+                if (p > 66) parts.push("physically expressive");
+                else if (p < 33) parts.push("less focused on physicality");
+                else parts.push("balanced in physical expression");
+            }
+            if (scores["Intimacy"] !== undefined) {
+                const i = scores["Intimacy"];
+                if (i > 66) parts.push("high need for emotional intimacy");
+                else if (i < 33) parts.push("more independent in relationships");
+                else parts.push("balanced need for intimacy");
+            }
+
+            // Remove duplicates and join
+            const uniqueParts = [...new Set(parts)];
+            let description = name + " is ";
+            if (uniqueParts.length === 0) description += "a unique individual with balanced traits.";
+            else if (uniqueParts.length === 1) description += uniqueParts[0] + ".";
+            else {
+                description += uniqueParts.slice(0, -1).join(", ") + ", and " + uniqueParts.slice(-1) + ".";
+            }
+            return description;
+        }
+
+        // ============================================================
         //  Password constant for extreme mode (90 questions)
         // ============================================================
         const EXTREME_PASSWORD = "resonanceX";
@@ -1233,13 +1311,13 @@
         };
 
         // ============================================================
-        //  QUESTION POOLS (updated options for clarity)
+        //  QUESTION POOLS (updated options for clarity, removed isDealbreaker flags)
         // ============================================================
         function q(id, text, category, type = "scale", weight = 1, options = null, 
-                   isDealbreaker = false, isDeep = false, isExtreme = false, 
+                   isDeep = false, isExtreme = false, 
                    hiddenTrait = null, traitMapping = null, 
                    matchType = 'similarity', complementaryMap = null, toleranceThreshold = 1) {
-            return { id, text, category, type, weight, options, isDealbreaker, isDeep, isExtreme, 
+            return { id, text, category, type, weight, options, isDeep, isExtreme, 
                      hiddenTrait, traitMapping, matchType, complementaryMap, toleranceThreshold };
         }
 
@@ -1260,122 +1338,122 @@
             q("n1","I often feel anxious or tense.","Neuroticism","scale",1),
             q("n2","I am relaxed most of the time.","Neuroticism","scale",1),
             q("n3","I get upset easily.","Neuroticism","scale",1),
-            q("v1","Do you want children in your future?","Values","scale",3, null, true, false, false, null, null, 'similarity'),
-            q("v2","Is financial stability a prerequisite for commitment?","Values","scale",2, null, false, false, false, null, null, 'similarity'),
+            q("v1","Do you want children in your future?","Values","scale",3, null, false, false, null, null, 'similarity'),
+            q("v2","Is financial stability a prerequisite for commitment?","Values","scale",2, null, false, false, null, null, 'similarity'),
             q("v3","Is travel and adventure essential?","Values","scale",1),
             q("v4","Do you value career over relationships?","Values","scale",2),
-            q("v5","Is spirituality/religion important in a partner?","Values","scale",2, null, true, false, false, null, null, 'similarity'),
+            q("v5","Is spirituality/religion important in a partner?","Values","scale",2, null, false, false, null, null, 'similarity'),
             q("l1","Do you prefer city life over nature?","Lifestyle","scale",1),
             q("l2","Do you prefer strict routine over spontaneity?","Lifestyle","scale",1),
             q("l3","Would you rather read than watch movies?","Lifestyle","scale",1),
-            q("d1","How would you rate your libido intensity?","Desire","choice",2, ["Very Low","Low","Moderate","High","Very High"], false, false, false, null, null, 'tolerance', null, 2),
-            q("r1","How important is romance and emotional connection in a relationship?","Values","scale",2, null, false, false, false),
-            q("d3","Comfort with sexting/digital intimacy?","Desire","choice",1, ["Love it","Enjoy it","Neutral","Dislike it"], false, false, false, null, null, 'tolerance', null, 1),
-            q("p1","Preferred body type in a partner?","Physicality","choice",1, ["Athletic","Curvy","Slim","Muscular","Any/All"], false, false, false, null, null, 'tolerance', null, 1),
-            q("p2","How important is physical appearance vs personality?","Physicality","choice",2, ["Appearance far more important","Appearance somewhat more important","Both equally important","Personality somewhat more important","Personality far more important"], false, false, false, null, null, 'similarity'),
-            q("p3","Preferred height dynamic?","Physicality","choice",1, ["Taller","Shorter","Same height","Irrelevant"], false, false, false, null, null, 'tolerance', null, 1),
-            q("i1","Is physical touch essential for you to feel loved?","Intimacy","scale",2, null, false, false, false, null, null, 'similarity'),
+            q("d1","How would you rate your libido intensity?","Desire","choice",2, ["Very Low","Low","Moderate","High","Very High"], false, false, null, null, 'tolerance', null, 2),
+            q("r1","How important is romance and emotional connection in a relationship?","Values","scale",2, null, false, false),
+            q("d3","Comfort with sexting/digital intimacy?","Desire","choice",1, ["Love it","Enjoy it","Neutral","Dislike it"], false, false, null, null, 'tolerance', null, 1),
+            q("p1","Preferred body type in a partner?","Physicality","choice",1, ["Athletic","Curvy","Slim","Muscular","Any/All"], false, false, null, null, 'tolerance', null, 1),
+            q("p2","How important is physical appearance vs personality?","Physicality","choice",2, ["Appearance far more important","Appearance somewhat more important","Both equally important","Personality somewhat more important","Personality far more important"], false, false, null, null, 'similarity'),
+            q("p3","Preferred height dynamic?","Physicality","choice",1, ["Taller","Shorter","Same height","Irrelevant"], false, false, null, null, 'tolerance', null, 1),
+            q("i1","Is physical touch essential for you to feel loved?","Intimacy","scale",2, null, false, false, null, null, 'similarity'),
         ];
 
         // --- DEEP DIVE (30) - hidden traits, sensuality, emotional patterns + one light BDSM question
         const deep = [
             q("h1","When plans change last minute, your first instinct is to...","Hidden","choice",1,
                 ["Find opportunity","Anxious but adapt","Reschedule to regain control","Cancel entirely"],
-                false,true,false,"Adaptability vs Control",
+                true, false,"Adaptability vs Control",
                 {0:"high_adaptability",1:"anxious_flexible",2:"control_seeking",3:"rigid_structure"},'tolerance',null,1),
             q("h2","A partner forgets your anniversary. You...","Hidden","choice",2,
                 ["Withdraw emotionally","Joke about it","Directly express disappointment","Plan something better"],
-                false,true,false,"Conflict Style",
+                true, false,"Conflict Style",
                 {0:"passive_aggressive",1:"indirect_communicator",2:"direct_communicator",3:"compensator"},'tolerance',null,1),
             q("h3","Your ideal vacation involves...","Hidden","choice",1,
                 ["Pure spontaneity","One planned activity per day","Every hour scheduled","Same place you've loved before"],
-                false,true,false,"Stimulation Seeking",
+                true, false,"Stimulation Seeking",
                 {0:"high_novelty",1:"balanced",2:"high_structure",3:"nostalgia_bound"},'tolerance',null,1),
             q("h4","When someone cries in front of you, you feel...","Hidden","choice",2,
                 ["Comfort immediately","Uncomfortable, need space","Curious about the cause","Your own emotions surface"],
-                false,true,false,"Emotional Contagion",
+                true, false,"Emotional Contagion",
                 {0:"empath",1:"avoidant",2:"analyst",3:"mirrorer"},'tolerance',null,1),
             q("h5","Your childhood room was...","Hidden","choice",1,
                 ["Minimalist, few possessions","Cozy, filled with memories","Chaotic, ever-changing","A curated display for others"],
-                false,true,false,"Attachment Roots",
+                true, false,"Attachment Roots",
                 {0:"detached",1:"sentimental",2:"unstable",3:"performer"},'tolerance',null,1),
             q("h6","In an argument, you most often...","Hidden","choice",2,
                 ["Bring up past grievances","Shut down completely","Over-explain your logic","Apologize even if not wrong"],
-                false,true,false,"Defense Mechanism",
+                true, false,"Defense Mechanism",
                 {0:"projector",1:"withdrawer",2:"intellectualizer",3:"fawner"},'tolerance',null,1),
             q("h7","Your relationship to 'alone time'...","Hidden","choice",2,
                 ["Recharge completely","Get lonely quickly","Productive but miss them","Anxious what they're doing"],
-                false,true,false,"Attachment Style",
+                true, false,"Attachment Style",
                 {0:"secure_avoidant",1:"anxious_preoccupied",2:"secure_balanced",3:"anxious_fearful"},'tolerance',null,1),
             q("h8","Receiving criticism feels...","Hidden","choice",1,
                 ["Like an attack","Useful data","Necessary but painful","Usually invalid"],
-                false,true,false,"Self-Concept Stability",
+                true, false,"Self-Concept Stability",
                 {0:"fragile_ego",1:"growth_mindset",2:"humble_but_hurt",3:"defensive_narcissist"},'tolerance',null,1),
-            q("ei1","How important is receiving massage/giving massage in intimacy?","Sensuality","scale",1, null, false,true,false, null, null, 'similarity'),
+            q("ei1","How important is receiving massage/giving massage in intimacy?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
             q("ei2","Preferred environment for intimacy?","Sensuality","choice",1,
-                ["Luxury hotel","Cozy home","Nature/outdoors","Anywhere passion strikes"], false,true,false, null, null, 'tolerance', null, 1),
-            q("ei3","Importance of scent in attraction?","Sensuality","scale",1, null, false,true,false, null, null, 'similarity'),
+                ["Luxury hotel","Cozy home","Nature/outdoors","Anywhere passion strikes"], true, false, null, null, 'tolerance', null, 1),
+            q("ei3","Importance of scent in attraction?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
             q("ei4","Do you prefer to lead or be led in sensual exploration?","Sensuality","choice",2,
-                ["Always lead","Prefer to follow","Equal exchange","Depends on mood"], false,true,false, null, null, 'complementary', {0:1,1:0,2:2,3:3}),
-            q("ei5","How do you feel about vocal expression during intimacy?","Sensuality","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("ei6","Importance of aftercare/cuddling post-intimacy?","Sensuality","scale",2, null, false,true,false, null, null, 'similarity'),
-            q("er1","I often have mood swings.","Neuroticism","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er2","I stay calm under pressure.","Neuroticism","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er3","I am quick to forgive.","Agreeableness","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er4","I hold grudges for a long time.","Agreeableness","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er5","I enjoy meeting new people.","Extraversion","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er6","I prefer small gatherings over large parties.","Extraversion","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er7","I finish projects before they are due.","Conscientiousness","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er8","I often procrastinate.","Conscientiousness","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er9","I enjoy abstract thinking.","Openness","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("er10","I appreciate art and beauty.","Openness","scale",1, null, false,true,false, null, null, 'similarity'),
+                ["Always lead","Prefer to follow","Equal exchange","Depends on mood"], true, false, null, null, 'complementary', {0:1,1:0,2:2,3:3}),
+            q("ei5","How do you feel about vocal expression during intimacy?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
+            q("ei6","Importance of aftercare/cuddling post-intimacy?","Sensuality","scale",2, null, true, false, null, null, 'similarity'),
+            q("er1","I often have mood swings.","Neuroticism","scale",1, null, true, false, null, null, 'similarity'),
+            q("er2","I stay calm under pressure.","Neuroticism","scale",1, null, true, false, null, null, 'similarity'),
+            q("er3","I am quick to forgive.","Agreeableness","scale",1, null, true, false, null, null, 'similarity'),
+            q("er4","I hold grudges for a long time.","Agreeableness","scale",1, null, true, false, null, null, 'similarity'),
+            q("er5","I enjoy meeting new people.","Extraversion","scale",1, null, true, false, null, null, 'similarity'),
+            q("er6","I prefer small gatherings over large parties.","Extraversion","scale",1, null, true, false, null, null, 'similarity'),
+            q("er7","I finish projects before they are due.","Conscientiousness","scale",1, null, true, false, null, null, 'similarity'),
+            q("er8","I often procrastinate.","Conscientiousness","scale",1, null, true, false, null, null, 'similarity'),
+            q("er9","I enjoy abstract thinking.","Openness","scale",1, null, true, false, null, null, 'similarity'),
+            q("er10","I appreciate art and beauty.","Openness","scale",1, null, true, false, null, null, 'similarity'),
             q("hp1","Your reaction to partner's success that surpasses yours?","Hidden","choice",2,
                 ["Pure pride","Pride with insecurity","Motivation to catch up","Subtle resentment"],
-                false,true,false,"Compersion vs Envy",null,'tolerance',null,1),
+                true, false,"Compersion vs Envy",null,'tolerance',null,1),
             q("hp2","When alone, your internal monologue is...","Hidden","choice",1,
                 ["Encouraging and planning","Analytical, problem-solving","Critical, self-doubting","Chaotic, hard to focus"],
-                false,true,false,"Inner Critic",null,'tolerance',null,1),
+                true, false,"Inner Critic",null,'tolerance',null,1),
             q("hp3","How do you typically recharge after social exhaustion?","Hidden","choice",1,
                 ["Solitude with a book","Light entertainment","Physical activity","Talking to a close friend"],
-                false,true,false,"Recharge Style",null,'tolerance',null,1),
-            q("hp4","Do you often feel responsible for others' happiness?","Hidden","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("hp5","Are you comfortable with silence in a conversation?","Hidden","scale",1, null, false,true,false, null, null, 'similarity'),
-            q("lb1","I am curious about light bondage (e.g., using a blindfold or soft restraints).","Sensuality","scale",2, null, false, true, false),
+                true, false,"Recharge Style",null,'tolerance',null,1),
+            q("hp4","Do you often feel responsible for others' happiness?","Hidden","scale",1, null, true, false, null, null, 'similarity'),
+            q("hp5","Are you comfortable with silence in a conversation?","Hidden","scale",1, null, true, false, null, null, 'similarity'),
+            q("lb1","I am curious about light bondage (e.g., using a blindfold or soft restraints).","Sensuality","scale",2, null, true, false),
         ];
 
         // --- EXTREME (30) - BDSM, fetish, Dom/sub, taboo
         const extreme = [
-            q("x1","I am aroused by the idea of being completely controlled by a partner.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x2","I enjoy taking control and giving orders in the bedroom.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x3","I am interested in bondage (rope, cuffs, restraints).","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x4","I find sensory deprivation (blindfolds, hoods) exciting.","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x5","I am curious about impact play (spanking, flogging).","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x6","I enjoy role-playing scenarios (teacher/student, captor/captive).","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x7","I have fantasies about being dominated by a powerful figure.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x8","I have fantasies about dominating a willing partner.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x9","I am aroused by specific non-sexual body parts (feet, hands, etc.).","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x10","I am interested in latex/leather/rubber clothing.","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x11","I enjoy being watched or watching others (voyeurism/exhibitionism).","Fetish","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x12","I am curious about group sex or swinging.","Fetish","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x13","I am turned on by power exchange dynamics outside the bedroom.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x14","I enjoy giving or receiving pain in a consensual context.","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x15","I am interested in pet play or animal roleplay.","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x16","I find age play (consensual adult) intriguing.","Fetish","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x17","I have a fetish for a specific material (leather, latex, silk).","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x18","I am curious about electrostimulation or e-stim toys.","BDSM","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x19","I enjoy being verbally degraded during intimacy.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x20","I enjoy verbally degrading a partner.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x21","I am interested in medical play or clinical scenes.","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x22","I find the idea of being tied up for an extended period exciting.","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x23","I would like to explore a 24/7 D/s lifestyle.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
-            q("x24","I am aroused by body modification (tattoos, piercings).","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x25","I enjoy cross-dressing or partner cross-dressing.","Fetish","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x26","I have fantasies about being in a polyamorous relationship.","Fetish","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x27","I am interested in primal play (hunting, wrestling).","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
-            q("x28","I enjoy wax play or temperature play.","BDSM","scale",1, null, false,true,true, null, null, 'similarity'),
-            q("x29","I am curious about knife play (safe, blunt).","BDSM","scale",2, null, false,true,true, null, null, 'similarity'),
+            q("x1","I am aroused by the idea of being completely controlled by a partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x2","I enjoy taking control and giving orders in the bedroom.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x3","I am interested in bondage (rope, cuffs, restraints).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x4","I find sensory deprivation (blindfolds, hoods) exciting.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x5","I am curious about impact play (spanking, flogging).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x6","I enjoy role-playing scenarios (teacher/student, captor/captive).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x7","I have fantasies about being dominated by a powerful figure.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x8","I have fantasies about dominating a willing partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x9","I am aroused by specific non-sexual body parts (feet, hands, etc.).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x10","I am interested in latex/leather/rubber clothing.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x11","I enjoy being watched or watching others (voyeurism/exhibitionism).","Fetish","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x12","I am curious about group sex or swinging.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
+            q("x13","I am turned on by power exchange dynamics outside the bedroom.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x14","I enjoy giving or receiving pain in a consensual context.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x15","I am interested in pet play or animal roleplay.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x16","I find age play (consensual adult) intriguing.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
+            q("x17","I have a fetish for a specific material (leather, latex, silk).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x18","I am curious about electrostimulation or e-stim toys.","BDSM","scale",1, null, true, true, null, null, 'similarity'),
+            q("x19","I enjoy being verbally degraded during intimacy.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x20","I enjoy verbally degrading a partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x21","I am interested in medical play or clinical scenes.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x22","I find the idea of being tied up for an extended period exciting.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x23","I would like to explore a 24/7 D/s lifestyle.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+            q("x24","I am aroused by body modification (tattoos, piercings).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x25","I enjoy cross-dressing or partner cross-dressing.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+            q("x26","I have fantasies about being in a polyamorous relationship.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
+            q("x27","I am interested in primal play (hunting, wrestling).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+            q("x28","I enjoy wax play or temperature play.","BDSM","scale",1, null, true, true, null, null, 'similarity'),
+            q("x29","I am curious about knife play (safe, blunt).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
             q("x30","I have a strong preference for a specific BDSM role (rigger, brat, little, etc.).","BDSM","choice",2,
-                ["Yes, I identify strongly","I'm flexible","I'm curious but unsure","No, not my thing"], false,true,true, null, null, 'tolerance', null, 1),
+                ["Yes, I identify strongly","I'm flexible","I'm curious but unsure","No, not my thing"], true, true, null, null, 'tolerance', null, 1),
         ];
 
         const standardMaster = standard.sort((a,b) => a.id.localeCompare(b.id));
@@ -1565,7 +1643,6 @@
             
             document.getElementById('q-deep').classList.toggle('hidden', !q.isDeep);
             document.getElementById('q-extreme').classList.toggle('hidden', !q.isExtreme);
-            document.getElementById('q-dealbreaker').classList.toggle('hidden', !q.isDealbreaker);
             
             const container = document.getElementById('options-container');
             container.innerHTML = '';
@@ -1704,6 +1781,10 @@
             buildBarChart('solo-bar-chart', scores);
             buildLegend('solo-legend', Object.keys(scores));
             
+            // Personality summary
+            const desc = generatePersonalityDescription(scores, state.userName);
+            document.getElementById('solo-personality-summary').innerText = desc;
+            
             if (state.questionCount >= 60) {
                 document.getElementById('hidden-traits').classList.remove('hidden');
                 document.getElementById('traits-container').innerHTML = '<div class="hidden-trait">🌀 Attachment style: Secure with anxious tendencies</div><div class="hidden-trait">🔥 Conflict style: Direct communicator</div>';
@@ -1734,6 +1815,10 @@
             buildBarChart('match-bar-chart1', scores1);
             buildBarChart('match-bar-chart2', scores2);
             buildLegend('match-legend', [...new Set([...Object.keys(scores1), ...Object.keys(scores2)])]);
+            
+            // Personality summaries
+            document.getElementById('match-personality-summary1').innerText = generatePersonalityDescription(scores1, state.userName);
+            document.getElementById('match-personality-summary2').innerText = generatePersonalityDescription(scores2, state.partnerName);
             
             const bridgeContainer = document.getElementById('match-bridge-container');
             bridgeContainer.innerHTML = '';
@@ -1777,6 +1862,10 @@
             
             buildBarChart('check-bar-chart', scores2);
             buildLegend('check-legend', Object.keys(scores2));
+            
+            // Personality summaries
+            document.getElementById('check-personality-summary1').innerText = generatePersonalityDescription(scores1, state.userName || 'You');
+            document.getElementById('check-personality-summary2').innerText = generatePersonalityDescription(scores2, name2);
             
             const bridgeContainer = document.getElementById('check-bridge-container');
             bridgeContainer.innerHTML = '';
@@ -1956,6 +2045,7 @@
             buildBarChart('solo-bar-chart', partnerScores);
             buildLegend('solo-legend', Object.keys(partnerScores));
             document.getElementById('hidden-traits').classList.add('hidden');
+            document.getElementById('solo-personality-summary').innerText = generatePersonalityDescription(partnerScores, 'Partner');
             
             const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
             copyBtn.innerText = 'Copy Partner ID';
