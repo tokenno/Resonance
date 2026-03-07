@@ -542,7 +542,7 @@
                 </div>
                 <div id="extreme-password-container" class="hidden mt-4">
                     <input type="password" id="extreme-password" placeholder="🔒 Extreme Mode Password" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
-                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'resonanceX'</p>
+                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'kind of amp - 3 letter word'</p>
                 </div>
                 <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
                     Begin Assessment
@@ -1409,7 +1409,7 @@
             // ============================================================
             //  Constants and question pools (fully restored)
             // ============================================================
-            const EXTREME_PASSWORD = "resonanceX";
+            const EXTREME_PASSWORD = "fet";
 
             const categoryExplanations = {
                 "Openness": "Curiosity, creativity, and preference for novelty vs. routine.",
@@ -1974,6 +1974,146 @@
                 return { id, email };
             }
 
+            // ============================================================
+            //  CORRECTED COMPATIBILITY ALGORITHM
+            //  This replaces the oversimplified version that ignored weights
+            //  and match types. Now properly handles:
+            //  - similarity (closer is better)
+            //  - complementary (opposites attract, uses mapping)
+            //  - tolerance (within threshold is good)
+            // ============================================================
+            function calculateTrueCompatibility(answers1, answers2, questions) {
+                let totalWeight = 0;
+                let weightedScore = 0;
+                
+                const qMap = {};
+                questions.forEach(q => qMap[q.id] = q);
+                
+                // Index answers by question ID
+                const a1 = {}, a2 = {};
+                answers1.forEach(a => a1[a.questionId] = a.answer);
+                answers2.forEach(a => a2[a.questionId] = a.answer);
+                
+                for (let qid in qMap) {
+                    const q = qMap[qid];
+                    const v1 = a1[qid], v2 = a2[qid];
+                    if (v1 === undefined || v2 === undefined) continue;
+                    
+                    let matchScore = 0;
+                    const maxDiff = 4; // 5-point scale (1-5), max diff is 4
+                    
+                    switch(q.matchType) {
+                        case 'similarity':
+                            // Closer is better (standard)
+                            // Normalize to 0-1 where 1 = identical, 0 = opposite
+                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
+                            break;
+                            
+                        case 'complementary':
+                            // Use complementaryMap if provided (maps values to their ideal complement)
+                            if (q.complementaryMap && q.complementaryMap[v1] !== undefined) {
+                                const idealMatch = q.complementaryMap[v1];
+                                if (v2 === idealMatch) {
+                                    matchScore = 1.0; // Perfect complement
+                                } else {
+                                    // Partial credit based on how close to ideal
+                                    const diffFromIdeal = Math.abs(v2 - idealMatch);
+                                    matchScore = Math.max(0, 1 - (diffFromIdeal / maxDiff));
+                                }
+                            } else {
+                                // Default complementary: opposite ends attract
+                                // Map 1->5, 2->4, 3->3, 4->2, 5->1
+                                const expected = 6 - v1;
+                                matchScore = 1 - (Math.abs(v2 - expected) / maxDiff);
+                            }
+                            break;
+                            
+                        case 'tolerance':
+                            // Within threshold is good, gradual falloff beyond
+                            const threshold = q.toleranceThreshold || 1;
+                            const actualDiff = Math.abs(v1 - v2);
+                            if (actualDiff <= threshold) {
+                                matchScore = 1.0;
+                            } else {
+                                // Linear falloff from threshold to max
+                                matchScore = Math.max(0, 1 - ((actualDiff - threshold) / (maxDiff - threshold)));
+                            }
+                            break;
+                            
+                        default:
+                            // Default to similarity
+                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
+                    }
+                    
+                    weightedScore += matchScore * q.weight;
+                    totalWeight += q.weight;
+                }
+                
+                // Return 0-100 percentage
+                if (totalWeight === 0) return 50; // Neutral if no comparable questions
+                return Math.round((weightedScore / totalWeight) * 100);
+            }
+
+            // ============================================================
+            //  CATEGORY-LEVEL COMPATIBILITY (for bridge recommendations)
+            // ============================================================
+            function calculateCategoryCompatibility(answers1, answers2, questions) {
+                const qMap = {};
+                questions.forEach(q => qMap[q.id] = q);
+                
+                const a1 = {}, a2 = {};
+                answers1.forEach(a => a1[a.questionId] = a.answer);
+                answers2.forEach(a => a2[a.questionId] = a.answer);
+                
+                const catScores = {};
+                const catWeights = {};
+                
+                for (let qid in qMap) {
+                    const q = qMap[qid];
+                    const v1 = a1[qid], v2 = a2[qid];
+                    if (v1 === undefined || v2 === undefined) continue;
+                    
+                    const cat = q.category || 'Other';
+                    if (!catScores[cat]) {
+                        catScores[cat] = 0;
+                        catWeights[cat] = 0;
+                    }
+                    
+                    let matchScore = 0;
+                    const maxDiff = 4;
+                    
+                    switch(q.matchType) {
+                        case 'similarity':
+                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
+                            break;
+                        case 'complementary':
+                            if (q.complementaryMap && q.complementaryMap[v1] !== undefined) {
+                                const idealMatch = q.complementaryMap[v1];
+                                matchScore = (v2 === idealMatch) ? 1.0 : Math.max(0, 1 - (Math.abs(v2 - idealMatch) / maxDiff));
+                            } else {
+                                matchScore = 1 - (Math.abs(v2 - (6 - v1)) / maxDiff);
+                            }
+                            break;
+                        case 'tolerance':
+                            const threshold = q.toleranceThreshold || 1;
+                            const actualDiff = Math.abs(v1 - v2);
+                            matchScore = (actualDiff <= threshold) ? 1.0 : Math.max(0, 1 - ((actualDiff - threshold) / (maxDiff - threshold)));
+                            break;
+                        default:
+                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
+                    }
+                    
+                    catScores[cat] += matchScore * q.weight;
+                    catWeights[cat] += q.weight;
+                }
+                
+                const result = {};
+                for (let cat in catScores) {
+                    result[cat] = Math.round((catScores[cat] / catWeights[cat]) * 100);
+                }
+                return result;
+            }
+
             function displaySoloResults(scores) {
                 const label = document.getElementById('solo-mode-label');
                 if (label) label.innerText = state.questionCount + ' questions';
@@ -2038,15 +2178,8 @@
                 if (p1) p1.innerText = state.userName || 'You';
                 if (p2) p2.innerText = state.partnerName || 'Partner';
                 
-                const allCats = new Set([...Object.keys(scores1), ...Object.keys(scores2)]);
-                let totalDiff = 0;
-                allCats.forEach(cat => {
-                    const v1 = scores1[cat] || 50;
-                    const v2 = scores2[cat] || 50;
-                    totalDiff += Math.abs(v1 - v2);
-                });
-                const avgDiff = totalDiff / allCats.size;
-                const compatibility = Math.max(0, Math.min(100, Math.round(100 - avgDiff)));
+                // Use CORRECTED algorithm instead of simple category averaging
+                const compatibility = calculateTrueCompatibility(state.p1Answers, state.p2Answers, state.presentation);
                 const scoreEl = document.getElementById('match-potential-score');
                 const descEl = document.getElementById('match-potential-desc');
                 if (scoreEl) scoreEl.innerText = compatibility + '%';
@@ -2061,23 +2194,21 @@
                 if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName);
                 if (sum2) sum2.innerText = generatePersonalityDescription(scores2, state.partnerName);
                 
+                // Use category-level compatibility for better bridge recommendations
+                const catCompat = calculateCategoryCompatibility(state.p1Answers, state.p2Answers, state.presentation);
                 const bridgeContainer = document.getElementById('match-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
-                    const commonCats = Object.keys(scores1).filter(cat => scores2.hasOwnProperty(cat));
-                    if (commonCats.length > 0) {
-                        const diffs = commonCats.map(cat => ({ cat, diff: Math.abs(scores1[cat] - scores2[cat]) }));
-                        diffs.sort((a,b) => b.diff - a.diff);
-                        const topDiffs = diffs.slice(0, 3).filter(d => d.diff > 30);
-                        if (topDiffs.length > 0) {
-                            topDiffs.forEach(d => {
-                                bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${d.cat} (${d.diff}%) – discuss your perspectives.</div>`;
-                            });
-                        } else {
-                            bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Your profiles are well aligned!</div>';
-                        }
+                    const sortedCats = Object.entries(catCompat).sort((a,b) => a[1] - b[1]); // Lowest first
+                    const problematic = sortedCats.filter(([cat, score]) => score < 60);
+                    
+                    if (problematic.length > 0) {
+                        problematic.slice(0, 3).forEach(([cat, score]) => {
+                            const diff = 100 - score;
+                            bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Work on ${cat}: ${diff}% difference detected – discuss expectations openly.</div>`;
+                        });
                     } else {
-                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">No shared categories – difficult to compare.</div>';
+                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Excellent alignment across all categories!</div>';
                     }
                 }
                 
@@ -2090,14 +2221,9 @@
                 if (p1) p1.innerText = name1;
                 if (p2) p2.innerText = name2;
                 
-                const commonCats = Object.keys(scores1).filter(cat => scores2.hasOwnProperty(cat));
-                let totalDiff = 0;
-                commonCats.forEach(cat => totalDiff += Math.abs(scores1[cat] - scores2[cat]));
-                let compatibility = 50;
-                if (commonCats.length > 0) {
-                    const avgDiff = totalDiff / commonCats.length;
-                    compatibility = Math.max(0, Math.min(100, Math.round(100 - avgDiff)));
-                }
+                // Use CORRECTED algorithm
+                const compatibility = calculateTrueCompatibility(checkUserAnswers, checkPartnerAnswers, standardMaster);
+                
                 const verdict = document.getElementById('check-verdict');
                 const sub = document.getElementById('check-verdict-sub');
                 const frictionScore = document.getElementById('check-friction-score');
@@ -2125,22 +2251,21 @@
                     emailArea.classList.add('hidden');
                 }
                 
+                // Use category-level compatibility for bridge recommendations
+                const catCompat = calculateCategoryCompatibility(checkUserAnswers, checkPartnerAnswers, standardMaster);
                 const bridgeContainer = document.getElementById('check-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
-                    if (commonCats.length > 0) {
-                        const diffs = commonCats.map(cat => ({ cat, diff: Math.abs(scores1[cat] - scores2[cat]) }));
-                        diffs.sort((a,b) => b.diff - a.diff);
-                        const topDiffs = diffs.slice(0, 3).filter(d => d.diff > 30);
-                        if (topDiffs.length > 0) {
-                            topDiffs.forEach(d => {
-                                bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${d.cat} (${d.diff}%) – discuss your perspectives.</div>`;
-                            });
-                        } else {
-                            bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Your profiles are well aligned!</div>';
-                        }
+                    const sortedCats = Object.entries(catCompat).sort((a,b) => a[1] - b[1]);
+                    const problematic = sortedCats.filter(([cat, score]) => score < 60);
+                    
+                    if (problematic.length > 0) {
+                        problematic.slice(0, 3).forEach(([cat, score]) => {
+                            const diff = 100 - score;
+                            bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Focus area: ${cat} shows ${diff}% difference – explore this topic together.</div>`;
+                        });
                     } else {
-                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">No shared categories – difficult to compare.</div>';
+                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Strong compatibility across all measured dimensions!</div>';
                     }
                 }
                 
