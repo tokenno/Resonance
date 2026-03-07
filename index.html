@@ -10,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* (all styles remain the same as before – omitted for brevity, but present in final) */
         :root {
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
@@ -831,7 +830,7 @@
             };
 
             // ============================================================
-            //  Audio functions (simplified for demo)
+            //  Audio functions (full implementation)
             // ============================================================
             let audioCtx = null;
             let oscillators = [];
@@ -913,14 +912,168 @@
             };
 
             window.playTraits = function(mode) {
-                alert('Trait sound playback not fully implemented in this demo.');
+                initAudio();
+                stopSound();
+
+                let scores1, scores2;
+                if (mode === 'match') {
+                    if (state.p1Answers.length && state.p2Answers.length) {
+                        scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                        scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                    } else {
+                        alert("Trait data not available.");
+                        return;
+                    }
+                } else { // check mode
+                    if (checkUserAnswers && checkPartnerAnswers) {
+                        scores1 = computeCategoryScores(checkUserAnswers, standardMaster);
+                        scores2 = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                    } else {
+                        alert("Trait data not available.");
+                        return;
+                    }
+                }
+
+                const freqs = [];
+                for (let cat in scores1) {
+                    const val = scores1[cat];
+                    const freq = 200 + val * 6;
+                    freqs.push(freq);
+                }
+                for (let cat in scores2) {
+                    const val = scores2[cat];
+                    const freq = 200 + val * 6;
+                    freqs.push(freq);
+                }
+                currentFreqs = freqs;
+
+                let index = 0;
+                const duration = 2;
+                const fadeTime = 0.05;
+
+                function playNext() {
+                    if (index >= freqs.length) index = 0;
+                    const freq = freqs[index];
+
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+
+                    const gain = audioCtx.createGain();
+                    gain.gain.value = 0;
+
+                    osc.connect(gain);
+                    gain.connect(gainNode);
+
+                    const now = audioCtx.currentTime;
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.1, now + fadeTime);
+                    gain.gain.setValueAtTime(0.1, now + duration - fadeTime);
+                    gain.gain.linearRampToValueAtTime(0, now + duration);
+
+                    oscillators.push(osc);
+                    osc.start(now);
+                    osc.stop(now + duration);
+
+                    osc.onended = () => {
+                        const idx = oscillators.indexOf(osc);
+                        if (idx > -1) oscillators.splice(idx, 1);
+                    };
+
+                    index++;
+                    sequenceTimeout = setTimeout(playNext, duration * 1000);
+                }
+
+                playNext();
             };
+
             window.downloadTraitsSound = function(mode) {
-                alert('Download not implemented in this demo.');
+                if (currentFreqs.length === 0) {
+                    if (mode === 'match') {
+                        if (state.p1Answers.length && state.p2Answers.length) {
+                            const scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                            const scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                            currentFreqs = [];
+                            for (let cat in scores1) currentFreqs.push(200 + scores1[cat] * 6);
+                            for (let cat in scores2) currentFreqs.push(200 + scores2[cat] * 6);
+                        } else {
+                            alert("No trait data to generate sound.");
+                            return;
+                        }
+                    } else if (mode === 'check') {
+                        if (checkUserAnswers && checkPartnerAnswers) {
+                            const scores1 = computeCategoryScores(checkUserAnswers, standardMaster);
+                            const scores2 = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                            currentFreqs = [];
+                            for (let cat in scores1) currentFreqs.push(200 + scores1[cat] * 6);
+                            for (let cat in scores2) currentFreqs.push(200 + scores2[cat] * 6);
+                        } else {
+                            alert("No trait data to generate sound.");
+                            return;
+                        }
+                    }
+                }
+
+                const sampleRate = 44100;
+                const durationPerTone = 2;
+                const fade = 0.05;
+                const totalSamples = Math.floor(sampleRate * durationPerTone * currentFreqs.length);
+                const buffer = new ArrayBuffer(44 + totalSamples * 2);
+                const view = new DataView(buffer);
+
+                function writeString(view, offset, str) {
+                    for (let i = 0; i < str.length; i++) {
+                        view.setUint8(offset + i, str.charCodeAt(i));
+                    }
+                }
+                writeString(view, 0, 'RIFF');
+                view.setUint32(4, 36 + totalSamples * 2, true);
+                writeString(view, 8, 'WAVE');
+                writeString(view, 12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, 1, true);
+                view.setUint16(22, 1, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * 2, true);
+                view.setUint16(32, 2, true);
+                view.setUint16(34, 16, true);
+                writeString(view, 36, 'data');
+                view.setUint32(40, totalSamples * 2, true);
+
+                let sampleIndex = 0;
+                const gain = 0.5;
+
+                for (let t = 0; t < currentFreqs.length; t++) {
+                    const freq = currentFreqs[t];
+                    const startSample = t * sampleRate * durationPerTone;
+                    const endSample = startSample + sampleRate * durationPerTone;
+
+                    for (let i = startSample; i < endSample; i++) {
+                        const time = (i - startSample) / sampleRate;
+                        let amplitude = gain;
+                        if (time < fade) {
+                            amplitude *= (time / fade);
+                        } else if (time > durationPerTone - fade) {
+                            amplitude *= ((durationPerTone - time) / fade);
+                        }
+
+                        const value = Math.sin(2 * Math.PI * freq * time) * amplitude * 32767;
+                        view.setInt16(44 + i * 2, value, true);
+                        sampleIndex++;
+                    }
+                }
+
+                const blob = new Blob([buffer], { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Resonant_Souls.wav';
+                a.click();
+                URL.revokeObjectURL(url);
             };
 
             // ============================================================
-            //  Generative Visual - Full implementation (restored)
+            //  Generative Visual - Full implementation
             // ============================================================
             window.generateVisual = function(mode) {
                 let canvas;
@@ -1165,7 +1318,7 @@
             }
 
             // ============================================================
-            //  Constants and state
+            //  Constants and state (full question pools restored)
             // ============================================================
             const EXTREME_PASSWORD = "resonanceX";
 
@@ -1230,11 +1383,114 @@
                 q("i1","Is physical touch essential for you to feel loved?","Intimacy","scale",2, null, false, false, null, null, 'similarity'),
             ];
 
-            // (deep and extreme arrays omitted for brevity – in full code they are included)
-            const standardMaster = standard;
-            const deepMaster = standard;   // placeholder – replace with full deep in real code
-            const extremeMaster = standard; // placeholder
+            // --- DEEP DIVE (30) - hidden traits, sensuality, emotional patterns + one light BDSM question
+            const deep = [
+                q("h1","When plans change last minute, your first instinct is to...","Hidden","choice",1,
+                    ["Find opportunity","Anxious but adapt","Reschedule to regain control","Cancel entirely"],
+                    true, false,"Adaptability vs Control",
+                    {0:"high_adaptability",1:"anxious_flexible",2:"control_seeking",3:"rigid_structure"},'tolerance',null,1),
+                q("h2","A partner forgets your anniversary. You...","Hidden","choice",2,
+                    ["Withdraw emotionally","Joke about it","Directly express disappointment","Plan something better"],
+                    true, false,"Conflict Style",
+                    {0:"passive_aggressive",1:"indirect_communicator",2:"direct_communicator",3:"compensator"},'tolerance',null,1),
+                q("h3","Your ideal vacation involves...","Hidden","choice",1,
+                    ["Pure spontaneity","One planned activity per day","Every hour scheduled","Same place you've loved before"],
+                    true, false,"Stimulation Seeking",
+                    {0:"high_novelty",1:"balanced",2:"high_structure",3:"nostalgia_bound"},'tolerance',null,1),
+                q("h4","When someone cries in front of you, you feel...","Hidden","choice",2,
+                    ["Comfort immediately","Uncomfortable, need space","Curious about the cause","Your own emotions surface"],
+                    true, false,"Emotional Contagion",
+                    {0:"empath",1:"avoidant",2:"analyst",3:"mirrorer"},'tolerance',null,1),
+                q("h5","Your childhood room was...","Hidden","choice",1,
+                    ["Minimalist, few possessions","Cozy, filled with memories","Chaotic, ever-changing","A curated display for others"],
+                    true, false,"Attachment Roots",
+                    {0:"detached",1:"sentimental",2:"unstable",3:"performer"},'tolerance',null,1),
+                q("h6","In an argument, you most often...","Hidden","choice",2,
+                    ["Bring up past grievances","Shut down completely","Over-explain your logic","Apologize even if not wrong"],
+                    true, false,"Defense Mechanism",
+                    {0:"projector",1:"withdrawer",2:"intellectualizer",3:"fawner"},'tolerance',null,1),
+                q("h7","Your relationship to 'alone time'...","Hidden","choice",2,
+                    ["Recharge completely","Get lonely quickly","Productive but miss them","Anxious what they're doing"],
+                    true, false,"Attachment Style",
+                    {0:"secure_avoidant",1:"anxious_preoccupied",2:"secure_balanced",3:"anxious_fearful"},'tolerance',null,1),
+                q("h8","Receiving criticism feels...","Hidden","choice",1,
+                    ["Like an attack","Useful data","Necessary but painful","Usually invalid"],
+                    true, false,"Self-Concept Stability",
+                    {0:"fragile_ego",1:"growth_mindset",2:"humble_but_hurt",3:"defensive_narcissist"},'tolerance',null,1),
+                q("ei1","How important is receiving massage/giving massage in intimacy?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
+                q("ei2","Preferred environment for intimacy?","Sensuality","choice",1,
+                    ["Luxury hotel","Cozy home","Nature/outdoors","Anywhere passion strikes"], true, false, null, null, 'tolerance', null, 1),
+                q("ei3","Importance of scent in attraction?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
+                q("ei4","Do you prefer to lead or be led in sensual exploration?","Sensuality","choice",2,
+                    ["Always lead","Prefer to follow","Equal exchange","Depends on mood"], true, false, null, null, 'complementary', {0:1,1:0,2:2,3:3}),
+                q("ei5","How do you feel about vocal expression during intimacy?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
+                q("ei6","Importance of aftercare/cuddling post-intimacy?","Sensuality","scale",2, null, true, false, null, null, 'similarity'),
+                q("er1","I often have mood swings.","Neuroticism","scale",1, null, true, false, null, null, 'similarity'),
+                q("er2","I stay calm under pressure.","Neuroticism","scale",1, null, true, false, null, null, 'similarity'),
+                q("er3","I am quick to forgive.","Agreeableness","scale",1, null, true, false, null, null, 'similarity'),
+                q("er4","I hold grudges for a long time.","Agreeableness","scale",1, null, true, false, null, null, 'similarity'),
+                q("er5","I enjoy meeting new people.","Extraversion","scale",1, null, true, false, null, null, 'similarity'),
+                q("er6","I prefer small gatherings over large parties.","Extraversion","scale",1, null, true, false, null, null, 'similarity'),
+                q("er7","I finish projects before they are due.","Conscientiousness","scale",1, null, true, false, null, null, 'similarity'),
+                q("er8","I often procrastinate.","Conscientiousness","scale",1, null, true, false, null, null, 'similarity'),
+                q("er9","I enjoy abstract thinking.","Openness","scale",1, null, true, false, null, null, 'similarity'),
+                q("er10","I appreciate art and beauty.","Openness","scale",1, null, true, false, null, null, 'similarity'),
+                q("hp1","Your reaction to partner's success that surpasses yours?","Hidden","choice",2,
+                    ["Pure pride","Pride with insecurity","Motivation to catch up","Subtle resentment"],
+                    true, false,"Compersion vs Envy",null,'tolerance',null,1),
+                q("hp2","When alone, your internal monologue is...","Hidden","choice",1,
+                    ["Encouraging and planning","Analytical, problem-solving","Critical, self-doubting","Chaotic, hard to focus"],
+                    true, false,"Inner Critic",null,'tolerance',null,1),
+                q("hp3","How do you typically recharge after social exhaustion?","Hidden","choice",1,
+                    ["Solitude with a book","Light entertainment","Physical activity","Talking to a close friend"],
+                    true, false,"Recharge Style",null,'tolerance',null,1),
+                q("hp4","Do you often feel responsible for others' happiness?","Hidden","scale",1, null, true, false, null, null, 'similarity'),
+                q("hp5","Are you comfortable with silence in a conversation?","Hidden","scale",1, null, true, false, null, null, 'similarity'),
+                q("lb1","I am curious about light bondage (e.g., using a blindfold or soft restraints).","Sensuality","scale",2, null, true, false),
+            ];
 
+            // --- EXTREME (30) - BDSM, fetish, Dom/sub, taboo
+            const extreme = [
+                q("x1","I am aroused by the idea of being completely controlled by a partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x2","I enjoy taking control and giving orders in the bedroom.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x3","I am interested in bondage (rope, cuffs, restraints).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x4","I find sensory deprivation (blindfolds, hoods) exciting.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x5","I am curious about impact play (spanking, flogging).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x6","I enjoy role-playing scenarios (teacher/student, captor/captive).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x7","I have fantasies about being dominated by a powerful figure.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x8","I have fantasies about dominating a willing partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x9","I am aroused by specific non-sexual body parts (feet, hands, etc.).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x10","I am interested in latex/leather/rubber clothing.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x11","I enjoy being watched or watching others (voyeurism/exhibitionism).","Fetish","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x12","I am curious about group sex or swinging.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
+                q("x13","I am turned on by power exchange dynamics outside the bedroom.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x14","I enjoy giving or receiving pain in a consensual context.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x15","I am interested in pet play or animal roleplay.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x16","I find age play (consensual adult) intriguing.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
+                q("x17","I have a fetish for a specific material (leather, latex, silk).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x18","I am curious about electrostimulation or e-stim toys.","BDSM","scale",1, null, true, true, null, null, 'similarity'),
+                q("x19","I enjoy being verbally degraded during intimacy.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x20","I enjoy verbally degrading a partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x21","I am interested in medical play or clinical scenes.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x22","I find the idea of being tied up for an extended period exciting.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x23","I would like to explore a 24/7 D/s lifestyle.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("x24","I am aroused by body modification (tattoos, piercings).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x25","I enjoy cross-dressing or partner cross-dressing.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
+                q("x26","I have fantasies about being in a polyamorous relationship.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
+                q("x27","I am interested in primal play (hunting, wrestling).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x28","I enjoy wax play or temperature play.","BDSM","scale",1, null, true, true, null, null, 'similarity'),
+                q("x29","I am curious about knife play (safe, blunt).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
+                q("x30","I have a strong preference for a specific BDSM role (rigger, brat, little, etc.).","BDSM","choice",2,
+                    ["Yes, I identify strongly","I'm flexible","I'm curious but unsure","No, not my thing"], true, true, null, null, 'tolerance', null, 1),
+            ];
+
+            const standardMaster = standard.sort((a,b) => a.id.localeCompare(b.id));
+            const deepMaster = [...standardMaster, ...deep.sort((a,b) => a.id.localeCompare(b.id))];
+            const extremeMaster = [...deepMaster, ...extreme.sort((a,b) => a.id.localeCompare(b.id))];
+
+            // ============================================================
+            //  STATE
+            // ============================================================
             let state = {
                 questionCount: 30,
                 mode: 'solo',
