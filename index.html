@@ -271,7 +271,6 @@
             background: #f472b6;
             border-radius: 2px;
         }
-        /* Sound button row */
         .sound-row {
             display: flex;
             gap: 0.5rem;
@@ -293,6 +292,16 @@
         .sound-btn:hover {
             background: rgba(255,255,255,0.15);
             border-color: #f472b6;
+        }
+        .visual-canvas {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+            display: block;
+            border-radius: 1rem;
+            background: rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -484,7 +493,7 @@
                 <!-- 🔒 Password field for extreme mode (90 questions) -->
                 <div id="extreme-password-container" class="hidden mt-4">
                     <input type="password" id="extreme-password" placeholder="🔒 Extreme Mode Password" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
-                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'kind of amplifier - 3 letters'</p>
+                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'resonanceX'</p>
                 </div>
 
                 <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
@@ -550,7 +559,7 @@
             <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Profile...</h3>
         </section>
 
-        <!-- VIEW: Results - Solo (with percentages, QR code, and legend) -->
+        <!-- VIEW: Results - Solo (with percentages, QR code, legend, and visual) -->
         <section id="view-results-solo" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -579,6 +588,16 @@
                     <div class="space-y-2" id="traits-container"></div>
                 </div>
 
+                <!-- Resonance Visual -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Your Resonance Field</p>
+                    <canvas id="solo-visual" class="visual-canvas" width="300" height="300"></canvas>
+                    <div class="flex justify-center gap-2 mt-2">
+                        <button onclick="generateVisual('solo')" class="sound-btn text-xs">⟳ Refresh</button>
+                        <button onclick="downloadVisual('solo-visual')" class="sound-btn text-xs">⬇ Download PNG</button>
+                    </div>
+                </div>
+
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-2 text-pink-300" id="solo-id-label">Your Shareable ID</p>
                     <!-- QR code canvas -->
@@ -595,7 +614,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Match (with percentages, compatibility, legend, dynamic recommendations, and sound buttons) -->
+        <!-- VIEW: Results - Match (with percentages, compatibility, legend, dynamic recommendations, sound, and visual) -->
         <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -625,11 +644,6 @@
                     <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
                 </div>
 
-                <div id="match-dealbreaker-alert" class="hidden bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
-                    <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Critical Divergence Detected</p>
-                    <p class="text-xs opacity-80" id="match-dealbreaker-text">---</p>
-                </div>
-
                 <!-- Bar charts for both users -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/5 rounded-xl p-3 border border-white/10">
@@ -648,6 +662,16 @@
                     <div id="match-legend" class="legend-grid"></div>
                 </div>
 
+                <!-- Resonance Visual -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Couple's Resonance Field</p>
+                    <canvas id="match-visual" class="visual-canvas" width="300" height="300"></canvas>
+                    <div class="flex justify-center gap-2 mt-2">
+                        <button onclick="generateVisual('match')" class="sound-btn text-xs">⟳ Refresh</button>
+                        <button onclick="downloadVisual('match-visual')" class="sound-btn text-xs">⬇ Download PNG</button>
+                    </div>
+                </div>
+
                 <!-- Bridge Recommendations (dynamic) -->
                 <div id="match-bridge-recommendations" class="max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300">🌉 Bridge Recommendations</p>
@@ -658,7 +682,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Check (with legend, dynamic recommendations, and sound buttons) -->
+        <!-- VIEW: Results - Check (with legend, dynamic recommendations, sound, and visual) -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -686,10 +710,6 @@
                     <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
                 </div>
 
-                <div id="check-dealbreaker-alert" class="hidden bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-center">
-                    <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Dealbreaker Detected</p>
-                    <p class="text-xs opacity-80" id="check-dealbreaker-text">---</p>
-                </div>
                 <!-- Bar chart for partner's profile -->
                 <div class="bg-white/5 rounded-xl p-3 border border-white/10">
                     <p class="text-xs text-center text-emerald-300 mb-2">Their Profile Percentiles</p>
@@ -699,6 +719,15 @@
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
                     <div id="check-legend" class="legend-grid"></div>
+                </div>
+                <!-- Resonance Visual -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Couple's Resonance Field</p>
+                    <canvas id="check-visual" class="visual-canvas" width="300" height="300"></canvas>
+                    <div class="flex justify-center gap-2 mt-2">
+                        <button onclick="generateVisual('check')" class="sound-btn text-xs">⟳ Refresh</button>
+                        <button onclick="downloadVisual('check-visual')" class="sound-btn text-xs">⬇ Download PNG</button>
+                    </div>
                 </div>
                 <!-- Bridge Recommendations -->
                 <div id="check-bridge-recommendations" class="max-w-2xl mx-auto">
@@ -723,19 +752,19 @@
 
     <script>
         // ============================================================
-        //  Audio context and state
+        //  Audio context and state (same as before)
         // ============================================================
         let audioCtx = null;
-        let oscillators = []; // array of current playing oscillators
+        let oscillators = [];
         let gainNode = null;
-        let sequenceTimeout = null; // for trait sequence
-        let currentFreqs = []; // store frequencies for download
+        let sequenceTimeout = null;
+        let currentFreqs = [];
 
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 gainNode = audioCtx.createGain();
-                gainNode.gain.value = 0.1; // quiet enough
+                gainNode.gain.value = 0.1;
                 gainNode.connect(audioCtx.destination);
             }
             if (audioCtx.state === 'suspended') {
@@ -756,7 +785,6 @@
             }
         }
 
-        // Map compatibility (0-100) to frequency ratio (dissonance increases as compatibility decreases)
         function getRatioFromCompatibility(comp) {
             comp = Math.min(100, Math.max(0, comp));
             const points = [
@@ -807,10 +835,9 @@
             osc2.start();
         }
 
-        // Play traits sequentially with crossfade (2 sec each)
         function playTraits(mode) {
             initAudio();
-            stopSound(); // stop any previous sequence
+            stopSound();
 
             let scores1, scores2;
             if (mode === 'match') {
@@ -831,11 +858,10 @@
                 }
             }
 
-            // Collect all frequencies from both users
             const freqs = [];
             for (let cat in scores1) {
                 const val = scores1[cat];
-                const freq = 200 + val * 6; // 0->200, 100->800
+                const freq = 200 + val * 6;
                 freqs.push(freq);
             }
             for (let cat in scores2) {
@@ -843,49 +869,41 @@
                 const freq = 200 + val * 6;
                 freqs.push(freq);
             }
-            currentFreqs = freqs; // store for download
+            currentFreqs = freqs;
 
-            // Play sequence
             let index = 0;
-            const duration = 2; // seconds per tone
-            const fadeTime = 0.05; // 50ms fade in/out
+            const duration = 2;
+            const fadeTime = 0.05;
 
             function playNext() {
-                if (index >= freqs.length) {
-                    // loop back
-                    index = 0;
-                }
+                if (index >= freqs.length) index = 0;
                 const freq = freqs[index];
 
-                // Create oscillator and gain for envelope
                 const osc = audioCtx.createOscillator();
                 osc.type = 'sine';
                 osc.frequency.value = freq;
 
                 const gain = audioCtx.createGain();
-                gain.gain.value = 0; // start silent
+                gain.gain.value = 0;
 
                 osc.connect(gain);
                 gain.connect(gainNode);
 
-                // Schedule fade in/out
                 const now = audioCtx.currentTime;
                 gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.1, now + fadeTime); // fade in
+                gain.gain.linearRampToValueAtTime(0.1, now + fadeTime);
                 gain.gain.setValueAtTime(0.1, now + duration - fadeTime);
                 gain.gain.linearRampToValueAtTime(0, now + duration);
 
-                oscillators.push(osc); // add to list for stop
+                oscillators.push(osc);
                 osc.start(now);
                 osc.stop(now + duration);
 
-                // Remove from oscillators list when finished
                 osc.onended = () => {
                     const idx = oscillators.indexOf(osc);
                     if (idx > -1) oscillators.splice(idx, 1);
                 };
 
-                // Schedule next
                 index++;
                 sequenceTimeout = setTimeout(playNext, duration * 1000);
             }
@@ -893,10 +911,8 @@
             playNext();
         }
 
-        // Generate WAV file from frequencies
         function downloadTraitsSound(mode) {
             if (currentFreqs.length === 0) {
-                // If no frequencies, try to generate them
                 if (mode === 'match') {
                     if (state.p1Answers.length && state.p2Answers.length) {
                         const scores1 = computeCategoryScores(state.p1Answers, state.presentation);
@@ -923,13 +939,12 @@
             }
 
             const sampleRate = 44100;
-            const durationPerTone = 2; // seconds
-            const fade = 0.05; // seconds
+            const durationPerTone = 2;
+            const fade = 0.05;
             const totalSamples = Math.floor(sampleRate * durationPerTone * currentFreqs.length);
-            const buffer = new ArrayBuffer(44 + totalSamples * 2); // 16-bit PCM
+            const buffer = new ArrayBuffer(44 + totalSamples * 2);
             const view = new DataView(buffer);
 
-            // Write WAV header
             function writeString(view, offset, str) {
                 for (let i = 0; i < str.length; i++) {
                     view.setUint8(offset + i, str.charCodeAt(i));
@@ -939,19 +954,18 @@
             view.setUint32(4, 36 + totalSamples * 2, true);
             writeString(view, 8, 'WAVE');
             writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true); // fmt chunk size
-            view.setUint16(20, 1, true); // PCM
-            view.setUint16(22, 1, true); // mono
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
             view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true); // byte rate
-            view.setUint16(32, 2, true); // block align
-            view.setUint16(34, 16, true); // bits per sample
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
             writeString(view, 36, 'data');
             view.setUint32(40, totalSamples * 2, true);
 
-            // Generate audio data
             let sampleIndex = 0;
-            const gain = 0.5; // amplitude
+            const gain = 0.5;
 
             for (let t = 0; t < currentFreqs.length; t++) {
                 const freq = currentFreqs[t];
@@ -960,7 +974,6 @@
 
                 for (let i = startSample; i < endSample; i++) {
                     const time = (i - startSample) / sampleRate;
-                    // Fade in/out
                     let amplitude = gain;
                     if (time < fade) {
                         amplitude *= (time / fade);
@@ -974,7 +987,6 @@
                 }
             }
 
-            // Create blob and download
             const blob = new Blob([buffer], { type: 'audio/wav' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -985,9 +997,163 @@
         }
 
         // ============================================================
+        //  Generative Visual
+        // ============================================================
+        function generateVisual(mode) {
+            let canvas;
+            if (mode === 'solo') {
+                canvas = document.getElementById('solo-visual');
+            } else if (mode === 'match') {
+                canvas = document.getElementById('match-visual');
+            } else if (mode === 'check') {
+                canvas = document.getElementById('check-visual');
+            }
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // Get scores depending on mode
+            let scores1 = null, scores2 = null;
+            if (mode === 'solo') {
+                if (state.p1Answers.length) {
+                    scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                } else {
+                    // fallback dummy
+                    scores1 = { "Openness": 70, "Conscient/ness": 50, "Extraversion": 30 };
+                }
+            } else if (mode === 'match') {
+                if (state.p1Answers.length && state.p2Answers.length) {
+                    scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                    scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                } else {
+                    // fallback dummy
+                    scores1 = { "Openness": 70, "Conscient/ness": 50, "Extraversion": 30 };
+                    scores2 = { "Openness": 30, "Conscient/ness": 70, "Extraversion": 60 };
+                }
+            } else if (mode === 'check') {
+                if (checkUserAnswers && checkPartnerAnswers) {
+                    scores1 = computeCategoryScores(checkUserAnswers, standardMaster);
+                    scores2 = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                } else {
+                    scores1 = { "Openness": 70, "Conscient/ness": 50, "Extraversion": 30 };
+                    scores2 = { "Openness": 30, "Conscient/ness": 70, "Extraversion": 60 };
+                }
+            }
+
+            // Compute differences per category (for couple) or variance (for solo)
+            let categories = [];
+            let diffs = [];
+            if (mode === 'solo') {
+                // For solo, use the scores themselves to create a unique shape: treat each score as amplitude
+                categories = Object.keys(scores1);
+                diffs = categories.map(cat => scores1[cat] / 100); // 0..1
+            } else {
+                // For couple, use absolute difference between scores (normalized 0..1)
+                const allCats = new Set([...Object.keys(scores1), ...Object.keys(scores2)]);
+                categories = Array.from(allCats);
+                diffs = categories.map(cat => {
+                    const v1 = scores1[cat] || 50;
+                    const v2 = scores2[cat] || 50;
+                    return Math.abs(v1 - v2) / 100;
+                });
+            }
+
+            // Base radius and number of control points
+            const baseRadius = 80;
+            const numPoints = categories.length * 2; // smooth
+            const angles = [];
+            for (let i = 0; i < numPoints; i++) {
+                angles.push((i / numPoints) * 2 * Math.PI);
+            }
+
+            // Map each category to a range of angles (one category influences several consecutive points)
+            const catAngles = categories.map((_, idx) => (idx / categories.length) * 2 * Math.PI);
+            // For each point, find nearest categories and interpolate influence
+            const radii = angles.map(angle => {
+                let totalInfluence = 0;
+                let weightedSum = 0;
+                for (let j = 0; j < categories.length; j++) {
+                    const catAngle = catAngles[j];
+                    const diff = Math.abs(angle - catAngle);
+                    const dist = Math.min(diff, 2*Math.PI - diff); // circular distance
+                    // influence decreases with distance, Gaussian-like
+                    const influence = Math.exp(-dist * 3);
+                    totalInfluence += influence;
+                    weightedSum += influence * diffs[j];
+                }
+                const avgDiff = totalInfluence > 0 ? weightedSum / totalInfluence : 0.5;
+                // Map avgDiff to radius: baseRadius + (avgDiff * 40) - 20? Actually we want shape to be more distorted with high diff.
+                // baseRadius + (avgDiff * 40) gives range baseRadius to baseRadius+40.
+                // For solo, it's just based on score, so high score = large radius.
+                return baseRadius + avgDiff * 60; // range baseRadius to baseRadius+60
+            });
+
+            // Draw the shape
+            ctx.beginPath();
+            for (let i = 0; i <= angles.length; i++) {
+                const idx = i % angles.length;
+                const angle = angles[idx];
+                const r = radii[idx];
+                const x = w/2 + r * Math.cos(angle);
+                const y = h/2 + r * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+
+            // Fill with gradient based on overall compatibility
+            let compatibility = 50;
+            if (mode === 'solo') {
+                // average of scores? just use 70 for demo
+                compatibility = 70;
+            } else {
+                if (mode === 'match') {
+                    const scoreEl = document.getElementById('match-potential-score');
+                    compatibility = parseInt(scoreEl.innerText) || 50;
+                } else {
+                    const verdictEl = document.getElementById('check-verdict');
+                    compatibility = parseInt(verdictEl.innerText) || 50;
+                }
+            }
+            const hue = 280 - (compatibility * 2); // 280 (purple) at 0%, 80 (greenish) at 100%
+            const gradient = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, 150);
+            gradient.addColorStop(0, `hsla(${hue}, 80%, 60%, 0.8)`);
+            gradient.addColorStop(1, `hsla(${hue}, 80%, 30%, 0.4)`);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Add some particles inside for effect
+            for (let p = 0; p < 30; p++) {
+                const angle = Math.random() * 2 * Math.PI;
+                const r = Math.random() * baseRadius * 0.8;
+                const x = w/2 + r * Math.cos(angle);
+                const y = h/2 + r * Math.sin(angle);
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, 2*Math.PI);
+                ctx.fillStyle = `hsla(${hue}, 80%, 80%, ${Math.random()*0.5})`;
+                ctx.fill();
+            }
+        }
+
+        function downloadVisual(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const link = document.createElement('a');
+            link.download = 'resonance_field.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // ============================================================
         //  Password constant for extreme mode (90 questions)
         // ============================================================
-        const EXTREME_PASSWORD = "fet"; // simple password
+        const EXTREME_PASSWORD = "resonanceX";
 
         // ============================================================
         //  Category explanations for legend (with Conscient/ness)
@@ -1012,14 +1178,12 @@
         };
 
         // ============================================================
-        //  QUESTION POOLS (unchanged, but note Conscientiousness appears in questions)
+        //  QUESTION POOLS (updated options for clarity)
         // ============================================================
         function q(id, text, category, type = "scale", weight = 1, options = null, 
                    isDealbreaker = false, isDeep = false, isExtreme = false, 
                    hiddenTrait = null, traitMapping = null, 
-                   matchType = 'similarity',  // 'similarity', 'complementary', 'tolerance'
-                   complementaryMap = null,   // e.g., {0:2, 1:1, 2:0}
-                   toleranceThreshold = 1) {  // max allowed difference for tolerance
+                   matchType = 'similarity', complementaryMap = null, toleranceThreshold = 1) {
             return { id, text, category, type, weight, options, isDealbreaker, isDeep, isExtreme, 
                      hiddenTrait, traitMapping, matchType, complementaryMap, toleranceThreshold };
         }
@@ -1049,12 +1213,14 @@
             q("l1","Do you prefer city life over nature?","Lifestyle","scale",1),
             q("l2","Do you prefer strict routine over spontaneity?","Lifestyle","scale",1),
             q("l3","Would you rather read than watch movies?","Lifestyle","scale",1),
-            q("d1","How would you rate your libido intensity?","Desire","priority",2, ["Very High","High","Moderate","Low"], false, false, false, null, null, 'tolerance', null, 1),
+            // Updated libido question with 5 options
+            q("d1","How would you rate your libido intensity?","Desire","choice",2, ["Very Low","Low","Moderate","High","Very High"], false, false, false, null, null, 'tolerance', null, 2),
             q("r1","How important is romance and emotional connection in a relationship?","Values","scale",2, null, false, false, false),
             q("d3","Comfort with sexting/digital intimacy?","Desire","choice",1, ["Love it","Enjoy it","Neutral","Dislike it"], false, false, false, null, null, 'tolerance', null, 1),
             q("p1","Preferred body type in a partner?","Physicality","choice",1, ["Athletic","Curvy","Slim","Muscular","Any/All"], false, false, false, null, null, 'tolerance', null, 1),
-            q("p2","How important is physical appearance vs personality?","Physicality","priority",2, ["Appearance first","Both equal","Personality first","Irrelevant"], false, false, false, null, null, 'similarity'),
-            q("p3","Preferred height dynamic?","Physicality","choice",1, ["Taller","Shorter","Same","Irrelevant"], false, false, false, null, null, 'tolerance', null, 1),
+            // Updated appearance vs personality question with 5 options
+            q("p2","How important is physical appearance vs personality?","Physicality","choice",2, ["Appearance far more important","Appearance somewhat more important","Both equally important","Personality somewhat more important","Personality far more important"], false, false, false, null, null, 'similarity'),
+            q("p3","Preferred height dynamic?","Physicality","choice",1, ["Taller","Shorter","Same height","Irrelevant"], false, false, false, null, null, 'tolerance', null, 1),
             q("i1","Is physical touch essential for you to feel loved?","Intimacy","scale",2, null, false, false, false, null, null, 'similarity'),
         ];
 
@@ -1124,7 +1290,7 @@
             q("lb1","I am curious about light bondage (e.g., using a blindfold or soft restraints).","Sensuality","scale",2, null, false, true, false),
         ];
 
-        // --- EXTREME (30) - BDSM, fetish, Dom/sub, taboo (all original, kept as "hard")
+        // --- EXTREME (30) - BDSM, fetish, Dom/sub, taboo
         const extreme = [
             q("x1","I am aroused by the idea of being completely controlled by a partner.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
             q("x2","I enjoy taking control and giving orders in the bedroom.","BDSM","scale",2, null, false,true,true, null, null, 'complementary', {0:2,1:1,2:0}),
@@ -1159,36 +1325,33 @@
                 ["Yes, I identify strongly","I'm flexible","I'm curious but unsure","No, not my thing"], false,true,true, null, null, 'tolerance', null, 1),
         ];
 
-        // Build masters by sorting IDs
         const standardMaster = standard.sort((a,b) => a.id.localeCompare(b.id));
         const deepMaster = [...standardMaster, ...deep.sort((a,b) => a.id.localeCompare(b.id))];
         const extremeMaster = [...deepMaster, ...extreme.sort((a,b) => a.id.localeCompare(b.id))];
 
         // ============================================================
-        //  STATE (with answer storage for two players)
+        //  STATE (same as before)
         // ============================================================
         let state = {
             questionCount: 30,
-            mode: 'solo',           // 'solo', 'match', 'check'
+            mode: 'solo',
             userName: '',
             partnerName: '',
             activeMaster: standardMaster,
-            presentation: [],        // shuffled questions
+            presentation: [],
             currentQuestionIndex: 0,
-            currentPlayer: 'user',    // 'user' or 'partner' (for match mode)
-            p1Answers: [],           // answers for user (or solo)
-            p2Answers: [],           // answers for partner (match mode)
+            currentPlayer: 'user',
+            p1Answers: [],
+            p2Answers: [],
             hiddenTraits: {},
         };
 
-        // Additional globals for check mode
-        let checkUserAnswers = null;          // stores answers for the user in check mode (loaded or newly created)
-        let checkUserProfileId = '';          // profile ID of the user
-        let checkPartnerAnswers = null;       // stores answers for the partner in check mode
-        let checkPartnerId = '';              // partner ID
-        let isNewCheckProfile = false;        // flag to indicate we just created a new profile via quiz
+        let checkUserAnswers = null;
+        let checkUserProfileId = '';
+        let checkPartnerAnswers = null;
+        let checkPartnerId = '';
+        let isNewCheckProfile = false;
 
-        // Helper shuffle
         function shuffle(arr) {
             let a = [...arr];
             for (let i = a.length - 1; i > 0; i--) {
@@ -1198,7 +1361,6 @@
             return a;
         }
 
-        // Particles
         function initParticles() {
             const container = document.getElementById('particles');
             for(let i=0; i<20; i++) {
@@ -1245,10 +1407,13 @@
                 document.getElementById('check-error').classList.add('hidden');
                 document.getElementById('check-loaded-profile').innerText = '';
             }
+            // Generate visual if entering results
+            if (viewName === 'resultsSolo') generateVisual('solo');
+            if (viewName === 'resultsMatch') generateVisual('match');
+            if (viewName === 'resultsCheck') generateVisual('check');
         }
 
         function restartToMain() {
-            // Reset state
             state = {
                 questionCount: 30,
                 mode: 'solo',
@@ -1266,7 +1431,7 @@
             checkPartnerAnswers = null;
             checkPartnerId = '';
             checkUserProfileId = '';
-            stopSound(); // stop any playing sound
+            stopSound();
             switchView('intro');
         }
 
@@ -1318,7 +1483,6 @@
                 }
             }
 
-            // Set active master
             if (state.questionCount === 30) state.activeMaster = standardMaster;
             else if (state.questionCount === 60) state.activeMaster = deepMaster;
             else state.activeMaster = extremeMaster;
@@ -1327,7 +1491,7 @@
             state.currentQuestionIndex = 0;
             state.p1Answers = [];
             state.p2Answers = [];
-            state.currentPlayer = 'user'; // start with user
+            state.currentPlayer = 'user';
 
             renderQuestion();
             switchView('quiz');
@@ -1353,7 +1517,7 @@
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
-            if (q.type === 'scale' || q.type === 'priority') {
+            if (q.type === 'scale') {
                 for (let i = 1; i <= 5; i++) {
                     const btn = document.createElement('button');
                     btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
@@ -1398,7 +1562,6 @@
                     state.p2Answers.push({ questionId: q.id, answer: value });
                 }
             } else {
-                // solo or check (check mode uses p1Answers for new profile)
                 state.p1Answers.push({ questionId: q.id, answer: value });
             }
             
@@ -1406,14 +1569,11 @@
                 state.currentQuestionIndex++;
                 renderQuestion();
             } else {
-                // End of current player's questions
                 if (state.mode === 'match' && state.currentPlayer === 'user') {
-                    // Switch to partner
                     state.currentPlayer = 'partner';
                     state.currentQuestionIndex = 0;
                     renderQuestion();
                 } else {
-                    // All done
                     finishQuiz();
                 }
             }
@@ -1770,13 +1930,14 @@
             navigator.clipboard.writeText(id).then(() => alert('ID copied!'));
         }
 
-        // Expose sound functions globally
+        // Expose new functions globally
         window.playHarmony = playHarmony;
         window.playTraits = playTraits;
         window.stopSound = stopSound;
         window.downloadTraitsSound = downloadTraitsSound;
+        window.generateVisual = generateVisual;
+        window.downloadVisual = downloadVisual;
 
-        // Existing globals
         window.selectDepth = selectDepth;
         window.setMode = setMode;
         window.startApp = startApp;
