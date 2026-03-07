@@ -250,6 +250,27 @@
             margin: 1.5rem 0;
             text-align: left;
         }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.02);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            background: #f472b6;
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
@@ -456,7 +477,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Quiz (with back button and exit to main) -->
+        <!-- VIEW: Quiz (with back button and exit to main, plus player indicator) -->
         <section id="view-quiz" class="hidden flex flex-col h-full w-full relative">
             <!-- Header with back button, exit, and badges -->
             <div class="flex items-center justify-between mb-2">
@@ -506,7 +527,7 @@
             <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Profile...</h3>
         </section>
 
-        <!-- VIEW: Results - Solo (with percentages and QR code) -->
+        <!-- VIEW: Results - Solo (with percentages, QR code, and legend) -->
         <section id="view-results-solo" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -521,6 +542,12 @@
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300">Personality Percentiles</p>
                     <div id="solo-bar-chart" class="bar-chart"></div>
+                </div>
+
+                <!-- Compact legend -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
+                    <div id="solo-legend" class="legend-grid"></div>
                 </div>
 
                 <!-- Hidden traits (only for deep/extreme) -->
@@ -545,7 +572,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Match (with percentages and compatibility) -->
+        <!-- VIEW: Results - Match (with percentages, compatibility, legend, dynamic recommendations) -->
         <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -572,7 +599,7 @@
                     <p class="text-xs opacity-80" id="match-dealbreaker-text">---</p>
                 </div>
 
-                <!-- Bar charts for both users (simplified side-by-side) -->
+                <!-- Bar charts for both users -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/5 rounded-xl p-3 border border-white/10">
                         <p class="text-xs text-center text-pink-300 mb-2" id="match-user1-name">You</p>
@@ -584,20 +611,23 @@
                     </div>
                 </div>
 
-                <!-- Bridge Recommendations -->
+                <!-- Legend (compact) -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
+                    <div id="match-legend" class="legend-grid"></div>
+                </div>
+
+                <!-- Bridge Recommendations (dynamic) -->
                 <div id="match-bridge-recommendations" class="max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300">🌉 Bridge Recommendations</p>
-                    <div class="space-y-2" id="match-bridge-container">
-                        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Discuss your different approaches to spontaneity.</div>
-                        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Find common ground in physical touch preferences.</div>
-                    </div>
+                    <div class="space-y-2" id="match-bridge-container"></div>
                 </div>
 
                 <button onclick="restartToMain()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Analysis</button>
             </div>
         </section>
 
-        <!-- VIEW: Results - Check (fully functional) -->
+        <!-- VIEW: Results - Check (with legend and dynamic recommendations) -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -620,18 +650,20 @@
                     <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Dealbreaker Detected</p>
                     <p class="text-xs opacity-80" id="check-dealbreaker-text">---</p>
                 </div>
-                <!-- Simple bar chart for check (partner's profile) -->
+                <!-- Bar chart for partner's profile -->
                 <div class="bg-white/5 rounded-xl p-3 border border-white/10">
                     <p class="text-xs text-center text-emerald-300 mb-2">Their Profile Percentiles</p>
                     <div id="check-bar-chart" class="bar-chart"></div>
                 </div>
+                <!-- Legend (compact) -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
+                    <div id="check-legend" class="legend-grid"></div>
+                </div>
                 <!-- Bridge Recommendations -->
                 <div id="check-bridge-recommendations" class="max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300">🌉 Bridge Recommendations</p>
-                    <div class="space-y-2" id="check-bridge-container">
-                        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">They value routine; you prefer spontaneity – plan balanced dates.</div>
-                        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Shared interest in intellectual conversations is a strong bond.</div>
-                    </div>
+                    <div class="space-y-2" id="check-bridge-container"></div>
                 </div>
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
                     <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Friction Score</p>
@@ -656,7 +688,28 @@
         const EXTREME_PASSWORD = "resonanceX"; // simple password
 
         // ============================================================
-        //  QUESTION POOLS WITH MATCH TYPES AND COMPLEMENTARY MAPS
+        //  Category explanations for legend
+        // ============================================================
+        const categoryExplanations = {
+            "Openness": "Curiosity, creativity, and preference for novelty vs. routine.",
+            "Conscientiousness": "Organization, dependability, and self-discipline.",
+            "Extraversion": "Sociability, talkativeness, and energy from social interaction.",
+            "Agreeableness": "Compassion, cooperativeness, and trust in others.",
+            "Neuroticism": "Tendency toward anxiety, mood swings, and emotional sensitivity.",
+            "Values": "Core beliefs about family, career, spirituality, and life goals.",
+            "Lifestyle": "Daily habits, preferences for routine, city vs. nature, etc.",
+            "Desire": "Sexual drive and comfort with digital intimacy.",
+            "Physicality": "Preferences regarding appearance, body type, and physical dynamics.",
+            "Intimacy": "Importance of touch, romance, and emotional connection.",
+            "Hidden": "Underlying psychological patterns (defense mechanisms, attachment).",
+            "Sensuality": "Attraction to sensory experiences like massage, scent, environment.",
+            "BDSM": "Interest in power exchange, bondage, dominance/submission.",
+            "Fetish": "Attraction to specific objects, materials, or scenarios.",
+            "Other": "Miscellaneous traits not covered above."
+        };
+
+        // ============================================================
+        //  QUESTION POOLS (unchanged)
         // ============================================================
         function q(id, text, category, type = "scale", weight = 1, options = null, 
                    isDealbreaker = false, isDeep = false, isExtreme = false, 
@@ -809,23 +862,20 @@
         const extremeMaster = [...deepMaster, ...extreme.sort((a,b) => a.id.localeCompare(b.id))];
 
         // ============================================================
-        //  STATE (with answer storage)
+        //  STATE (with answer storage for two players)
         // ============================================================
         let state = {
             questionCount: 30,
-            mode: 'solo',
+            mode: 'solo',           // 'solo', 'match', 'check'
             userName: '',
             partnerName: '',
-            thresholds: {},
             activeMaster: standardMaster,
-            presentation: [],
+            presentation: [],        // shuffled questions
             currentQuestionIndex: 0,
-            p1Answers: [],       // stores answers for player 1 (or solo)
-            p2Answers: [],       // stores for player 2 (match mode)
+            currentPlayer: 'user',    // 'user' or 'partner' (for match mode)
+            p1Answers: [],           // answers for user (or solo)
+            p2Answers: [],           // answers for partner (match mode)
             hiddenTraits: {},
-            userAnswers: null,
-            userDepth: null,
-            isCheckQuiz: false
         };
 
         // Additional globals for check mode
@@ -884,12 +934,9 @@
                 } else {
                     passwordContainer.classList.add('hidden');
                 }
-                // Clear any previous password error
                 document.getElementById('password-error').classList.add('hidden');
             }
-            // Reset check view UI if needed
             if (viewName === 'check') {
-                // Hide step2 and user-id-section initially, show step1
                 document.getElementById('check-step1').classList.remove('hidden');
                 document.getElementById('check-user-id-section').classList.add('hidden');
                 document.getElementById('check-id-section').classList.add('hidden');
@@ -905,16 +952,13 @@
                 mode: 'solo',
                 userName: '',
                 partnerName: '',
-                thresholds: {},
                 activeMaster: standardMaster,
                 presentation: [],
                 currentQuestionIndex: 0,
+                currentPlayer: 'user',
                 p1Answers: [],
                 p2Answers: [],
                 hiddenTraits: {},
-                userAnswers: null,
-                userDepth: null,
-                isCheckQuiz: false
             };
             checkUserAnswers = null;
             checkPartnerAnswers = null;
@@ -944,7 +988,6 @@
             }
         }
 
-        // Modified beginAssessment with password protection for extreme mode
         function beginAssessment() {
             const userName = document.getElementById('user-name').value.trim();
             if (!userName) {
@@ -962,7 +1005,6 @@
                 state.partnerName = partnerName;
             }
 
-            // 🔒 Password check for extreme mode (90 questions)
             if (state.questionCount === 90) {
                 const passwordInput = document.getElementById('extreme-password').value;
                 if (passwordInput !== EXTREME_PASSWORD) {
@@ -973,23 +1015,21 @@
                 }
             }
 
-            // Set active master based on count
+            // Set active master
             if (state.questionCount === 30) state.activeMaster = standardMaster;
             else if (state.questionCount === 60) state.activeMaster = deepMaster;
             else state.activeMaster = extremeMaster;
 
-            // Shuffle questions for presentation (but keep original for answer mapping)
             state.presentation = shuffle(state.activeMaster);
             state.currentQuestionIndex = 0;
             state.p1Answers = [];
             state.p2Answers = [];
+            state.currentPlayer = 'user'; // start with user
 
-            // Start quiz
             renderQuestion();
             switchView('quiz');
         }
 
-        // Simple renderQuestion that displays a placeholder and options
         function renderQuestion() {
             const index = state.currentQuestionIndex;
             const total = state.presentation.length;
@@ -1003,16 +1043,13 @@
             document.getElementById('q-text').innerText = q.text;
             document.getElementById('q-category-display').innerText = q.category || 'General';
             
-            // Show/hide badges
             document.getElementById('q-deep').classList.toggle('hidden', !q.isDeep);
             document.getElementById('q-extreme').classList.toggle('hidden', !q.isExtreme);
             document.getElementById('q-dealbreaker').classList.toggle('hidden', !q.isDealbreaker);
             
-            // Create options (simple scale 1-5 or choice)
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
-            // For simplicity, we'll create 5 buttons for scale questions
             if (q.type === 'scale' || q.type === 'priority') {
                 for (let i = 1; i <= 5; i++) {
                     const btn = document.createElement('button');
@@ -1030,7 +1067,6 @@
                     container.appendChild(btn);
                 });
             } else {
-                // fallback
                 for (let i = 1; i <= 5; i++) {
                     const btn = document.createElement('button');
                     btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
@@ -1040,75 +1076,76 @@
                 }
             }
             
-            // Update player indicator for match mode
             const indicator = document.getElementById('player-indicator');
             if (state.mode === 'match') {
-                indicator.innerText = `${state.userName} (You) answering`;
+                indicator.innerText = state.currentPlayer === 'user' ? `${state.userName} (You) answering` : `${state.partnerName} answering`;
             } else {
                 indicator.innerText = `${state.userName} answering`;
             }
         }
 
-        // Handle answer selection
         function selectAnswer(value) {
             const index = state.currentQuestionIndex;
             const q = state.presentation[index];
             
-            // Store answer in appropriate array (simplified: always p1Answers for solo, for match we'd need logic, but for demo we'll just push)
-            state.p1Answers.push({ questionId: q.id, answer: value });
+            if (state.mode === 'match') {
+                if (state.currentPlayer === 'user') {
+                    state.p1Answers.push({ questionId: q.id, answer: value });
+                } else {
+                    state.p2Answers.push({ questionId: q.id, answer: value });
+                }
+            } else {
+                // solo or check (check mode uses p1Answers for new profile)
+                state.p1Answers.push({ questionId: q.id, answer: value });
+            }
             
-            // Move to next question or finish
             if (index + 1 < state.presentation.length) {
                 state.currentQuestionIndex++;
                 renderQuestion();
             } else {
-                // End of quiz – generate results
-                finishQuiz();
+                // End of current player's questions
+                if (state.mode === 'match' && state.currentPlayer === 'user') {
+                    // Switch to partner
+                    state.currentPlayer = 'partner';
+                    state.currentQuestionIndex = 0;
+                    renderQuestion();
+                } else {
+                    // All done
+                    finishQuiz();
+                }
             }
         }
 
-        // Function to compute and display results (modified for check mode)
         function finishQuiz() {
             switchView('processing');
             
-            // Simulate processing delay
             setTimeout(() => {
-                // Compute category scores from p1Answers
-                const categoryScores = computeCategoryScores(state.p1Answers, state.presentation);
-                
                 if (state.mode === 'solo') {
-                    displaySoloResults(categoryScores);
+                    const scores = computeCategoryScores(state.p1Answers, state.presentation);
+                    displaySoloResults(scores);
                 } else if (state.mode === 'match') {
-                    // For match mode, we need partner answers – simulate with random or slightly different
-                    const p2Dummy = generateDummyAnswers(state.presentation, state.p1Answers);
-                    const categoryScores2 = computeCategoryScores(p2Dummy, state.presentation);
-                    displayMatchResults(categoryScores, categoryScores2);
+                    const scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                    const scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                    displayMatchResults(scores1, scores2);
                 } else if (state.mode === 'check') {
-                    // For check mode, we just finished creating a new profile
-                    // Store answers and generate an ID
-                    checkUserAnswers = state.p1Answers.slice(); // copy
+                    checkUserAnswers = state.p1Answers.slice();
                     const profileId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
                     checkUserProfileId = profileId;
                     
-                    // Now go back to check view, but prefill the user ID and show step2
                     switchView('check');
                     document.getElementById('check-step1').classList.add('hidden');
                     document.getElementById('check-user-id-section').classList.remove('hidden');
                     document.getElementById('check-id-section').classList.remove('hidden');
                     document.getElementById('check-user-id').value = profileId;
                     document.getElementById('check-loaded-profile').innerText = `Profile loaded for ${state.userName}`;
-                    // Clear any previous error
                     document.getElementById('check-error').classList.add('hidden');
                 }
             }, 1500);
         }
 
-        // Helper: compute average per category (normalized to 0-100)
         function computeCategoryScores(answers, questions) {
             const catMap = {};
             const catCount = {};
-            
-            // Build a map of questionId to category (from presentation)
             const qMap = {};
             questions.forEach(q => { qMap[q.id] = q; });
             
@@ -1117,7 +1154,6 @@
                 if (!q) return;
                 const cat = q.category || 'Other';
                 if (!catMap[cat]) { catMap[cat] = 0; catCount[cat] = 0; }
-                // Scale answer to 0-100: answer is 1-5 -> (ans-1)*25
                 catMap[cat] += (ans.answer - 1) * 25;
                 catCount[cat]++;
             });
@@ -1129,24 +1165,12 @@
             return scores;
         }
 
-        // Generate dummy answers based on p1 with some variation
-        function generateDummyAnswers(questions, p1Answers, variation = 0.2) {
-            return p1Answers.map(ans => {
-                let newVal = ans.answer;
-                if (Math.random() < variation) {
-                    newVal = Math.min(5, Math.max(1, ans.answer + (Math.random() > 0.5 ? 1 : -1)));
-                }
-                return { questionId: ans.questionId, answer: newVal };
-            });
-        }
-
-        // Display solo results with bar chart and QR code
         function displaySoloResults(scores) {
             document.getElementById('solo-mode-label').innerText = state.questionCount + ' questions';
             const soloId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
             document.getElementById('solo-id').innerText = soloId;
             
-            // Generate QR code
+            // QR code
             const qr = qrcode(0, 'H');
             qr.addData(soloId);
             qr.make();
@@ -1162,27 +1186,12 @@
                 }
             }
             
-            // Build bar chart
-            const container = document.getElementById('solo-bar-chart');
-            container.innerHTML = '';
-            const categories = Object.keys(scores).sort();
-            categories.forEach(cat => {
-                const val = scores[cat];
-                const item = document.createElement('div');
-                item.className = 'bar-item';
-                item.innerHTML = `
-                    <span class="bar-label">${cat}</span>
-                    <div class="bar-track"><div class="bar-fill" style="width:${val}%"></div></div>
-                    <span class="bar-value">${val}%</span>
-                `;
-                container.appendChild(item);
-            });
+            buildBarChart('solo-bar-chart', scores);
+            buildLegend('solo-legend', Object.keys(scores));
             
-            // Show hidden traits if any deep questions (simplified)
             if (state.questionCount >= 60) {
                 document.getElementById('hidden-traits').classList.remove('hidden');
-                const traitsContainer = document.getElementById('traits-container');
-                traitsContainer.innerHTML = '<div class="hidden-trait">🌀 Attachment style: Secure with anxious tendencies</div><div class="hidden-trait">🔥 Conflict style: Direct communicator</div>';
+                document.getElementById('traits-container').innerHTML = '<div class="hidden-trait">🌀 Attachment style: Secure with anxious tendencies</div><div class="hidden-trait">🔥 Conflict style: Direct communicator</div>';
             } else {
                 document.getElementById('hidden-traits').classList.add('hidden');
             }
@@ -1194,9 +1203,9 @@
             document.getElementById('res-p1').innerText = state.userName || 'You';
             document.getElementById('res-p2').innerText = state.partnerName || 'Partner';
             
-            // Compute overall compatibility (average similarity across categories)
-            let totalDiff = 0;
+            // Compatibility
             const allCats = new Set([...Object.keys(scores1), ...Object.keys(scores2)]);
+            let totalDiff = 0;
             allCats.forEach(cat => {
                 const v1 = scores1[cat] || 50;
                 const v2 = scores2[cat] || 50;
@@ -1208,59 +1217,60 @@
             document.getElementById('match-potential-desc').innerText = 
                 compatibility > 80 ? 'Strong alignment' : compatibility > 60 ? 'Moderate resonance' : 'Significant friction';
             
-            // Build bar charts
             buildBarChart('match-bar-chart1', scores1);
             buildBarChart('match-bar-chart2', scores2);
+            buildLegend('match-legend', [...new Set([...Object.keys(scores1), ...Object.keys(scores2)])]);
+            
+            // Bridge recommendations
+            const bridgeContainer = document.getElementById('match-bridge-container');
+            bridgeContainer.innerHTML = '';
+            const commonCats = Object.keys(scores1).filter(cat => scores2.hasOwnProperty(cat));
+            if (commonCats.length > 0) {
+                const diffs = commonCats.map(cat => ({ cat, diff: Math.abs(scores1[cat] - scores2[cat]) }));
+                diffs.sort((a,b) => b.diff - a.diff);
+                const topDiffs = diffs.slice(0, 3).filter(d => d.diff > 30);
+                if (topDiffs.length > 0) {
+                    topDiffs.forEach(d => {
+                        bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${d.cat} (${d.diff}%) – discuss your perspectives.</div>`;
+                    });
+                } else {
+                    bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Your profiles are well aligned!</div>';
+                }
+            } else {
+                bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">No shared categories – difficult to compare.</div>';
+            }
             
             switchView('resultsMatch');
         }
 
-        // Function to display check results (used by runCompatibilityCheck)
         function displayCheckResults(scores1, scores2, name1 = 'You', name2 = 'Partner') {
             document.getElementById('check-res-p1').innerText = name1;
             document.getElementById('check-res-p2').innerText = name2;
             
-            // Use only common categories for compatibility calculation
-            const cats1 = Object.keys(scores1);
-            const cats2 = Object.keys(scores2);
-            const commonCats = cats1.filter(cat => cats2.includes(cat));
-            
+            const commonCats = Object.keys(scores1).filter(cat => scores2.hasOwnProperty(cat));
             let totalDiff = 0;
-            commonCats.forEach(cat => {
-                totalDiff += Math.abs(scores1[cat] - scores2[cat]);
-            });
-            
-            // If no common categories, compatibility = 50% (neutral)
+            commonCats.forEach(cat => totalDiff += Math.abs(scores1[cat] - scores2[cat]));
             let compatibility = 50;
             if (commonCats.length > 0) {
                 const avgDiff = totalDiff / commonCats.length;
                 compatibility = Math.max(0, Math.min(100, Math.round(100 - avgDiff)));
             }
-            
             document.getElementById('check-verdict').innerText = compatibility + '%';
             document.getElementById('check-verdict-sub').innerText = 
-                compatibility > 80 ? 'High resonance' : 
-                compatibility > 60 ? 'Moderate' : 
-                compatibility > 40 ? 'Neutral' : 'Low resonance';
-                
+                compatibility > 80 ? 'High resonance' : compatibility > 60 ? 'Moderate' : compatibility > 40 ? 'Neutral' : 'Low resonance';
             document.getElementById('check-friction-score').innerText = (100 - compatibility) + '%';
             document.getElementById('check-friction-desc').innerText = 
-                (100 - compatibility) < 20 ? 'Low friction – promising' : 
-                (100 - compatibility) < 40 ? 'Moderate friction – requires communication' : 
-                'High friction – significant differences';
+                (100 - compatibility) < 20 ? 'Low friction – promising' : (100 - compatibility) < 40 ? 'Moderate friction – requires communication' : 'High friction – significant differences';
             
-            // Build bar chart for partner's profile
             buildBarChart('check-bar-chart', scores2);
+            buildLegend('check-legend', Object.keys(scores2));
             
-            // Generate bridge recommendations based on largest differences in common categories
             const bridgeContainer = document.getElementById('check-bridge-container');
             bridgeContainer.innerHTML = '';
-            
             if (commonCats.length > 0) {
                 const diffs = commonCats.map(cat => ({ cat, diff: Math.abs(scores1[cat] - scores2[cat]) }));
                 diffs.sort((a,b) => b.diff - a.diff);
                 const topDiffs = diffs.slice(0, 3).filter(d => d.diff > 30);
-                
                 if (topDiffs.length > 0) {
                     topDiffs.forEach(d => {
                         bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${d.cat} (${d.diff}%) – discuss your perspectives.</div>`;
@@ -1293,11 +1303,33 @@
             });
         }
 
-        // Back button in quiz
+        function buildLegend(containerId, categories) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            categories.sort().forEach(cat => {
+                const desc = categoryExplanations[cat] || "No description available.";
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <div class="legend-color"></div>
+                    <span><strong>${cat}:</strong> ${desc}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
         function previousQuestion() {
             if (state.currentQuestionIndex > 0) {
-                // Remove last answer (the one for current-1)
-                state.p1Answers.pop();
+                if (state.mode === 'match') {
+                    if (state.currentPlayer === 'user') {
+                        state.p1Answers.pop();
+                    } else {
+                        state.p2Answers.pop();
+                    }
+                } else {
+                    state.p1Answers.pop();
+                }
                 state.currentQuestionIndex--;
                 renderQuestion();
             } else {
@@ -1309,25 +1341,20 @@
         function showCheckIdInput() {
             document.getElementById('check-step1').classList.add('hidden');
             document.getElementById('check-user-id-section').classList.remove('hidden');
-            document.getElementById('check-id-section').classList.add('hidden'); // hide step2 until profile loaded
+            document.getElementById('check-id-section').classList.add('hidden');
         }
 
         function startCheckNew() {
             const name = document.getElementById('check-your-name').value.trim();
-            if (!name) {
-                alert("Please enter your name.");
-                return;
-            }
+            if (!name) { alert("Please enter your name."); return; }
             state.userName = name;
             state.mode = 'check';
-            // For check mode, we use 30 questions (standard) for simplicity, but could use the selected depth
             state.questionCount = 30; 
             state.activeMaster = standardMaster;
             state.presentation = shuffle(state.activeMaster);
             state.currentQuestionIndex = 0;
             state.p1Answers = [];
             isNewCheckProfile = true;
-            
             switchView('quiz');
         }
 
@@ -1338,12 +1365,10 @@
                 document.getElementById('check-error').classList.remove('hidden');
                 return;
             }
-            // Generate deterministic answers based on the ID using a seeded PRNG
             checkUserAnswers = generateAnswersFromId(id, standardMaster);
             checkUserProfileId = id;
             document.getElementById('check-loaded-profile').innerText = `Profile loaded from ID: ${id}`;
             document.getElementById('check-error').classList.add('hidden');
-            // Show step2
             document.getElementById('check-id-section').classList.remove('hidden');
         }
 
@@ -1355,32 +1380,24 @@
                 return;
             }
             if (!checkUserAnswers) {
-                document.getElementById('check-error').innerText = "Your profile not loaded. Please create or enter your ID first.";
+                document.getElementById('check-error').innerText = "Your profile not loaded.";
                 document.getElementById('check-error').classList.remove('hidden');
                 return;
             }
-            // Generate partner answers from ID using the same deterministic method
             checkPartnerAnswers = generateAnswersFromId(partnerId, standardMaster);
             checkPartnerId = partnerId;
             
-            // Compute scores
             const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
             const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
-            
-            // Display results
             displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + partnerId.substr(-4));
         }
 
-        // Deterministic answer generation from an ID string using a seeded PRNG for more variety
         function generateAnswersFromId(id, questions) {
-            // Simple hash to seed a pseudo-random generator
             let seed = 0;
             for (let i = 0; i < id.length; i++) {
                 seed = ((seed << 5) - seed) + id.charCodeAt(i);
-                seed |= 0; // Convert to 32-bit integer
+                seed |= 0;
             }
-            
-            // Mulberry32 PRNG
             function mulberry32() {
                 seed += 0x6D2B79F5;
                 let t = seed;
@@ -1388,38 +1405,26 @@
                 t ^= t + Math.imul(t ^ t >>> 7, t | 61);
                 return ((t ^ t >>> 14) >>> 0) / 4294967296;
             }
-            
             const answers = [];
             for (let i = 0; i < questions.length; i++) {
                 const q = questions[i];
-                // Generate a value between 1 and 5 using the seeded PRNG
                 const val = Math.floor(mulberry32() * 5) + 1;
                 answers.push({ questionId: q.id, answer: val });
             }
             return answers;
         }
 
-        // New function: show partner's full profile (like solo results)
         function showPartnerFullProfile() {
-            if (!checkPartnerAnswers) {
-                alert("No partner profile loaded.");
-                return;
-            }
-            // Compute scores for partner
+            if (!checkPartnerAnswers) { alert("No partner profile."); return; }
             const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
             
-            // Temporarily switch to solo results view but with partner's data
             document.getElementById('solo-title').innerText = "Partner's Dimensional Map";
             document.getElementById('solo-mode-label').innerText = "30 questions • Profile from ID";
             document.getElementById('solo-id-label').innerText = "Partner's Resonance ID";
+            document.getElementById('solo-id').innerText = checkPartnerId || 'RS-****';
             
-            // Generate a fake ID for partner if not already
-            const partnerIdDisplay = checkPartnerId || 'RS-****';
-            document.getElementById('solo-id').innerText = partnerIdDisplay;
-            
-            // Generate QR code for partner ID
             const qr = qrcode(0, 'H');
-            qr.addData(partnerIdDisplay);
+            qr.addData(checkPartnerId || 'RS-****');
             qr.make();
             const canvas = document.getElementById('solo-qrcode');
             canvas.width = 150;
@@ -1433,49 +1438,26 @@
                 }
             }
             
-            // Build bar chart with partner's scores
-            const container = document.getElementById('solo-bar-chart');
-            container.innerHTML = '';
-            const categories = Object.keys(partnerScores).sort();
-            categories.forEach(cat => {
-                const val = partnerScores[cat];
-                const item = document.createElement('div');
-                item.className = 'bar-item';
-                item.innerHTML = `
-                    <span class="bar-label">${cat}</span>
-                    <div class="bar-track"><div class="bar-fill" style="width:${val}%"></div></div>
-                    <span class="bar-value">${val}%</span>
-                `;
-                container.appendChild(item);
-            });
-            
-            // Hide hidden traits (standard mode only)
+            buildBarChart('solo-bar-chart', partnerScores);
+            buildLegend('solo-legend', Object.keys(partnerScores));
             document.getElementById('hidden-traits').classList.add('hidden');
             
-            // Change copy button to copy partner ID
             const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
             copyBtn.innerText = 'Copy Partner ID';
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(partnerIdDisplay).then(() => alert('Partner ID copied!'));
-            };
+            copyBtn.onclick = () => { navigator.clipboard.writeText(checkPartnerId || '').then(() => alert('Partner ID copied!')); };
             
-            // Change New Session button to go back to check results
             const newBtn = document.querySelector('#view-results-solo .flex.gap-2 button:last-child');
             newBtn.innerText = 'Back to Check';
             newBtn.onclick = () => {
-                // Restore original button text and behavior before switching
                 copyBtn.innerText = 'Copy ID';
                 copyBtn.onclick = copySoloID;
                 newBtn.innerText = 'New Session';
                 newBtn.onclick = restartToMain;
-                // Recompute and show check results again
                 if (checkUserAnswers && checkPartnerAnswers) {
                     const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
                     const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
                     displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + (checkPartnerId ? checkPartnerId.substr(-4) : ''));
-                } else {
-                    restartToMain();
-                }
+                } else { restartToMain(); }
             };
             
             switchView('resultsSolo');
@@ -1486,7 +1468,6 @@
             navigator.clipboard.writeText(id).then(() => alert('ID copied!'));
         }
 
-        // Expose functions globally
         window.selectDepth = selectDepth;
         window.setMode = setMode;
         window.startApp = startApp;
