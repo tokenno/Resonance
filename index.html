@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance · Soul Signals</title>
+    <title>Resonance · Personality and Soulmate Alignment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Generator & Scanner Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
@@ -1317,6 +1317,135 @@
             }
 
             // ============================================================
+            //  NEW: Extract detailed personality labels from answers
+            // ============================================================
+            function extractPersonalityLabels(answers, questions) {
+                // Create a map of question id to answer
+                const ansMap = {};
+                answers.forEach(a => { ansMap[a.questionId] = a.answer; });
+
+                const labels = [];
+
+                // Helper to get answer value for a given id (if exists)
+                const getAns = (id) => ansMap[id] !== undefined ? ansMap[id] : null;
+
+                // --- Attachment style (from h7) ---
+                const h7 = getAns("h7");
+                if (h7 !== null) {
+                    const map = {
+                        0: "Secure-Avoidant",
+                        1: "Anxious-Preoccupied",
+                        2: "Secure-Balanced",
+                        3: "Anxious-Fearful"
+                    };
+                    labels.push(`🧩 Attachment: ${map[h7] || "Unknown"}`);
+                }
+
+                // --- Conflict style (from h2 and h6) ---
+                const h2 = getAns("h2");
+                const h6 = getAns("h6");
+                if (h2 !== null && h6 !== null) {
+                    // combine: if both are direct -> Assertive; if one withdraw -> Passive; etc.
+                    if (h2 === 2 && h6 === 2) labels.push("⚔️ Conflict Style: Assertive");
+                    else if (h2 === 0 || h6 === 0) labels.push("⚔️ Conflict Style: Withdrawing");
+                    else if (h2 === 1 || h6 === 1) labels.push("⚔️ Conflict Style: Joking/Deflecting");
+                    else if (h2 === 3 || h6 === 3) labels.push("⚔️ Conflict Style: Compensating");
+                    else labels.push("⚔️ Conflict Style: Mixed");
+                }
+
+                // --- BDSM Archetype (from extreme questions) ---
+                // Count dominance vs submission questions
+                let domScore = 0, subScore = 0, countDom = 0, countSub = 0;
+                const domIds = ["x2","x8","x13","x20","x23"];
+                const subIds = ["x1","x7","x19"];
+                domIds.forEach(id => {
+                    const val = getAns(id);
+                    if (val !== null) { domScore += val; countDom++; }
+                });
+                subIds.forEach(id => {
+                    const val = getAns(id);
+                    if (val !== null) { subScore += val; countSub++; }
+                });
+                if (countDom > 0 && countSub > 0) {
+                    const domAvg = domScore / countDom;
+                    const subAvg = subScore / countSub;
+                    if (domAvg > 3.5 && subAvg < 2.5) labels.push("🔗 BDSM Archetype: Dominant");
+                    else if (subAvg > 3.5 && domAvg < 2.5) labels.push("🔗 BDSM Archetype: Submissive");
+                    else if (domAvg > 3.5 && subAvg > 3.5) labels.push("🔗 BDSM Archetype: Switch");
+                    else labels.push("🔗 BDSM Archetype: Vanilla / Kink-curious");
+                }
+
+                // --- Sensual Profile (from ei1-ei6) ---
+                const ei1 = getAns("ei1"), ei3 = getAns("ei3"), ei6 = getAns("ei6");
+                if (ei1 !== null && ei3 !== null && ei6 !== null) {
+                    const avgSensual = (ei1 + ei3 + ei6) / 3;
+                    if (avgSensual > 4) labels.push("💆 Sensuality: Highly Sensual");
+                    else if (avgSensual < 2) labels.push("💆 Sensuality: Pragmatic");
+                    else labels.push("💆 Sensuality: Balanced");
+                }
+
+                // --- Emotional Regulation (from er1, er2) ---
+                const er1 = getAns("er1"), er2 = getAns("er2");
+                if (er1 !== null && er2 !== null) {
+                    // er1 is anxiety, er2 is calm (reverse)
+                    if (er1 > 4 && er2 < 2) labels.push("😰 Emotional: Anxious");
+                    else if (er1 < 2 && er2 > 4) labels.push("😌 Emotional: Calm");
+                    else labels.push("😐 Emotional: Moderate");
+                }
+
+                // --- Recharge Style (from hp3) ---
+                const hp3 = getAns("hp3");
+                if (hp3 !== null) {
+                    const map = {
+                        0: "Introvert (solitude)",
+                        1: "Light entertainer",
+                        2: "Active recharger",
+                        3: "Social recharger"
+                    };
+                    labels.push(`🔋 Recharge Style: ${map[hp3] || "Unknown"}`);
+                }
+
+                // --- Inner Critic (from hp2) ---
+                const hp2 = getAns("hp2");
+                if (hp2 !== null) {
+                    const map = {
+                        0: "Encouraging",
+                        1: "Analytical",
+                        2: "Critical",
+                        3: "Chaotic"
+                    };
+                    labels.push(`🗣️ Inner Critic: ${map[hp2] || "Unknown"}`);
+                }
+
+                // --- Stimulation Seeking (from h3) ---
+                const h3 = getAns("h3");
+                if (h3 !== null) {
+                    const map = {
+                        0: "High novelty seeker",
+                        1: "Balanced explorer",
+                        2: "Structured planner",
+                        3: "Nostalgic"
+                    };
+                    labels.push(`🧳 Stimulation: ${map[h3] || "Unknown"}`);
+                }
+
+                // --- Compersion vs Envy (from hp1) ---
+                const hp1 = getAns("hp1");
+                if (hp1 !== null) {
+                    const map = {
+                        0: "Compersion (pure pride)",
+                        1: "Mixed pride/insecurity",
+                        2: "Motivated",
+                        3: "Envious"
+                    };
+                    labels.push(`❤️ Compersion: ${map[hp1] || "Unknown"}`);
+                }
+
+                // If no deep/extreme questions, return empty array
+                return labels;
+            }
+
+            // ============================================================
             //  Constants and state (full question pools – all unique)
             // ============================================================
             const EXTREME_PASSWORD = "fet";
@@ -1889,14 +2018,20 @@
                 const summary = document.getElementById('solo-personality-summary');
                 if (summary) summary.innerText = desc;
                 
+                // Display extracted personality labels
                 if (state.questionCount >= 60) {
-                    const traits = document.getElementById('hidden-traits');
                     const traitsContainer = document.getElementById('traits-container');
-                    if (traits) traits.classList.remove('hidden');
-                    if (traitsContainer) traitsContainer.innerHTML = '<div class="hidden-trait">🌀 Attachment style: Secure with anxious tendencies</div><div class="hidden-trait">🔥 Conflict style: Direct communicator</div>';
+                    if (traitsContainer) {
+                        const labels = extractPersonalityLabels(state.p1Answers, state.presentation);
+                        if (labels.length > 0) {
+                            traitsContainer.innerHTML = labels.map(l => `<div class="hidden-trait">${l}</div>`).join('');
+                        } else {
+                            traitsContainer.innerHTML = '<div class="hidden-trait">No additional patterns detected.</div>';
+                        }
+                    }
+                    document.getElementById('hidden-traits').classList.remove('hidden');
                 } else {
-                    const traits = document.getElementById('hidden-traits');
-                    if (traits) traits.classList.add('hidden');
+                    document.getElementById('hidden-traits').classList.add('hidden');
                 }
                 
                 switchView('resultsSolo');
@@ -1931,6 +2066,7 @@
                 if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName);
                 if (sum2) sum2.innerText = generatePersonalityDescription(scores2, state.partnerName);
                 
+                // (Bridge recommendations remain as before)
                 const bridgeContainer = document.getElementById('match-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
@@ -1985,6 +2121,7 @@
                 if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName || 'You');
                 if (sum2) sum2.innerText = generatePersonalityDescription(scores2, name2);
                 
+                // (Bridge recommendations same as before)
                 const bridgeContainer = document.getElementById('check-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
