@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance · Personality and Soulmate Alignment</title>
+    <title>Resonance · Soul Signals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Generator & Scanner Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
@@ -524,7 +524,7 @@
             <button onclick="switchView('mode')" class="text-xs text-white/40 hover:text-white underline underline-offset-4">← Back</button>
         </section>
 
-        <!-- VIEW: Setup -->
+        <!-- VIEW: Setup (with email fields) -->
         <section id="view-setup" class="hidden space-y-6 result-reveal">
             <div class="text-right">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -535,12 +535,14 @@
             </div>
             <div class="space-y-4 max-w-md mx-auto">
                 <input type="text" id="user-name" placeholder="Your Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                <input type="email" id="user-email" placeholder="Your Email (optional)" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
                 <div id="partner-input" class="hidden">
                     <input type="text" id="partner-name" placeholder="Partner's Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30 mt-3">
+                    <input type="email" id="partner-email" placeholder="Partner's Email (optional)" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30 mt-3">
                 </div>
                 <div id="extreme-password-container" class="hidden mt-4">
                     <input type="password" id="extreme-password" placeholder="🔒 Extreme Mode Password" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
-                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'kind of amplifier - 3 letters'</p>
+                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'resonanceX'</p>
                 </div>
                 <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
                     Begin Assessment
@@ -700,7 +702,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Check -->
+        <!-- VIEW: Results - Check (with email reveal) -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -721,6 +723,13 @@
                     <p class="text-4xl font-bold serif mb-2" id="check-verdict">82%</p>
                     <p class="text-sm" id="check-verdict-sub">High resonance</p>
                 </div>
+
+                <!-- Email reveal area (shown only if compatibility > 90) -->
+                <div id="email-reveal-area" class="hidden bg-emerald-500/20 border border-emerald-500/30 rounded-xl p-4 text-center">
+                    <p class="text-emerald-300 font-bold text-sm mb-1">✨ High Compatibility – Contact Info Revealed ✨</p>
+                    <p id="revealed-email" class="text-sm break-all">email@example.com</p>
+                </div>
+
                 <div class="sound-row">
                     <button onclick="playHarmony('check')" class="sound-btn">🎵 Play Harmony</button>
                     <button onclick="playTraits('check')" class="sound-btn">🎹 Play Traits</button>
@@ -1072,7 +1081,7 @@
             };
 
             // ============================================================
-            //  Generative Visual
+            //  Generative Visual (fully restored)
             // ============================================================
             window.generateVisual = function(mode) {
                 let canvas;
@@ -1317,35 +1326,23 @@
             }
 
             // ============================================================
-            //  NEW: Extract detailed personality labels from answers
+            //  Extract detailed personality labels
             // ============================================================
             function extractPersonalityLabels(answers, questions) {
-                // Create a map of question id to answer
                 const ansMap = {};
                 answers.forEach(a => { ansMap[a.questionId] = a.answer; });
-
+                const getAns = (id) => ansMap[id] !== undefined ? ansMap[id] : null;
                 const labels = [];
 
-                // Helper to get answer value for a given id (if exists)
-                const getAns = (id) => ansMap[id] !== undefined ? ansMap[id] : null;
-
-                // --- Attachment style (from h7) ---
                 const h7 = getAns("h7");
                 if (h7 !== null) {
-                    const map = {
-                        0: "Secure-Avoidant",
-                        1: "Anxious-Preoccupied",
-                        2: "Secure-Balanced",
-                        3: "Anxious-Fearful"
-                    };
+                    const map = { 0: "Secure-Avoidant", 1: "Anxious-Preoccupied", 2: "Secure-Balanced", 3: "Anxious-Fearful" };
                     labels.push(`🧩 Attachment: ${map[h7] || "Unknown"}`);
                 }
 
-                // --- Conflict style (from h2 and h6) ---
                 const h2 = getAns("h2");
                 const h6 = getAns("h6");
                 if (h2 !== null && h6 !== null) {
-                    // combine: if both are direct -> Assertive; if one withdraw -> Passive; etc.
                     if (h2 === 2 && h6 === 2) labels.push("⚔️ Conflict Style: Assertive");
                     else if (h2 === 0 || h6 === 0) labels.push("⚔️ Conflict Style: Withdrawing");
                     else if (h2 === 1 || h6 === 1) labels.push("⚔️ Conflict Style: Joking/Deflecting");
@@ -1353,19 +1350,11 @@
                     else labels.push("⚔️ Conflict Style: Mixed");
                 }
 
-                // --- BDSM Archetype (from extreme questions) ---
-                // Count dominance vs submission questions
                 let domScore = 0, subScore = 0, countDom = 0, countSub = 0;
                 const domIds = ["x2","x8","x13","x20","x23"];
                 const subIds = ["x1","x7","x19"];
-                domIds.forEach(id => {
-                    const val = getAns(id);
-                    if (val !== null) { domScore += val; countDom++; }
-                });
-                subIds.forEach(id => {
-                    const val = getAns(id);
-                    if (val !== null) { subScore += val; countSub++; }
-                });
+                domIds.forEach(id => { const val = getAns(id); if (val !== null) { domScore += val; countDom++; } });
+                subIds.forEach(id => { const val = getAns(id); if (val !== null) { subScore += val; countSub++; } });
                 if (countDom > 0 && countSub > 0) {
                     const domAvg = domScore / countDom;
                     const subAvg = subScore / countSub;
@@ -1375,7 +1364,6 @@
                     else labels.push("🔗 BDSM Archetype: Vanilla / Kink-curious");
                 }
 
-                // --- Sensual Profile (from ei1-ei6) ---
                 const ei1 = getAns("ei1"), ei3 = getAns("ei3"), ei6 = getAns("ei6");
                 if (ei1 !== null && ei3 !== null && ei6 !== null) {
                     const avgSensual = (ei1 + ei3 + ei6) / 3;
@@ -1384,71 +1372,44 @@
                     else labels.push("💆 Sensuality: Balanced");
                 }
 
-                // --- Emotional Regulation (from er1, er2) ---
                 const er1 = getAns("er1"), er2 = getAns("er2");
                 if (er1 !== null && er2 !== null) {
-                    // er1 is anxiety, er2 is calm (reverse)
                     if (er1 > 4 && er2 < 2) labels.push("😰 Emotional: Anxious");
                     else if (er1 < 2 && er2 > 4) labels.push("😌 Emotional: Calm");
                     else labels.push("😐 Emotional: Moderate");
                 }
 
-                // --- Recharge Style (from hp3) ---
                 const hp3 = getAns("hp3");
                 if (hp3 !== null) {
-                    const map = {
-                        0: "Introvert (solitude)",
-                        1: "Light entertainer",
-                        2: "Active recharger",
-                        3: "Social recharger"
-                    };
+                    const map = { 0: "Introvert (solitude)", 1: "Light entertainer", 2: "Active recharger", 3: "Social recharger" };
                     labels.push(`🔋 Recharge Style: ${map[hp3] || "Unknown"}`);
                 }
 
-                // --- Inner Critic (from hp2) ---
                 const hp2 = getAns("hp2");
                 if (hp2 !== null) {
-                    const map = {
-                        0: "Encouraging",
-                        1: "Analytical",
-                        2: "Critical",
-                        3: "Chaotic"
-                    };
+                    const map = { 0: "Encouraging", 1: "Analytical", 2: "Critical", 3: "Chaotic" };
                     labels.push(`🗣️ Inner Critic: ${map[hp2] || "Unknown"}`);
                 }
 
-                // --- Stimulation Seeking (from h3) ---
                 const h3 = getAns("h3");
                 if (h3 !== null) {
-                    const map = {
-                        0: "High novelty seeker",
-                        1: "Balanced explorer",
-                        2: "Structured planner",
-                        3: "Nostalgic"
-                    };
+                    const map = { 0: "High novelty seeker", 1: "Balanced explorer", 2: "Structured planner", 3: "Nostalgic" };
                     labels.push(`🧳 Stimulation: ${map[h3] || "Unknown"}`);
                 }
 
-                // --- Compersion vs Envy (from hp1) ---
                 const hp1 = getAns("hp1");
                 if (hp1 !== null) {
-                    const map = {
-                        0: "Compersion (pure pride)",
-                        1: "Mixed pride/insecurity",
-                        2: "Motivated",
-                        3: "Envious"
-                    };
+                    const map = { 0: "Compersion (pure pride)", 1: "Mixed pride/insecurity", 2: "Motivated", 3: "Envious" };
                     labels.push(`❤️ Compersion: ${map[hp1] || "Unknown"}`);
                 }
 
-                // If no deep/extreme questions, return empty array
                 return labels;
             }
 
             // ============================================================
-            //  Constants and state (full question pools – all unique)
+            //  Constants and question pools (fully restored)
             // ============================================================
-            const EXTREME_PASSWORD = "fet";
+            const EXTREME_PASSWORD = "resonanceX";
 
             const categoryExplanations = {
                 "Openness": "Curiosity, creativity, and preference for novelty vs. routine.",
@@ -1617,13 +1578,15 @@
             const extremeMaster = [...deepMaster, ...extreme.sort((a,b) => a.id.localeCompare(b.id))];
 
             // ============================================================
-            //  STATE
+            //  STATE (with email fields)
             // ============================================================
             let state = {
                 questionCount: 30,
                 mode: 'solo',
                 userName: '',
+                userEmail: '',
                 partnerName: '',
+                partnerEmail: '',
                 activeMaster: standardMaster,
                 presentation: [],
                 currentQuestionIndex: 0,
@@ -1635,8 +1598,10 @@
 
             let checkUserAnswers = null;
             let checkUserProfileId = '';
+            let checkUserEmail = null;
             let checkPartnerAnswers = null;
             let checkPartnerId = '';
+            let checkPartnerEmail = null;
             let isNewCheckProfile = false;
 
             function shuffle(arr) {
@@ -1718,7 +1683,9 @@
                     questionCount: 30,
                     mode: 'solo',
                     userName: '',
+                    userEmail: '',
                     partnerName: '',
+                    partnerEmail: '',
                     activeMaster: standardMaster,
                     presentation: [],
                     currentQuestionIndex: 0,
@@ -1728,9 +1695,11 @@
                     hiddenTraits: {},
                 };
                 checkUserAnswers = null;
+                checkUserProfileId = '';
+                checkUserEmail = null;
                 checkPartnerAnswers = null;
                 checkPartnerId = '';
-                checkUserProfileId = '';
+                checkPartnerEmail = null;
                 stopSound();
                 stopScanner();
                 switchView('intro');
@@ -1769,6 +1738,7 @@
                     return;
                 }
                 state.userName = userName;
+                state.userEmail = document.getElementById('user-email').value.trim() || null;
                 
                 if (state.mode === 'match') {
                     const partnerName = document.getElementById('partner-name').value.trim();
@@ -1777,6 +1747,7 @@
                         return;
                     }
                     state.partnerName = partnerName;
+                    state.partnerEmail = document.getElementById('partner-email').value.trim() || null;
                 }
 
                 if (state.questionCount === 90) {
@@ -1911,6 +1882,7 @@
                         checkUserAnswers = state.p1Answers.slice();
                         const profileId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
                         checkUserProfileId = profileId;
+                        checkUserEmail = state.userEmail;
                         
                         switchView('check');
                         const step1 = document.getElementById('check-step1');
@@ -1987,15 +1959,33 @@
                 });
             }
 
+            // --- Helper to parse ID string with optional base64 email ---
+            function parseIdString(str) {
+                const parts = str.split(':');
+                const id = parts[0].trim();
+                let email = null;
+                if (parts.length > 1) {
+                    try {
+                        email = atob(parts[1].trim());
+                    } catch (e) {
+                        email = null; // if not valid base64, ignore
+                    }
+                }
+                return { id, email };
+            }
+
             function displaySoloResults(scores) {
                 const label = document.getElementById('solo-mode-label');
                 if (label) label.innerText = state.questionCount + ' questions';
-                const soloId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
+                const baseId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
                 const idEl = document.getElementById('solo-id');
-                if (idEl) idEl.innerText = soloId;
+                if (idEl) idEl.innerText = baseId; // display only base ID
+                
+                // Prepare full string for QR and copy (include encoded email if present)
+                const fullString = state.userEmail ? baseId + ':' + btoa(state.userEmail) : baseId;
                 
                 const qr = qrcode(0, 'H');
-                qr.addData(soloId);
+                qr.addData(fullString);
                 qr.make();
                 const canvas = document.getElementById('solo-qrcode');
                 if (canvas) {
@@ -2018,7 +2008,6 @@
                 const summary = document.getElementById('solo-personality-summary');
                 if (summary) summary.innerText = desc;
                 
-                // Display extracted personality labels
                 if (state.questionCount >= 60) {
                     const traitsContainer = document.getElementById('traits-container');
                     if (traitsContainer) {
@@ -2032,6 +2021,12 @@
                     document.getElementById('hidden-traits').classList.remove('hidden');
                 } else {
                     document.getElementById('hidden-traits').classList.add('hidden');
+                }
+                
+                // Store fullString in a data attribute for copying
+                const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
+                if (copyBtn) {
+                    copyBtn.dataset.fullString = fullString;
                 }
                 
                 switchView('resultsSolo');
@@ -2066,7 +2061,6 @@
                 if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName);
                 if (sum2) sum2.innerText = generatePersonalityDescription(scores2, state.partnerName);
                 
-                // (Bridge recommendations remain as before)
                 const bridgeContainer = document.getElementById('match-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
@@ -2121,7 +2115,16 @@
                 if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName || 'You');
                 if (sum2) sum2.innerText = generatePersonalityDescription(scores2, name2);
                 
-                // (Bridge recommendations same as before)
+                // Email reveal if compatibility > 90 and partner email exists
+                const emailArea = document.getElementById('email-reveal-area');
+                const emailSpan = document.getElementById('revealed-email');
+                if (compatibility > 90 && checkPartnerEmail) {
+                    emailArea.classList.remove('hidden');
+                    emailSpan.innerText = checkPartnerEmail;
+                } else {
+                    emailArea.classList.add('hidden');
+                }
+                
                 const bridgeContainer = document.getElementById('check-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
@@ -2175,6 +2178,7 @@
                 const name = document.getElementById('check-your-name').value.trim();
                 if (!name) { alert("Please enter your name."); return; }
                 state.userName = name;
+                state.userEmail = null; // no email for quick check profile
                 state.mode = 'check';
                 state.questionCount = 30; 
                 state.activeMaster = standardMaster;
@@ -2186,8 +2190,8 @@
             };
 
             window.submitUserID = function() {
-                const id = document.getElementById('check-user-id').value.trim();
-                if (!id) {
+                const input = document.getElementById('check-user-id').value.trim();
+                if (!input) {
                     const err = document.getElementById('check-error');
                     if (err) {
                         err.innerText = "Please enter an ID.";
@@ -2195,10 +2199,12 @@
                     }
                     return;
                 }
+                const { id, email } = parseIdString(input);
                 checkUserAnswers = generateAnswersFromId(id, standardMaster);
                 checkUserProfileId = id;
+                checkUserEmail = email;
                 const loaded = document.getElementById('check-loaded-profile');
-                if (loaded) loaded.innerText = `Profile loaded from ID: ${id}`;
+                if (loaded) loaded.innerText = `Profile loaded from ID: ${id}` + (email ? ` (email embedded)` : '');
                 const err = document.getElementById('check-error');
                 if (err) err.classList.add('hidden');
                 const idSec = document.getElementById('check-id-section');
@@ -2206,8 +2212,8 @@
             };
 
             window.runCompatibilityCheck = function() {
-                const partnerId = document.getElementById('check-partner-id').value.trim();
-                if (!partnerId) {
+                const partnerInput = document.getElementById('check-partner-id').value.trim();
+                if (!partnerInput) {
                     const err = document.getElementById('check-error');
                     if (err) {
                         err.innerText = "Please enter partner's ID.";
@@ -2223,8 +2229,10 @@
                     }
                     return;
                 }
+                const { id: partnerId, email: partnerEmail } = parseIdString(partnerInput);
                 checkPartnerAnswers = generateAnswersFromId(partnerId, standardMaster);
                 checkPartnerId = partnerId;
+                checkPartnerEmail = partnerEmail;
                 
                 const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
                 const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
@@ -2264,10 +2272,14 @@
                 if (title) title.innerText = "Partner's Dimensional Map";
                 if (modeLabel) modeLabel.innerText = "30 questions • Profile from ID";
                 if (idLabel) idLabel.innerText = "Partner's Resonance ID";
-                if (idEl) idEl.innerText = checkPartnerId || 'RS-****';
+                const baseId = checkPartnerId || 'RS-****';
+                if (idEl) idEl.innerText = baseId;
+                
+                // Full string for QR (with email if present)
+                const fullString = checkPartnerEmail ? baseId + ':' + btoa(checkPartnerEmail) : baseId;
                 
                 const qr = qrcode(0, 'H');
-                qr.addData(checkPartnerId || 'RS-****');
+                qr.addData(fullString);
                 qr.make();
                 const canvas = document.getElementById('solo-qrcode');
                 if (canvas) {
@@ -2294,7 +2306,10 @@
                 const newBtn = document.querySelector('#view-results-solo .flex.gap-2 button:last-child');
                 if (copyBtn) {
                     copyBtn.innerText = 'Copy Partner ID';
-                    copyBtn.onclick = () => { navigator.clipboard.writeText(checkPartnerId || '').then(() => alert('Partner ID copied!')); };
+                    copyBtn.dataset.fullString = fullString;
+                    copyBtn.onclick = function() {
+                        navigator.clipboard.writeText(this.dataset.fullString).then(() => alert('Partner ID copied!'));
+                    };
                 }
                 if (newBtn) {
                     newBtn.innerText = 'Back to Check';
@@ -2319,8 +2334,14 @@
             };
 
             window.copySoloID = function() { 
-                const id = document.getElementById('solo-id').innerText;
-                navigator.clipboard.writeText(id).then(() => alert('ID copied!'));
+                const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
+                if (copyBtn && copyBtn.dataset.fullString) {
+                    navigator.clipboard.writeText(copyBtn.dataset.fullString).then(() => alert('ID copied!'));
+                } else {
+                    // fallback to displayed ID (shouldn't happen)
+                    const idEl = document.getElementById('solo-id');
+                    if (idEl) navigator.clipboard.writeText(idEl.innerText).then(() => alert('ID copied!'));
+                }
             };
         })();
     </script>
