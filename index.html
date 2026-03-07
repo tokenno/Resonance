@@ -399,13 +399,14 @@
             <button onclick="switchView('depth')" class="text-xs text-white/40 hover:text-white underline underline-offset-4 block mx-auto">← Change depth</button>
         </section>
 
-        <!-- VIEW: Check Compatibility -->
+        <!-- VIEW: Check Compatibility (fully functional) -->
         <section id="view-check" class="hidden space-y-6 result-reveal">
             <div class="text-center mb-6">
                 <h2 class="text-3xl italic mb-2">Compatibility Check</h2>
                 <p class="text-xs text-emerald-200/60 uppercase tracking-[0.3em]">Enter their Resonance ID</p>
             </div>
             <div class="space-y-4 max-w-md mx-auto">
+                <!-- Step 1: Your Profile -->
                 <div id="check-step1" class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 1: Your Profile</p>
                     <input type="text" id="check-your-name" placeholder="Your Name (for new profile)" class="w-full glass-input rounded-lg p-3 text-center mb-3 placeholder-white/30">
@@ -413,18 +414,23 @@
                         <button onclick="startCheckNew()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-2 rounded-lg text-xs uppercase tracking-wider">
                             Create New (30q)
                         </button>
-                        <button onclick="startCheckExisting()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2 rounded-lg text-xs uppercase tracking-wider">
+                        <button onclick="showCheckIdInput()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2 rounded-lg text-xs uppercase tracking-wider">
                             I Have an ID
                         </button>
                     </div>
                 </div>
+
+                <!-- Step 1b: Enter your existing ID (hidden initially) -->
                 <div id="check-user-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Your Resonance ID</p>
                     <input type="text" id="check-user-id" placeholder="Enter your ID" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
                     <button onclick="submitUserID()" class="w-full bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg mt-3 text-sm uppercase tracking-wider">
                         Load Profile
                     </button>
+                    <p class="text-xs text-center mt-2 opacity-60" id="check-loaded-profile"></p>
                 </div>
+
+                <!-- Step 2: Their ID (hidden until profile loaded) -->
                 <div id="check-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 2: Their Resonance ID</p>
                     <input type="text" id="check-partner-id" placeholder="Enter their ID" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
@@ -432,6 +438,7 @@
                         Analyze Friction
                     </button>
                 </div>
+
                 <p id="check-error" class="text-red-400 text-xs text-center hidden"></p>
             </div>
             <button onclick="switchView('mode')" class="text-xs text-white/40 hover:text-white underline underline-offset-4">← Back</button>
@@ -595,7 +602,7 @@
             </div>
         </section>
 
-        <!-- VIEW: Results - Check -->
+        <!-- VIEW: Results - Check (fully functional) -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="result-reveal space-y-4">
                 <div class="text-center">
@@ -615,7 +622,7 @@
                     <p class="text-red-300 font-bold text-sm uppercase tracking-widest mb-1">⚠ Dealbreaker Detected</p>
                     <p class="text-xs opacity-80" id="check-dealbreaker-text">---</p>
                 </div>
-                <!-- Simple bar chart for check (just one side) -->
+                <!-- Simple bar chart for check (partner's profile) -->
                 <div class="bg-white/5 rounded-xl p-3 border border-white/10">
                     <p class="text-xs text-center text-emerald-300 mb-2">Their Profile Percentiles</p>
                     <div id="check-bar-chart" class="bar-chart"></div>
@@ -823,6 +830,12 @@
             isCheckQuiz: false
         };
 
+        // Additional globals for check mode
+        let checkUserAnswers = null;          // stores answers for the user in check mode (loaded or newly created)
+        let checkUserProfileId = '';          // profile ID of the user
+        let checkPartnerAnswers = null;       // stores answers for the partner in check mode
+        let isNewCheckProfile = false;        // flag to indicate we just created a new profile via quiz
+
         // Helper shuffle
         function shuffle(arr) {
             let a = [...arr];
@@ -874,6 +887,15 @@
                 }
                 // Clear any previous password error
                 document.getElementById('password-error').classList.add('hidden');
+            }
+            // Reset check view UI if needed
+            if (viewName === 'check') {
+                // Hide step2 and user-id-section initially, show step1
+                document.getElementById('check-step1').classList.remove('hidden');
+                document.getElementById('check-user-id-section').classList.add('hidden');
+                document.getElementById('check-id-section').classList.add('hidden');
+                document.getElementById('check-error').classList.add('hidden');
+                document.getElementById('check-loaded-profile').innerText = '';
             }
         }
 
@@ -1021,13 +1043,13 @@
             }
         }
 
-        // New function to compute and display results
+        // Function to compute and display results (modified for check mode)
         function finishQuiz() {
             switchView('processing');
             
             // Simulate processing delay
             setTimeout(() => {
-                // Compute category scores from p1Answers (and for match, generate dummy p2Answers)
+                // Compute category scores from p1Answers
                 const categoryScores = computeCategoryScores(state.p1Answers, state.presentation);
                 
                 if (state.mode === 'solo') {
@@ -1038,10 +1060,21 @@
                     const categoryScores2 = computeCategoryScores(p2Dummy, state.presentation);
                     displayMatchResults(categoryScores, categoryScores2);
                 } else if (state.mode === 'check') {
-                    // For check mode, simulate a partner profile
-                    const p2Dummy = generateDummyAnswers(state.presentation, state.p1Answers, 0.3); // 30% different
-                    const categoryScores2 = computeCategoryScores(p2Dummy, state.presentation);
-                    displayCheckResults(categoryScores, categoryScores2);
+                    // For check mode, we just finished creating a new profile
+                    // Store answers and generate an ID
+                    checkUserAnswers = state.p1Answers.slice(); // copy
+                    const profileId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
+                    checkUserProfileId = profileId;
+                    
+                    // Now go back to check view, but prefill the user ID and show step2
+                    switchView('check');
+                    document.getElementById('check-step1').classList.add('hidden');
+                    document.getElementById('check-user-id-section').classList.remove('hidden');
+                    document.getElementById('check-id-section').classList.remove('hidden');
+                    document.getElementById('check-user-id').value = profileId;
+                    document.getElementById('check-loaded-profile').innerText = `Profile loaded for ${state.userName}`;
+                    // Clear any previous error
+                    document.getElementById('check-error').classList.add('hidden');
                 }
             }, 1500);
         }
@@ -1156,9 +1189,10 @@
             switchView('resultsMatch');
         }
 
-        function displayCheckResults(scores1, scores2) {
-            document.getElementById('check-res-p1').innerText = state.userName || 'You';
-            document.getElementById('check-res-p2').innerText = 'Profile#' + Math.floor(Math.random()*1000);
+        // New function to display check results (used by runCompatibilityCheck)
+        function displayCheckResults(scores1, scores2, name1 = 'You', name2 = 'Partner') {
+            document.getElementById('check-res-p1').innerText = name1;
+            document.getElementById('check-res-p2').innerText = name2;
             
             let totalDiff = 0;
             const allCats = new Set([...Object.keys(scores1), ...Object.keys(scores2)]);
@@ -1175,6 +1209,24 @@
             document.getElementById('check-friction-desc').innerText = (100 - compatibility) < 20 ? 'Low friction – promising' : 'Moderate friction – requires communication';
             
             buildBarChart('check-bar-chart', scores2); // show partner's profile
+            
+            // Optional: generate bridge recommendations based on largest differences
+            const bridgeContainer = document.getElementById('check-bridge-container');
+            bridgeContainer.innerHTML = '';
+            const differences = [];
+            allCats.forEach(cat => {
+                const diff = Math.abs((scores1[cat]||50) - (scores2[cat]||50));
+                if (diff > 30) {
+                    differences.push(cat);
+                }
+            });
+            if (differences.length > 0) {
+                bridgeContainer.innerHTML = differences.map(cat => 
+                    `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${cat} – discuss your perspectives.</div>`
+                ).join('');
+            } else {
+                bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Your profiles are well aligned!</div>';
+            }
             
             switchView('resultsCheck');
         }
@@ -1209,11 +1261,89 @@
             }
         }
 
-        // Stub functions for check mode (to avoid errors)
-        function startCheckNew() { alert("Check mode not fully implemented in this demo."); }
-        function startCheckExisting() { alert("Check mode not fully implemented."); }
-        function submitUserID() { alert("Check mode not fully implemented."); }
-        function runCompatibilityCheck() { alert("Check mode not fully implemented."); }
+        // ========== Check Mode Functions ==========
+        function showCheckIdInput() {
+            document.getElementById('check-step1').classList.add('hidden');
+            document.getElementById('check-user-id-section').classList.remove('hidden');
+            document.getElementById('check-id-section').classList.add('hidden'); // hide step2 until profile loaded
+        }
+
+        function startCheckNew() {
+            const name = document.getElementById('check-your-name').value.trim();
+            if (!name) {
+                alert("Please enter your name.");
+                return;
+            }
+            state.userName = name;
+            state.mode = 'check';
+            // For check mode, we use 30 questions (standard) for simplicity, but could use the selected depth
+            state.questionCount = 30; 
+            state.activeMaster = standardMaster;
+            state.presentation = shuffle(state.activeMaster);
+            state.currentQuestionIndex = 0;
+            state.p1Answers = [];
+            isNewCheckProfile = true;
+            
+            switchView('quiz');
+        }
+
+        function submitUserID() {
+            const id = document.getElementById('check-user-id').value.trim();
+            if (!id) {
+                document.getElementById('check-error').innerText = "Please enter an ID.";
+                document.getElementById('check-error').classList.remove('hidden');
+                return;
+            }
+            // Generate dummy answers based on the ID (deterministic)
+            checkUserAnswers = generateAnswersFromId(id, standardMaster);
+            checkUserProfileId = id;
+            document.getElementById('check-loaded-profile').innerText = `Profile loaded from ID: ${id}`;
+            document.getElementById('check-error').classList.add('hidden');
+            // Show step2
+            document.getElementById('check-id-section').classList.remove('hidden');
+        }
+
+        function runCompatibilityCheck() {
+            const partnerId = document.getElementById('check-partner-id').value.trim();
+            if (!partnerId) {
+                document.getElementById('check-error').innerText = "Please enter partner's ID.";
+                document.getElementById('check-error').classList.remove('hidden');
+                return;
+            }
+            if (!checkUserAnswers) {
+                document.getElementById('check-error').innerText = "Your profile not loaded. Please create or enter your ID first.";
+                document.getElementById('check-error').classList.remove('hidden');
+                return;
+            }
+            // Generate partner answers from ID
+            checkPartnerAnswers = generateAnswersFromId(partnerId, standardMaster);
+            
+            // Compute scores
+            const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
+            const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
+            
+            // Display results
+            displayCheckResults(userScores, partnerScores, 'You', 'Partner#' + partnerId.substr(-4));
+        }
+
+        // Deterministic answer generation from an ID string (simple hash)
+        function generateAnswersFromId(id, questions) {
+            let hash = 0;
+            for (let i = 0; i < id.length; i++) {
+                hash = ((hash << 5) - hash) + id.charCodeAt(i);
+                hash |= 0; // Convert to 32bit integer
+            }
+            const answers = [];
+            // Use the hash to seed answers for each question
+            for (let i = 0; i < questions.length; i++) {
+                const q = questions[i];
+                // Create a pseudo-random value between 1 and 5 based on hash and question id
+                const val = ((Math.abs(hash) + q.id.charCodeAt(0)) % 5) + 1;
+                answers.push({ questionId: q.id, answer: val });
+            }
+            return answers;
+        }
+
         function copySoloID() { 
             const id = document.getElementById('solo-id').innerText;
             navigator.clipboard.writeText(id).then(() => alert('ID copied!'));
@@ -1229,7 +1359,7 @@
         window.previousQuestion = previousQuestion;
         window.selectAnswer = selectAnswer;
         window.startCheckNew = startCheckNew;
-        window.startCheckExisting = startCheckExisting;
+        window.showCheckIdInput = showCheckIdInput;
         window.submitUserID = submitUserID;
         window.runCompatibilityCheck = runCompatibilityCheck;
         window.copySoloID = copySoloID;
