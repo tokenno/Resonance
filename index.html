@@ -1194,38 +1194,56 @@
             document.getElementById('check-res-p1').innerText = name1;
             document.getElementById('check-res-p2').innerText = name2;
             
+            // Use only common categories for compatibility calculation
+            const cats1 = Object.keys(scores1);
+            const cats2 = Object.keys(scores2);
+            const commonCats = cats1.filter(cat => cats2.includes(cat));
+            
             let totalDiff = 0;
-            const allCats = new Set([...Object.keys(scores1), ...Object.keys(scores2)]);
-            allCats.forEach(cat => {
-                const v1 = scores1[cat] || 50;
-                const v2 = scores2[cat] || 50;
-                totalDiff += Math.abs(v1 - v2);
+            commonCats.forEach(cat => {
+                totalDiff += Math.abs(scores1[cat] - scores2[cat]);
             });
-            const avgDiff = totalDiff / allCats.size;
-            const compatibility = Math.max(0, Math.min(100, Math.round(100 - avgDiff)));
+            
+            // If no common categories, compatibility = 50% (neutral)
+            let compatibility = 50;
+            if (commonCats.length > 0) {
+                const avgDiff = totalDiff / commonCats.length;
+                compatibility = Math.max(0, Math.min(100, Math.round(100 - avgDiff)));
+            }
+            
             document.getElementById('check-verdict').innerText = compatibility + '%';
-            document.getElementById('check-verdict-sub').innerText = compatibility > 80 ? 'High resonance' : compatibility > 60 ? 'Moderate' : 'Low resonance';
+            document.getElementById('check-verdict-sub').innerText = 
+                compatibility > 80 ? 'High resonance' : 
+                compatibility > 60 ? 'Moderate' : 
+                compatibility > 40 ? 'Neutral' : 'Low resonance';
+                
             document.getElementById('check-friction-score').innerText = (100 - compatibility) + '%';
-            document.getElementById('check-friction-desc').innerText = (100 - compatibility) < 20 ? 'Low friction – promising' : 'Moderate friction – requires communication';
+            document.getElementById('check-friction-desc').innerText = 
+                (100 - compatibility) < 20 ? 'Low friction – promising' : 
+                (100 - compatibility) < 40 ? 'Moderate friction – requires communication' : 
+                'High friction – significant differences';
             
-            buildBarChart('check-bar-chart', scores2); // show partner's profile
+            // Build bar chart for partner's profile
+            buildBarChart('check-bar-chart', scores2);
             
-            // Optional: generate bridge recommendations based on largest differences
+            // Generate bridge recommendations based on largest differences in common categories
             const bridgeContainer = document.getElementById('check-bridge-container');
             bridgeContainer.innerHTML = '';
-            const differences = [];
-            allCats.forEach(cat => {
-                const diff = Math.abs((scores1[cat]||50) - (scores2[cat]||50));
-                if (diff > 30) {
-                    differences.push(cat);
+            
+            if (commonCats.length > 0) {
+                const diffs = commonCats.map(cat => ({ cat, diff: Math.abs(scores1[cat] - scores2[cat]) }));
+                diffs.sort((a,b) => b.diff - a.diff);
+                const topDiffs = diffs.slice(0, 3).filter(d => d.diff > 30);
+                
+                if (topDiffs.length > 0) {
+                    topDiffs.forEach(d => {
+                        bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${d.cat} (${d.diff}%) – discuss your perspectives.</div>`;
+                    });
+                } else {
+                    bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Your profiles are well aligned!</div>';
                 }
-            });
-            if (differences.length > 0) {
-                bridgeContainer.innerHTML = differences.map(cat => 
-                    `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Notable difference in ${cat} – discuss your perspectives.</div>`
-                ).join('');
             } else {
-                bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Your profiles are well aligned!</div>';
+                bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">No shared categories – difficult to compare.</div>';
             }
             
             switchView('resultsCheck');
@@ -1294,7 +1312,7 @@
                 document.getElementById('check-error').classList.remove('hidden');
                 return;
             }
-            // Generate dummy answers based on the ID (deterministic)
+            // Generate deterministic answers based on the ID using a seeded PRNG
             checkUserAnswers = generateAnswersFromId(id, standardMaster);
             checkUserProfileId = id;
             document.getElementById('check-loaded-profile').innerText = `Profile loaded from ID: ${id}`;
@@ -1315,7 +1333,7 @@
                 document.getElementById('check-error').classList.remove('hidden');
                 return;
             }
-            // Generate partner answers from ID
+            // Generate partner answers from ID using the same deterministic method
             checkPartnerAnswers = generateAnswersFromId(partnerId, standardMaster);
             
             // Compute scores
@@ -1323,22 +1341,32 @@
             const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
             
             // Display results
-            displayCheckResults(userScores, partnerScores, 'You', 'Partner#' + partnerId.substr(-4));
+            displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + partnerId.substr(-4));
         }
 
-        // Deterministic answer generation from an ID string (simple hash)
+        // Deterministic answer generation from an ID string using a seeded PRNG for more variety
         function generateAnswersFromId(id, questions) {
-            let hash = 0;
+            // Simple hash to seed a pseudo-random generator
+            let seed = 0;
             for (let i = 0; i < id.length; i++) {
-                hash = ((hash << 5) - hash) + id.charCodeAt(i);
-                hash |= 0; // Convert to 32bit integer
+                seed = ((seed << 5) - seed) + id.charCodeAt(i);
+                seed |= 0; // Convert to 32-bit integer
             }
+            
+            // Mulberry32 PRNG
+            function mulberry32() {
+                seed += 0x6D2B79F5;
+                let t = seed;
+                t = Math.imul(t ^ t >>> 15, t | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            }
+            
             const answers = [];
-            // Use the hash to seed answers for each question
             for (let i = 0; i < questions.length; i++) {
                 const q = questions[i];
-                // Create a pseudo-random value between 1 and 5 based on hash and question id
-                const val = ((Math.abs(hash) + q.id.charCodeAt(0)) % 5) + 1;
+                // Generate a value between 1 and 5 using the seeded PRNG
+                const val = Math.floor(mulberry32() * 5) + 1;
                 answers.push({ questionId: q.id, answer: val });
             }
             return answers;
