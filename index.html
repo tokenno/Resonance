@@ -241,47 +241,14 @@
         .back-link:hover {
             opacity: 1;
         }
-        /* Tooltip styles */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 280px;
-            background: rgba(20, 10, 30, 0.95);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(244, 114, 182, 0.5);
-            color: #fff;
-            text-align: left;
-            border-radius: 12px;
-            padding: 12px;
-            position: absolute;
-            z-index: 100;
-            bottom: 150%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
+        .scientific-summary {
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid #f472b6;
+            padding: 1rem;
+            border-radius: 0.5rem;
             font-size: 0.8rem;
-            font-weight: 300;
-            line-height: 1.5;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -8px;
-            border-width: 8px;
-            border-style: solid;
-            border-color: rgba(244, 114, 182, 0.5) transparent transparent transparent;
+            margin: 1.5rem 0;
+            text-align: left;
         }
     </style>
 </head>
@@ -296,23 +263,11 @@
                 <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
                     Resonance
                 </h1>
-                <!-- Info tooltip with scientific summary -->
-                <div class="tooltip text-pink-300/70 text-xl">
-                    ⓘ
-                    <span class="tooltiptext">
-                        <span class="font-semibold block mb-1 text-pink-300">🔬 Scientifically validated frameworks</span>
-                        • <strong>Big Five Inventory (BFI)</strong> – measures OCEAN personality traits (reliability >0.8).<br>
-                        • <strong>Experiences in Close Relationships (ECR)</strong> – attachment styles (Ainsworth, 1978).<br>
-                        • <strong>Sexual Openness Inventory (SOI)</strong> – kink & taboo interests (Mosher, 1988).<br>
-                        • <strong>Hidden traits</strong> – derived from clinical psychology (defense mechanisms, emotional contagion).<br>
-                        <span class="block mt-1 text-emerald-300">All scales have been peer‑reviewed and replicated.</span>
-                    </span>
-                </div>
             </div>
             <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Where Soul Signals Align</p>
         </header>
 
-        <!-- VIEW: Intro -->
+        <!-- VIEW: Intro (with scientific summary visible) -->
         <section id="view-intro" class="text-center space-y-6 result-reveal">
             <div class="space-y-4 text-base font-light leading-relaxed opacity-90 max-w-lg mx-auto">
                 <p>Choose your depth of exploration.</p>
@@ -320,6 +275,19 @@
                 <p><span class="text-purple-300">60 questions</span> – deep dive with attachment & emotional patterns.</p>
                 <p><span class="text-red-300">90 questions</span> – extreme analysis: fetishes and 20+ scientific personality facets.</p>
             </div>
+
+            <!-- Scientific summary section (no hover) -->
+            <div class="scientific-summary max-w-lg mx-auto">
+                <p class="font-semibold text-pink-300 mb-1">🔬 Scientifically validated frameworks</p>
+                <p class="text-xs leading-relaxed opacity-80">
+                    • <strong>Big Five Inventory (BFI)</strong> – measures OCEAN personality traits (reliability >0.8).<br>
+                    • <strong>Experiences in Close Relationships (ECR)</strong> – attachment styles (Ainsworth, 1978).<br>
+                    • <strong>Sexual Openness Inventory (SOI)</strong> – kink & taboo interests (Mosher, 1988).<br>
+                    • <strong>Hidden traits</strong> – derived from clinical psychology (defense mechanisms, emotional contagion).<br>
+                    <span class="text-emerald-300">All scales have been peer‑reviewed and replicated.</span>
+                </p>
+            </div>
+
             <div class="pt-6">
                 <button onclick="startApp()" class="pulse-btn bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-medium py-4 px-12 rounded-full transition-all transform hover:scale-105 shadow-lg tracking-widest uppercase text-sm">
                     Begin Exploration
@@ -329,6 +297,10 @@
 
         <!-- VIEW: Depth Selection -->
         <section id="view-depth" class="hidden space-y-6 result-reveal">
+            <!-- Exit to main link -->
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="text-center mb-8">
                 <h2 class="text-3xl italic mb-2">Select Depth</h2>
                 <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">How deep shall we go?</p>
@@ -377,6 +349,9 @@
 
         <!-- VIEW: Mode Selection -->
         <section id="view-mode" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="text-center mb-8">
                 <h2 class="text-3xl italic mb-2">Select Protocol</h2>
                 <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]" id="mode-subtitle">30 questions • Choose your path</p>
@@ -401,6 +376,9 @@
 
         <!-- VIEW: Check Compatibility (fully functional) -->
         <section id="view-check" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="text-center mb-6">
                 <h2 class="text-3xl italic mb-2">Compatibility Check</h2>
                 <p class="text-xs text-emerald-200/60 uppercase tracking-[0.3em]">Enter their Resonance ID</p>
@@ -446,6 +424,9 @@
 
         <!-- VIEW: Setup (with password field for extreme mode) and BACK LINK added -->
         <section id="view-setup" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="text-center mb-6">
                 <h2 class="text-3xl italic mb-2" id="setup-title">Identity Protocol</h2>
                 <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Enter names to begin</p>
@@ -475,13 +456,18 @@
             </div>
         </section>
 
-        <!-- VIEW: Quiz (with back button added) -->
+        <!-- VIEW: Quiz (with back button and exit to main) -->
         <section id="view-quiz" class="hidden flex flex-col h-full w-full relative">
-            <!-- Header with back button and progress -->
+            <!-- Header with back button, exit, and badges -->
             <div class="flex items-center justify-between mb-2">
-                <span onclick="previousQuestion()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4 flex items-center gap-1">
-                    ← Back
-                </span>
+                <div class="flex items-center gap-3">
+                    <span onclick="previousQuestion()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4 flex items-center gap-1">
+                        ← Back
+                    </span>
+                    <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4 flex items-center gap-1">
+                        Exit to main
+                    </span>
+                </div>
                 <div class="flex items-center gap-2">
                     <span id="q-deep" class="hidden deep-dive-badge">Deep</span>
                     <span id="q-extreme" class="hidden extreme-badge">Extreme</span>
@@ -507,6 +493,9 @@
 
         <!-- VIEW: Processing -->
         <section id="view-processing" class="hidden text-center space-y-6">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="relative w-32 h-32 mx-auto">
                 <div class="absolute inset-0 border-4 border-pink-500/30 rounded-full animate-ping"></div>
                 <div class="absolute inset-4 border-4 border-purple-500/50 rounded-full animate-pulse"></div>
@@ -519,9 +508,12 @@
 
         <!-- VIEW: Results - Solo (with percentages and QR code) -->
         <section id="view-results-solo" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2">
+            <div class="text-right mb-2">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="result-reveal space-y-6">
                 <div class="text-center">
-                    <h2 class="text-3xl md:text-4xl italic mb-1">Your Dimensional Map</h2>
+                    <h2 class="text-3xl md:text-4xl italic mb-1" id="solo-title">Your Dimensional Map</h2>
                     <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70" id="solo-mode-label">Standard Profile</p>
                 </div>
                 
@@ -538,7 +530,7 @@
                 </div>
 
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Your Shareable ID</p>
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300" id="solo-id-label">Your Shareable ID</p>
                     <!-- QR code canvas -->
                     <div class="flex justify-center mb-3">
                         <canvas id="solo-qrcode" width="150" height="150"></canvas>
@@ -548,13 +540,16 @@
                 </div>
                 <div class="flex gap-2 max-w-md mx-auto">
                     <button onclick="copySoloID()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">Copy ID</button>
-                    <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Session</button>
+                    <button onclick="restartToMain()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Session</button>
                 </div>
             </div>
         </section>
 
         <!-- VIEW: Results - Match (with percentages and compatibility) -->
         <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
+            <div class="text-right mb-2">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="result-reveal space-y-4">
                 <div class="text-center">
                     <h2 class="text-3xl italic mb-1">Friction Analysis</h2>
@@ -598,12 +593,15 @@
                     </div>
                 </div>
 
-                <button onclick="location.reload()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Analysis</button>
+                <button onclick="restartToMain()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Analysis</button>
             </div>
         </section>
 
         <!-- VIEW: Results - Check (fully functional) -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
+            <div class="text-right mb-2">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
+            </div>
             <div class="result-reveal space-y-4">
                 <div class="text-center">
                     <h2 class="text-3xl italic mb-1">Instant Compatibility</h2>
@@ -641,8 +639,8 @@
                     <p class="text-xs mt-2 italic" id="check-friction-desc">Low friction – promising</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="location.reload()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Check</button>
-                    <button onclick="switchToFullProfile()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg text-xs uppercase tracking-wider text-emerald-300">
+                    <button onclick="restartToMain()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Check</button>
+                    <button onclick="showPartnerFullProfile()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg text-xs uppercase tracking-wider text-emerald-300">
                         See Full Details
                     </button>
                 </div>
@@ -834,6 +832,7 @@
         let checkUserAnswers = null;          // stores answers for the user in check mode (loaded or newly created)
         let checkUserProfileId = '';          // profile ID of the user
         let checkPartnerAnswers = null;       // stores answers for the partner in check mode
+        let checkPartnerId = '';              // partner ID
         let isNewCheckProfile = false;        // flag to indicate we just created a new profile via quiz
 
         // Helper shuffle
@@ -897,6 +896,31 @@
                 document.getElementById('check-error').classList.add('hidden');
                 document.getElementById('check-loaded-profile').innerText = '';
             }
+        }
+
+        function restartToMain() {
+            // Reset state
+            state = {
+                questionCount: 30,
+                mode: 'solo',
+                userName: '',
+                partnerName: '',
+                thresholds: {},
+                activeMaster: standardMaster,
+                presentation: [],
+                currentQuestionIndex: 0,
+                p1Answers: [],
+                p2Answers: [],
+                hiddenTraits: {},
+                userAnswers: null,
+                userDepth: null,
+                isCheckQuiz: false
+            };
+            checkUserAnswers = null;
+            checkPartnerAnswers = null;
+            checkPartnerId = '';
+            checkUserProfileId = '';
+            switchView('intro');
         }
 
         function startApp() { switchView('depth'); }
@@ -1159,6 +1183,8 @@
                 document.getElementById('hidden-traits').classList.remove('hidden');
                 const traitsContainer = document.getElementById('traits-container');
                 traitsContainer.innerHTML = '<div class="hidden-trait">🌀 Attachment style: Secure with anxious tendencies</div><div class="hidden-trait">🔥 Conflict style: Direct communicator</div>';
+            } else {
+                document.getElementById('hidden-traits').classList.add('hidden');
             }
             
             switchView('resultsSolo');
@@ -1189,7 +1215,7 @@
             switchView('resultsMatch');
         }
 
-        // New function to display check results (used by runCompatibilityCheck)
+        // Function to display check results (used by runCompatibilityCheck)
         function displayCheckResults(scores1, scores2, name1 = 'You', name2 = 'Partner') {
             document.getElementById('check-res-p1').innerText = name1;
             document.getElementById('check-res-p2').innerText = name2;
@@ -1335,6 +1361,7 @@
             }
             // Generate partner answers from ID using the same deterministic method
             checkPartnerAnswers = generateAnswersFromId(partnerId, standardMaster);
+            checkPartnerId = partnerId;
             
             // Compute scores
             const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
@@ -1372,11 +1399,92 @@
             return answers;
         }
 
+        // New function: show partner's full profile (like solo results)
+        function showPartnerFullProfile() {
+            if (!checkPartnerAnswers) {
+                alert("No partner profile loaded.");
+                return;
+            }
+            // Compute scores for partner
+            const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
+            
+            // Temporarily switch to solo results view but with partner's data
+            document.getElementById('solo-title').innerText = "Partner's Dimensional Map";
+            document.getElementById('solo-mode-label').innerText = "30 questions • Profile from ID";
+            document.getElementById('solo-id-label').innerText = "Partner's Resonance ID";
+            
+            // Generate a fake ID for partner if not already
+            const partnerIdDisplay = checkPartnerId || 'RS-****';
+            document.getElementById('solo-id').innerText = partnerIdDisplay;
+            
+            // Generate QR code for partner ID
+            const qr = qrcode(0, 'H');
+            qr.addData(partnerIdDisplay);
+            qr.make();
+            const canvas = document.getElementById('solo-qrcode');
+            canvas.width = 150;
+            canvas.height = 150;
+            const ctx = canvas.getContext('2d');
+            const cellSize = 150 / qr.getModuleCount();
+            for (let row = 0; row < qr.getModuleCount(); row++) {
+                for (let col = 0; col < qr.getModuleCount(); col++) {
+                    ctx.fillStyle = qr.isDark(row, col) ? '#f472b6' : 'transparent';
+                    ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                }
+            }
+            
+            // Build bar chart with partner's scores
+            const container = document.getElementById('solo-bar-chart');
+            container.innerHTML = '';
+            const categories = Object.keys(partnerScores).sort();
+            categories.forEach(cat => {
+                const val = partnerScores[cat];
+                const item = document.createElement('div');
+                item.className = 'bar-item';
+                item.innerHTML = `
+                    <span class="bar-label">${cat}</span>
+                    <div class="bar-track"><div class="bar-fill" style="width:${val}%"></div></div>
+                    <span class="bar-value">${val}%</span>
+                `;
+                container.appendChild(item);
+            });
+            
+            // Hide hidden traits (standard mode only)
+            document.getElementById('hidden-traits').classList.add('hidden');
+            
+            // Change copy button to copy partner ID
+            const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
+            copyBtn.innerText = 'Copy Partner ID';
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(partnerIdDisplay).then(() => alert('Partner ID copied!'));
+            };
+            
+            // Change New Session button to go back to check results
+            const newBtn = document.querySelector('#view-results-solo .flex.gap-2 button:last-child');
+            newBtn.innerText = 'Back to Check';
+            newBtn.onclick = () => {
+                // Restore original button text and behavior before switching
+                copyBtn.innerText = 'Copy ID';
+                copyBtn.onclick = copySoloID;
+                newBtn.innerText = 'New Session';
+                newBtn.onclick = restartToMain;
+                // Recompute and show check results again
+                if (checkUserAnswers && checkPartnerAnswers) {
+                    const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
+                    const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                    displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + (checkPartnerId ? checkPartnerId.substr(-4) : ''));
+                } else {
+                    restartToMain();
+                }
+            };
+            
+            switchView('resultsSolo');
+        }
+
         function copySoloID() { 
             const id = document.getElementById('solo-id').innerText;
             navigator.clipboard.writeText(id).then(() => alert('ID copied!'));
         }
-        function switchToFullProfile() { alert("Full profile demo"); }
 
         // Expose functions globally
         window.selectDepth = selectDepth;
@@ -1391,7 +1499,8 @@
         window.submitUserID = submitUserID;
         window.runCompatibilityCheck = runCompatibilityCheck;
         window.copySoloID = copySoloID;
-        window.switchToFullProfile = switchToFullProfile;
+        window.showPartnerFullProfile = showPartnerFullProfile;
+        window.restartToMain = restartToMain;
     </script>
 </body>
 </html>
