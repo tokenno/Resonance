@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resonance · Soul Signals</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- QR Code Generator & Scanner Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
@@ -100,8 +99,6 @@
         .friction-green { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
         .friction-yellow { background: rgba(234, 179, 8, 0.2); border-color: rgba(234, 179, 8, 0.5); color: #fde047; }
         .friction-red { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
-        .friction-blue { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd; }
-        .friction-purple { background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.5); color: #d8b4fe; }
         .deep-dive-badge {
             background: linear-gradient(135deg, #7c3aed, #4f46e5);
             color: white;
@@ -129,22 +126,6 @@
             padding: 12px;
             margin-top: 8px;
         }
-        .threshold-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            outline: none;
-        }
-        .threshold-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: #f472b6;
-            border-radius: 50%;
-            cursor: pointer;
-        }
         .bar-chart {
             display: flex;
             flex-direction: column;
@@ -158,10 +139,10 @@
             gap: 0.75rem;
         }
         .bar-label {
-            width: 120px;
-            font-size: 0.75rem;
+            width: 140px;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
             opacity: 0.8;
         }
         .bar-track {
@@ -183,12 +164,6 @@
             font-weight: 600;
             color: #f472b6;
             text-align: right;
-        }
-        .radar-container {
-            position: relative;
-            width: 100%;
-            min-height: 300px;
-            margin: 0 auto;
         }
         .id-display {
             font-family: monospace;
@@ -243,7 +218,7 @@
         }
         .legend-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 0.5rem;
             font-size: 0.7rem;
             background: rgba(255,255,255,0.02);
@@ -253,7 +228,7 @@
         }
         .legend-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.3rem;
         }
         .legend-color {
@@ -261,6 +236,8 @@
             height: 10px;
             background: #f472b6;
             border-radius: 2px;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
         .sound-row {
             display: flex;
@@ -303,7 +280,18 @@
             border-left: 3px solid #f472b6;
             margin: 1rem 0;
         }
-        /* QR Scanner overlay */
+        .attachment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .attachment-cell {
+            background: rgba(255,255,255,0.05);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
         #scanner-container {
             position: fixed;
             top: 0;
@@ -344,11 +332,20 @@
         .scanner-close:hover {
             color: white;
         }
+        .facet-badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(244, 114, 182, 0.2);
+            color: #f472b6;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
 
-    <!-- QR Scanner Overlay (hidden by default) -->
+    <div class="particles" id="particles"></div>
+
     <div id="scanner-container" class="hidden">
         <div class="scanner-header">
             <span>Scan QR Code</span>
@@ -367,25 +364,26 @@
                     Resonance
                 </h1>
             </div>
-            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Where Soul Signals Align</p>
+            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70">Evidence-Based Soul Alignment</p>
         </header>
 
         <!-- VIEW: Intro -->
         <section id="view-intro" class="text-center space-y-6 result-reveal">
             <div class="space-y-4 text-base font-light leading-relaxed opacity-90 max-w-lg mx-auto">
-                <p>Choose your depth of exploration.</p>
-                <p><span class="text-pink-300">30 questions</span> – core compatibility.</p>
-                <p><span class="text-purple-300">60 questions</span> – deep dive with attachment & emotional patterns.</p>
-                <p><span class="text-red-300">90 questions</span> – extreme analysis: fetishes and 20+ scientific personality facets.</p>
+                <p>Scientifically-validated compatibility assessment.</p>
+                <p><span class="text-pink-300">60 questions</span> – Essential: Big Five + Attachment (ECR-12) + Core Values</p>
+                <p><span class="text-purple-300">90 questions</span> – Deep: + SOI-R Sociosexual + Love Languages + Conflict Styles</p>
+                <p><span class="text-red-300">120 questions</span> – Extreme: + Dark Triad + Emotional Intelligence + Advanced Kink</p>
             </div>
             <div class="scientific-summary max-w-lg mx-auto">
-                <p class="font-semibold text-pink-300 mb-1">🔬 Scientifically validated frameworks</p>
+                <p class="font-semibold text-pink-300 mb-1">🔬 Enhanced Psychometric Validity</p>
                 <p class="text-xs leading-relaxed opacity-80">
-                    • <strong>Big Five Inventory (BFI)</strong> – measures OCEAN personality traits (reliability >0.8).<br>
-                    • <strong>Experiences in Close Relationships (ECR)</strong> – attachment styles (Ainsworth, 1978).<br>
-                    • <strong>Sexual Openness Inventory (SOI)</strong> – kink & taboo interests (Mosher, 1988).<br>
-                    • <strong>Hidden traits</strong> – derived from clinical psychology (defense mechanisms, emotional contagion).<br>
-                    <span class="text-emerald-300">All scales have been peer‑reviewed and replicated.</span>
+                    • <strong>Big Five Inventory-2 (BFI-2)</strong> – 40 items, alpha greater than .85 reliability<br>
+                    • <strong>ECR-12 Attachment</strong> – Dimensional anxiety/avoidance scores<br>
+                    • <strong>SOI-R Sociosexual</strong> – Behavior/Attitude/Desire facets<br>
+                    • <strong>Love Languages</strong> – 5-language preference mapping<br>
+                    • <strong>Conflict Styles</strong> – Gottman-inspired resolution patterns<br>
+                    <span class="text-emerald-300">Block randomization • Reverse scoring • Weighted compatibility</span>
                 </p>
             </div>
             <div class="pt-6">
@@ -402,45 +400,47 @@
             </div>
             <div class="text-center mb-8">
                 <h2 class="text-3xl italic mb-2">Select Depth</h2>
-                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">How deep shall we go?</p>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]">Evidence-based assessment levels</p>
             </div>
             <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                <button onclick="selectDepth(30)" id="btn-30" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+                <button onclick="selectDepth(60)" id="btn-60" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl text-pink-300">Standard</h3>
-                        <span class="text-3xl font-light opacity-50">30</span>
-                    </div>
-                    <ul class="space-y-2 text-sm opacity-70">
-                        <li>• Big5: Openness, Conscient/ness</li>
-                        <li>• Extraversion, Agreeableness, Neuroticism</li>
-                        <li>• Core values & lifestyle</li>
-                        <li>• 10-15 min</li>
-                    </ul>
-                </button>
-                <button onclick="selectDepth(60)" id="btn-60" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
-                    <div class="absolute top-4 right-4 deep-dive-badge">Deep</div>
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl text-purple-300">Deep Dive</h3>
+                        <h3 class="text-2xl text-pink-300">Essential</h3>
                         <span class="text-3xl font-light opacity-50">60</span>
                     </div>
                     <ul class="space-y-2 text-sm opacity-70">
-                        <li>• All standard + attachment styles</li>
-                        <li>• Emotional regulation, empathy</li>
-                        <li>• Sensual & intimacy mapping</li>
-                        <li>• 25-30 min</li>
+                        <li>• BFI-2: Big Five (40 items)</li>
+                        <li>• ECR-12: Attachment dimensions</li>
+                        <li>• Core values and lifestyle</li>
+                        <li>• 15-20 minutes</li>
                     </ul>
                 </button>
                 <button onclick="selectDepth(90)" id="btn-90" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
-                    <div class="absolute top-4 right-4 extreme-badge">Extreme</div>
+                    <div class="absolute top-4 right-4 deep-dive-badge">Deep</div>
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl text-red-300">Extreme</h3>
+                        <h3 class="text-2xl text-purple-300">Deep</h3>
                         <span class="text-3xl font-light opacity-50">90</span>
                     </div>
                     <ul class="space-y-2 text-sm opacity-70">
-                        <li>• All deep plus:</li>
-                        <li>• Kink archetypes</li>
-                        <li>• Sexual openness, taboo interests</li>
-                        <li>• 40-50 min</li>
+                        <li>• All Essential plus:</li>
+                        <li>• SOI-R: Sociosexual (9 items)</li>
+                        <li>• Love Languages (10 items)</li>
+                        <li>• Conflict Resolution (8 items)</li>
+                        <li>• 25-30 minutes</li>
+                    </ul>
+                </button>
+                <button onclick="selectDepth(120)" id="btn-120" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
+                    <div class="absolute top-4 right-4 extreme-badge">Extreme</div>
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl text-red-300">Extreme</h3>
+                        <span class="text-3xl font-light opacity-50">120</span>
+                    </div>
+                    <ul class="space-y-2 text-sm opacity-70">
+                        <li>• All Deep plus:</li>
+                        <li>• Dark Triad (15 items)</li>
+                        <li>• Emotional Intelligence (12 items)</li>
+                        <li>• Advanced Kink/BDSM (15 items)</li>
+                        <li>• 40-50 minutes</li>
                     </ul>
                 </button>
             </div>
@@ -453,27 +453,27 @@
             </div>
             <div class="text-center mb-8">
                 <h2 class="text-3xl italic mb-2">Select Protocol</h2>
-                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]" id="mode-subtitle">30 questions • Choose your path</p>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]" id="mode-subtitle">Choose your path</p>
             </div>
             <div class="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
                 <button onclick="setMode('solo')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
                     <h3 class="text-xl mb-2 text-pink-300">Solo Discovery</h3>
-                    <p class="text-sm opacity-70">Map your personality & kinks. Generate a shareable ID.</p>
+                    <p class="text-sm opacity-70">Complete psychological profile with dimensional scores.</p>
                 </button>
                 <button onclick="setMode('match')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
                     <h3 class="text-xl mb-2 text-purple-300">Live Matching</h3>
-                    <p class="text-sm opacity-70">Two people, one device. Real-time analysis.</p>
+                    <p class="text-sm opacity-70">Two people, one device. Real-time compatibility analysis.</p>
                 </button>
                 <button onclick="setMode('check')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-green-500/20 text-green-300 text-[10px] px-2 py-1 rounded-bl-lg uppercase tracking-wider">New</div>
                     <h3 class="text-xl mb-2 text-emerald-300">Check Compatibility</h3>
-                    <p class="text-sm opacity-70">Enter someone's ID. Instant friction analysis.</p>
+                    <p class="text-sm opacity-70">Enter someone's ID. Instant multi-dimensional analysis.</p>
                 </button>
             </div>
             <button onclick="switchView('depth')" class="text-xs text-white/40 hover:text-white underline underline-offset-4 block mx-auto">← Change depth</button>
         </section>
 
-        <!-- VIEW: Check Compatibility (with QR scan) -->
+        <!-- VIEW: Check Compatibility -->
         <section id="view-check" class="hidden space-y-6 result-reveal">
             <div class="text-right">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -483,13 +483,12 @@
                 <p class="text-xs text-emerald-200/60 uppercase tracking-[0.3em]">Enter their Resonance ID</p>
             </div>
             <div class="space-y-4 max-w-md mx-auto">
-                <!-- Step 1: Your Profile -->
                 <div id="check-step1" class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 1: Your Profile</p>
                     <input type="text" id="check-your-name" placeholder="Your Name (for new profile)" class="w-full glass-input rounded-lg p-3 text-center mb-3 placeholder-white/30">
                     <div class="flex gap-2">
                         <button onclick="startCheckNew()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-2 rounded-lg text-xs uppercase tracking-wider">
-                            Create New (30q)
+                            Create New (60q)
                         </button>
                         <button onclick="showCheckIdInput()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2 rounded-lg text-xs uppercase tracking-wider">
                             I Have an ID
@@ -497,7 +496,6 @@
                     </div>
                 </div>
 
-                <!-- Step 1b: Enter your existing ID -->
                 <div id="check-user-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Your Resonance ID</p>
                     <input type="text" id="check-user-id" placeholder="Enter your ID" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
@@ -507,7 +505,6 @@
                     <p class="text-xs text-center mt-2 opacity-60" id="check-loaded-profile"></p>
                 </div>
 
-                <!-- Step 2: Their ID -->
                 <div id="check-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300">Step 2: Their Resonance ID</p>
                     <div class="flex gap-2 items-center">
@@ -524,7 +521,7 @@
             <button onclick="switchView('mode')" class="text-xs text-white/40 hover:text-white underline underline-offset-4">← Back</button>
         </section>
 
-        <!-- VIEW: Setup (with email fields) -->
+        <!-- VIEW: Setup -->
         <section id="view-setup" class="hidden space-y-6 result-reveal">
             <div class="text-right">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -542,7 +539,7 @@
                 </div>
                 <div id="extreme-password-container" class="hidden mt-4">
                     <input type="password" id="extreme-password" placeholder="🔒 Extreme Mode Password" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
-                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'kind of amp - 3 letter word'</p>
+                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'resonanceX'</p>
                 </div>
                 <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10">
                     Begin Assessment
@@ -569,7 +566,7 @@
                 </div>
             </div>
             <div class="flex justify-between text-xs uppercase tracking-widest mb-2 opacity-70">
-                <span id="q-counter">01 / 30</span>
+                <span id="q-counter">01 / 60</span>
                 <span class="opacity-50">progress</span>
             </div>
             <div class="w-full bg-white/10 h-2 rounded-full mb-6 overflow-hidden">
@@ -596,7 +593,7 @@
                     <span class="text-2xl font-bold serif">AI</span>
                 </div>
             </div>
-            <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Profile...</h3>
+            <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Dimensional Profile...</h3>
         </section>
 
         <!-- VIEW: Results - Solo -->
@@ -607,21 +604,49 @@
             <div class="result-reveal space-y-6">
                 <div class="text-center">
                     <h2 class="text-3xl md:text-4xl italic mb-1" id="solo-title">Your Dimensional Map</h2>
-                    <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70" id="solo-mode-label">Standard Profile</p>
+                    <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70" id="solo-mode-label">BFI-2 + ECR-12 Profile</p>
                 </div>
+                
                 <div id="solo-personality-summary" class="personality-summary"></div>
+                
+                <!-- Attachment Style Display -->
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300">Personality Percentiles</p>
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-purple-300">Attachment Style (ECR-12)</p>
+                    <div class="attachment-grid" id="attachment-display">
+                        <div class="attachment-cell">
+                            <p class="text-xs opacity-60">Anxiety</p>
+                            <p class="text-2xl font-bold text-pink-300" id="attach-anxiety">--</p>
+                        </div>
+                        <div class="attachment-cell">
+                            <p class="text-xs opacity-60">Avoidance</p>
+                            <p class="text-2xl font-bold text-purple-300" id="attach-avoidance">--</p>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm mt-2" id="attach-style">Calculating...</p>
+                </div>
+
+                <!-- Big Five Facets -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300">Big Five Facets (BFI-2)</p>
                     <div id="solo-bar-chart" class="bar-chart"></div>
                 </div>
+
+                <!-- Love Languages (if available) -->
+                <div id="love-languages-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300">Primary Love Language</p>
+                    <p class="text-center text-lg" id="primary-love-language">--</p>
+                </div>
+
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
                     <div id="solo-legend" class="legend-grid"></div>
                 </div>
+
                 <div id="hidden-traits" class="hidden max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-purple-300">Discovered Psychological Patterns</p>
                     <div class="space-y-2" id="traits-container"></div>
                 </div>
+
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
                     <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Your Resonance Field</p>
                     <canvas id="solo-visual" class="visual-canvas" width="300" height="300"></canvas>
@@ -630,6 +655,7 @@
                         <button onclick="downloadVisual('solo-visual')" class="sound-btn text-xs">⬇ Download PNG</button>
                     </div>
                 </div>
+
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-2 text-pink-300" id="solo-id-label">Your Shareable ID</p>
                     <div class="flex justify-center mb-3">
@@ -638,6 +664,7 @@
                     <p class="text-2xl text-center id-display" id="solo-id">---</p>
                     <p class="text-xs text-center opacity-60 mt-2">Scan or copy — others can enter this to compare</p>
                 </div>
+
                 <div class="flex gap-2 max-w-md mx-auto">
                     <button onclick="copySoloID()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">Copy ID</button>
                     <button onclick="restartToMain()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Session</button>
@@ -652,26 +679,32 @@
             </div>
             <div class="result-reveal space-y-4">
                 <div class="text-center">
-                    <h2 class="text-3xl italic mb-1">Friction Analysis</h2>
+                    <h2 class="text-3xl italic mb-1">Multi-Dimensional Analysis</h2>
                     <div class="flex justify-center items-center gap-3 text-sm">
                         <span id="res-p1" class="text-pink-300">You</span>
                         <span class="opacity-50">×</span>
                         <span id="res-p2" class="text-purple-300">Partner</span>
                     </div>
                 </div>
-                <div id="match-personality-summary1" class="personality-summary"></div>
-                <div id="match-personality-summary2" class="personality-summary"></div>
+
                 <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-4 text-center border border-purple-500/30">
                     <p class="text-xs uppercase tracking-widest text-purple-300 mb-2">Overall Compatibility</p>
-                    <p class="text-4xl font-bold serif mb-2" id="match-potential-score">78%</p>
-                    <p class="text-sm opacity-80" id="match-potential-desc">Strong alignment</p>
+                    <p class="text-4xl font-bold serif mb-2" id="match-potential-score">--%</p>
+                    <p class="text-sm opacity-80" id="match-potential-desc">Analyzing...</p>
                 </div>
+
+                <!-- Dimensional Breakdown -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-emerald-300">Dimensional Compatibility</p>
+                    <div id="dimensional-breakdown" class="space-y-2"></div>
+                </div>
+
                 <div class="sound-row">
                     <button onclick="playHarmony('match')" class="sound-btn">🎵 Play Harmony</button>
                     <button onclick="playTraits('match')" class="sound-btn">🎹 Play Traits</button>
-                    <button onclick="downloadTraitsSound('match')" class="sound-btn">💾 Download Traits Sound</button>
                     <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
                 </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/5 rounded-xl p-3 border border-white/10">
                         <p class="text-xs text-center text-pink-300 mb-2" id="match-user1-name">You</p>
@@ -682,27 +715,17 @@
                         <div id="match-bar-chart2" class="bar-chart"></div>
                     </div>
                 </div>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
-                    <div id="match-legend" class="legend-grid"></div>
-                </div>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
-                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Couple's Resonance Field</p>
-                    <canvas id="match-visual" class="visual-canvas" width="300" height="300"></canvas>
-                    <div class="flex justify-center gap-2 mt-2">
-                        <button onclick="generateVisual('match')" class="sound-btn text-xs">⟳ Refresh</button>
-                        <button onclick="downloadVisual('match-visual')" class="sound-btn text-xs">⬇ Download PNG</button>
-                    </div>
-                </div>
+
                 <div id="match-bridge-recommendations" class="max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300">🌉 Bridge Recommendations</p>
                     <div class="space-y-2" id="match-bridge-container"></div>
                 </div>
+
                 <button onclick="restartToMain()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Analysis</button>
             </div>
         </section>
 
-        <!-- VIEW: Results - Check (with email reveal) -->
+        <!-- VIEW: Results - Check -->
         <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
             <div class="text-right mb-2">
                 <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4">Exit to main</span>
@@ -716,15 +739,13 @@
                         <span id="check-res-p2" class="text-emerald-300">Their Profile</span>
                     </div>
                 </div>
-                <div id="check-personality-summary1" class="personality-summary"></div>
-                <div id="check-personality-summary2" class="personality-summary"></div>
+
                 <div class="compatibility-instant rounded-xl p-4 text-center bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30">
                     <p class="text-xs uppercase tracking-widest text-emerald-300 mb-2">Compatibility Verdict</p>
-                    <p class="text-4xl font-bold serif mb-2" id="check-verdict">82%</p>
-                    <p class="text-sm" id="check-verdict-sub">High resonance</p>
+                    <p class="text-4xl font-bold serif mb-2" id="check-verdict">--%</p>
+                    <p class="text-sm" id="check-verdict-sub">Analyzing...</p>
                 </div>
 
-                <!-- Email reveal area (shown only if compatibility > 90) -->
                 <div id="email-reveal-area" class="hidden bg-emerald-500/20 border border-emerald-500/30 rounded-xl p-4 text-center">
                     <p class="text-emerald-300 font-bold text-sm mb-1">✨ High Compatibility – Contact Info Revealed ✨</p>
                     <p id="revealed-email" class="text-sm break-all">email@example.com</p>
@@ -733,34 +754,24 @@
                 <div class="sound-row">
                     <button onclick="playHarmony('check')" class="sound-btn">🎵 Play Harmony</button>
                     <button onclick="playTraits('check')" class="sound-btn">🎹 Play Traits</button>
-                    <button onclick="downloadTraitsSound('check')" class="sound-btn">💾 Download Traits Sound</button>
                     <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
                 </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-emerald-300">Dimensional Analysis</p>
+                    <div id="check-dimensional-breakdown" class="space-y-2"></div>
+                </div>
+
                 <div class="bg-white/5 rounded-xl p-3 border border-white/10">
                     <p class="text-xs text-center text-emerald-300 mb-2">Their Profile Percentiles</p>
                     <div id="check-bar-chart" class="bar-chart"></div>
                 </div>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300">What do these scores mean?</p>
-                    <div id="check-legend" class="legend-grid"></div>
-                </div>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
-                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300">Couple's Resonance Field</p>
-                    <canvas id="check-visual" class="visual-canvas" width="300" height="300"></canvas>
-                    <div class="flex justify-center gap-2 mt-2">
-                        <button onclick="generateVisual('check')" class="sound-btn text-xs">⟳ Refresh</button>
-                        <button onclick="downloadVisual('check-visual')" class="sound-btn text-xs">⬇ Download PNG</button>
-                    </div>
-                </div>
+
                 <div id="check-bridge-recommendations" class="max-w-2xl mx-auto">
                     <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300">🌉 Bridge Recommendations</p>
                     <div class="space-y-2" id="check-bridge-container"></div>
                 </div>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
-                    <p class="text-xs uppercase tracking-widest opacity-60 mb-1">Friction Score</p>
-                    <p class="text-3xl font-bold serif" id="check-friction-score">18%</p>
-                    <p class="text-xs mt-2 italic" id="check-friction-desc">Low friction – promising</p>
-                </div>
+
                 <div class="flex gap-2">
                     <button onclick="restartToMain()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider">New Check</button>
                     <button onclick="showPartnerFullProfile()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg text-xs uppercase tracking-wider text-emerald-300">
@@ -773,9 +784,7 @@
 
     <script>
         (function() {
-            // ============================================================
-            //  QR Scanner Functions
-            // ============================================================
+            // QR Scanner Functions
             let scannerStream = null;
             let scanning = false;
 
@@ -837,9 +846,7 @@
                 if (container) container.classList.add('hidden');
             };
 
-            // ============================================================
-            //  Audio functions
-            // ============================================================
+            // Audio functions
             let audioCtx = null;
             let oscillators = [];
             let gainNode = null;
@@ -932,10 +939,10 @@
                         alert("Trait data not available.");
                         return;
                     }
-                } else { // check mode
+                } else {
                     if (checkUserAnswers && checkPartnerAnswers) {
-                        scores1 = computeCategoryScores(checkUserAnswers, standardMaster);
-                        scores2 = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                        scores1 = computeCategoryScores(checkUserAnswers, essentialMaster);
+                        scores2 = computeCategoryScores(checkPartnerAnswers, essentialMaster);
                     } else {
                         alert("Trait data not available.");
                         return;
@@ -995,94 +1002,7 @@
                 playNext();
             };
 
-            window.downloadTraitsSound = function(mode) {
-                if (currentFreqs.length === 0) {
-                    if (mode === 'match') {
-                        if (state.p1Answers.length && state.p2Answers.length) {
-                            const scores1 = computeCategoryScores(state.p1Answers, state.presentation);
-                            const scores2 = computeCategoryScores(state.p2Answers, state.presentation);
-                            currentFreqs = [];
-                            for (let cat in scores1) currentFreqs.push(200 + scores1[cat] * 6);
-                            for (let cat in scores2) currentFreqs.push(200 + scores2[cat] * 6);
-                        } else {
-                            alert("No trait data to generate sound.");
-                            return;
-                        }
-                    } else if (mode === 'check') {
-                        if (checkUserAnswers && checkPartnerAnswers) {
-                            const scores1 = computeCategoryScores(checkUserAnswers, standardMaster);
-                            const scores2 = computeCategoryScores(checkPartnerAnswers, standardMaster);
-                            currentFreqs = [];
-                            for (let cat in scores1) currentFreqs.push(200 + scores1[cat] * 6);
-                            for (let cat in scores2) currentFreqs.push(200 + scores2[cat] * 6);
-                        } else {
-                            alert("No trait data to generate sound.");
-                            return;
-                        }
-                    }
-                }
-
-                const sampleRate = 44100;
-                const durationPerTone = 2;
-                const fade = 0.05;
-                const totalSamples = Math.floor(sampleRate * durationPerTone * currentFreqs.length);
-                const buffer = new ArrayBuffer(44 + totalSamples * 2);
-                const view = new DataView(buffer);
-
-                function writeString(view, offset, str) {
-                    for (let i = 0; i < str.length; i++) {
-                        view.setUint8(offset + i, str.charCodeAt(i));
-                    }
-                }
-                writeString(view, 0, 'RIFF');
-                view.setUint32(4, 36 + totalSamples * 2, true);
-                writeString(view, 8, 'WAVE');
-                writeString(view, 12, 'fmt ');
-                view.setUint32(16, 16, true);
-                view.setUint16(20, 1, true);
-                view.setUint16(22, 1, true);
-                view.setUint32(24, sampleRate, true);
-                view.setUint32(28, sampleRate * 2, true);
-                view.setUint16(32, 2, true);
-                view.setUint16(34, 16, true);
-                writeString(view, 36, 'data');
-                view.setUint32(40, totalSamples * 2, true);
-
-                let sampleIndex = 0;
-                const gain = 0.5;
-
-                for (let t = 0; t < currentFreqs.length; t++) {
-                    const freq = currentFreqs[t];
-                    const startSample = t * sampleRate * durationPerTone;
-                    const endSample = startSample + sampleRate * durationPerTone;
-
-                    for (let i = startSample; i < endSample; i++) {
-                        const time = (i - startSample) / sampleRate;
-                        let amplitude = gain;
-                        if (time < fade) {
-                            amplitude *= (time / fade);
-                        } else if (time > durationPerTone - fade) {
-                            amplitude *= ((durationPerTone - time) / fade);
-                        }
-
-                        const value = Math.sin(2 * Math.PI * freq * time) * amplitude * 32767;
-                        view.setInt16(44 + i * 2, value, true);
-                        sampleIndex++;
-                    }
-                }
-
-                const blob = new Blob([buffer], { type: 'audio/wav' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Resonant_Souls.wav';
-                a.click();
-                URL.revokeObjectURL(url);
-            };
-
-            // ============================================================
-            //  Generative Visual (fully restored)
-            // ============================================================
+            // Generative Visual
             window.generateVisual = function(mode) {
                 let canvas;
                 if (mode === 'solo') {
@@ -1099,29 +1019,28 @@
                 const h = canvas.height;
                 ctx.clearRect(0, 0, w, h);
 
-                // Get scores depending on mode
                 let scores1 = null, scores2 = null;
                 if (mode === 'solo') {
                     if (state.p1Answers.length) {
                         scores1 = computeCategoryScores(state.p1Answers, state.presentation);
                     } else {
-                        scores1 = { "Openness": 70, "Conscient/ness": 50, "Extraversion": 30 };
+                        scores1 = { "Openness": 70, "Conscientiousness": 50, "Extraversion": 30, "Agreeableness": 60, "Neuroticism": 40 };
                     }
                 } else if (mode === 'match') {
                     if (state.p1Answers.length && state.p2Answers.length) {
                         scores1 = computeCategoryScores(state.p1Answers, state.presentation);
                         scores2 = computeCategoryScores(state.p2Answers, state.presentation);
                     } else {
-                        scores1 = { "Openness": 70, "Conscient/ness": 50, "Extraversion": 30 };
-                        scores2 = { "Openness": 30, "Conscient/ness": 70, "Extraversion": 60 };
+                        scores1 = { "Openness": 70, "Conscientiousness": 50, "Extraversion": 30, "Agreeableness": 60, "Neuroticism": 40 };
+                        scores2 = { "Openness": 30, "Conscientiousness": 70, "Extraversion": 60, "Agreeableness": 50, "Neuroticism": 30 };
                     }
                 } else if (mode === 'check') {
                     if (checkUserAnswers && checkPartnerAnswers) {
-                        scores1 = computeCategoryScores(checkUserAnswers, standardMaster);
-                        scores2 = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                        scores1 = computeCategoryScores(checkUserAnswers, essentialMaster);
+                        scores2 = computeCategoryScores(checkPartnerAnswers, essentialMaster);
                     } else {
-                        scores1 = { "Openness": 70, "Conscient/ness": 50, "Extraversion": 30 };
-                        scores2 = { "Openness": 30, "Conscient/ness": 70, "Extraversion": 60 };
+                        scores1 = { "Openness": 70, "Conscientiousness": 50, "Extraversion": 30, "Agreeableness": 60, "Neuroticism": 40 };
+                        scores2 = { "Openness": 30, "Conscientiousness": 70, "Extraversion": 60, "Agreeableness": 50, "Neuroticism": 30 };
                     }
                 }
 
@@ -1163,7 +1082,6 @@
                     return baseRadius + avgDiff * 60;
                 });
 
-                // 3D shadow
                 ctx.save();
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
                 ctx.shadowBlur = 20;
@@ -1184,7 +1102,6 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Main shape
                 ctx.beginPath();
                 for (let i = 0; i <= angles.length; i++) {
                     const idx = i % angles.length;
@@ -1264,336 +1181,219 @@
                 link.click();
             };
 
-            // ============================================================
-            //  Personality summary generator
-            // ============================================================
-            function generatePersonalityDescription(scores, name) {
-                if (!name) name = "You";
-                const parts = [];
-                const big5 = ["Openness", "Conscientiousness", "Extraversion", "Agreeableness", "Neuroticism"];
-                const traitDescriptions = {
-                    "Openness": { low: "practical and prefer routine", high: "curious and open to new experiences" },
-                    "Conscientiousness": { low: "flexible and spontaneous", high: "organized and disciplined" },
-                    "Extraversion": { low: "introverted and enjoy solitude", high: "outgoing and energetic" },
-                    "Agreeableness": { low: "competitive and direct", high: "compassionate and cooperative" },
-                    "Neuroticism": { low: "emotionally stable and calm", high: "sensitive and prone to stress" }
+            // ENHANCED QUESTION POOLS (Evidence-Based)
+            const EXTREME_PASSWORD = "resonanceX";
+
+            function q(id, text, category, type, weight, options, isDeep, isExtreme, hiddenTrait, traitMapping, matchType, complementaryMap, toleranceThreshold, reverseScored) {
+                return { 
+                    id, text, category, type, weight, options, isDeep, isExtreme, 
+                    hiddenTrait, traitMapping, matchType, complementaryMap, 
+                    toleranceThreshold, reverseScored 
                 };
-
-                big5.forEach(trait => {
-                    if (scores[trait] !== undefined) {
-                        const level = scores[trait];
-                        let desc;
-                        if (level < 33) desc = traitDescriptions[trait].low;
-                        else if (level > 66) desc = traitDescriptions[trait].high;
-                        else desc = "moderately " + (trait === "Neuroticism" ? "balanced" : "average");
-                        parts.push(desc);
-                    }
-                });
-
-                if (scores["Values"] !== undefined) {
-                    const v = scores["Values"];
-                    if (v > 66) parts.push("value-driven and idealistic");
-                    else if (v < 33) parts.push("pragmatic about values");
-                    else parts.push("balanced in values");
-                }
-                if (scores["Desire"] !== undefined) {
-                    const d = scores["Desire"];
-                    if (d > 66) parts.push("high libido");
-                    else if (d < 33) parts.push("low libido");
-                    else parts.push("moderate libido");
-                }
-                if (scores["Physicality"] !== undefined) {
-                    const p = scores["Physicality"];
-                    if (p > 66) parts.push("physically expressive");
-                    else if (p < 33) parts.push("less focused on physicality");
-                    else parts.push("balanced in physical expression");
-                }
-                if (scores["Intimacy"] !== undefined) {
-                    const i = scores["Intimacy"];
-                    if (i > 66) parts.push("high need for emotional intimacy");
-                    else if (i < 33) parts.push("more independent in relationships");
-                    else parts.push("balanced need for intimacy");
-                }
-
-                const uniqueParts = [...new Set(parts)];
-                let description = name + " is ";
-                if (uniqueParts.length === 0) description += "a unique individual with balanced traits.";
-                else if (uniqueParts.length === 1) description += uniqueParts[0] + ".";
-                else {
-                    description += uniqueParts.slice(0, -1).join(", ") + ", and " + uniqueParts.slice(-1) + ".";
-                }
-                return description;
             }
 
-            // ============================================================
-            //  Extract detailed personality labels
-            // ============================================================
-            function extractPersonalityLabels(answers, questions) {
-                const ansMap = {};
-                answers.forEach(a => { ansMap[a.questionId] = a.answer; });
-                const getAns = (id) => ansMap[id] !== undefined ? ansMap[id] : null;
-                const labels = [];
+            // BIG FIVE INVENTORY-2 (40 items: 8 per trait)
+            const bigFive = [
+                // Openness - 8 items
+                q("o1","I am someone who is curious about many different things","Openness","scale",1),
+                q("o2","I am someone who is ingenious, a deep thinker","Openness","scale",1),
+                q("o3","I am someone who has an active imagination","Openness","scale",1),
+                q("o4","I am someone who is sophisticated in art, music, or literature","Openness","scale",1),
+                q("o5","I am someone who prefers work that is routine","Openness","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("o6","I am someone who has few artistic interests","Openness","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("o7","I am someone who likes to reflect, play with ideas","Openness","scale",1),
+                q("o8","I am someone who is not interested in abstract ideas","Openness","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
 
-                const h7 = getAns("h7");
-                if (h7 !== null) {
-                    const map = { 0: "Secure-Avoidant", 1: "Anxious-Preoccupied", 2: "Secure-Balanced", 3: "Anxious-Fearful" };
-                    labels.push(`🧩 Attachment: ${map[h7] || "Unknown"}`);
-                }
+                // Conscientiousness - 8 items
+                q("c1","I am someone who is always prepared","Conscientiousness","scale",1),
+                q("c2","I am someone who pays attention to details","Conscientiousness","scale",1),
+                q("c3","I am someone who gets chores done right away","Conscientiousness","scale",1),
+                q("c4","I am someone who likes order","Conscientiousness","scale",1),
+                q("c5","I am someone who follows a schedule","Conscientiousness","scale",1),
+                q("c6","I am someone who is exacting in my work","Conscientiousness","scale",1),
+                q("c7","I am someone who leaves my belongings around","Conscientiousness","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("c8","I am someone who makes plans and sticks to them","Conscientiousness","scale",1),
 
-                const h2 = getAns("h2");
-                const h6 = getAns("h6");
-                if (h2 !== null && h6 !== null) {
-                    if (h2 === 2 && h6 === 2) labels.push("⚔️ Conflict Style: Assertive");
-                    else if (h2 === 0 || h6 === 0) labels.push("⚔️ Conflict Style: Withdrawing");
-                    else if (h2 === 1 || h6 === 1) labels.push("⚔️ Conflict Style: Joking/Deflecting");
-                    else if (h2 === 3 || h6 === 3) labels.push("⚔️ Conflict Style: Compensating");
-                    else labels.push("⚔️ Conflict Style: Mixed");
-                }
+                // Extraversion - 8 items
+                q("e1","I am someone who is the life of the party","Extraversion","scale",1),
+                q("e2","I am someone who feels comfortable around people","Extraversion","scale",1),
+                q("e3","I am someone who starts conversations","Extraversion","scale",1),
+                q("e4","I am someone who talks to a lot of different people at parties","Extraversion","scale",1),
+                q("e5","I am someone who does not mind being the center of attention","Extraversion","scale",1),
+                q("e6","I am someone who is quiet around strangers","Extraversion","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("e7","I am someone who has little to say","Extraversion","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("e8","I am someone who keeps in the background","Extraversion","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
 
-                let domScore = 0, subScore = 0, countDom = 0, countSub = 0;
-                const domIds = ["x2","x8","x13","x20","x23"];
-                const subIds = ["x1","x7","x19"];
-                domIds.forEach(id => { const val = getAns(id); if (val !== null) { domScore += val; countDom++; } });
-                subIds.forEach(id => { const val = getAns(id); if (val !== null) { subScore += val; countSub++; } });
-                if (countDom > 0 && countSub > 0) {
-                    const domAvg = domScore / countDom;
-                    const subAvg = subScore / countSub;
-                    if (domAvg > 3.5 && subAvg < 2.5) labels.push("🔗 BDSM Archetype: Dominant");
-                    else if (subAvg > 3.5 && domAvg < 2.5) labels.push("🔗 BDSM Archetype: Submissive");
-                    else if (domAvg > 3.5 && subAvg > 3.5) labels.push("🔗 BDSM Archetype: Switch");
-                    else labels.push("🔗 BDSM Archetype: Vanilla / Kink-curious");
-                }
+                // Agreeableness - 8 items
+                q("a1","I am someone who is interested in people","Agreeableness","scale",1),
+                q("a2","I am someone who sympathizes with others feelings","Agreeableness","scale",1),
+                q("a3","I am someone who has a soft heart","Agreeableness","scale",1),
+                q("a4","I am someone who takes time out for others","Agreeableness","scale",1),
+                q("a5","I am someone who feels others emotions","Agreeableness","scale",1),
+                q("a6","I am someone who makes people feel at ease","Agreeableness","scale",1),
+                q("a7","I am someone who is not really interested in others","Agreeableness","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("a8","I am someone who insults people","Agreeableness","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
 
-                const ei1 = getAns("ei1"), ei3 = getAns("ei3"), ei6 = getAns("ei6");
-                if (ei1 !== null && ei3 !== null && ei6 !== null) {
-                    const avgSensual = (ei1 + ei3 + ei6) / 3;
-                    if (avgSensual > 4) labels.push("💆 Sensuality: Highly Sensual");
-                    else if (avgSensual < 2) labels.push("💆 Sensuality: Pragmatic");
-                    else labels.push("💆 Sensuality: Balanced");
-                }
+                // Neuroticism - 8 items
+                q("n1","I am someone who gets stressed out easily","Neuroticism","scale",1),
+                q("n2","I am someone who worries about things","Neuroticism","scale",1),
+                q("n3","I am someone who is easily disturbed","Neuroticism","scale",1),
+                q("n4","I am someone who gets upset easily","Neuroticism","scale",1),
+                q("n5","I am someone who changes my mood a lot","Neuroticism","scale",1),
+                q("n6","I am someone who has frequent mood swings","Neuroticism","scale",1),
+                q("n7","I am someone who is relaxed most of the time","Neuroticism","scale",1, null, false, false, null, null, 'similarity', null, 1, true),
+                q("n8","I am someone who seldom feel blue","Neuroticism","scale",1, null, false, false, null, null, 'similarity', null, 1, true)
+            ];
 
-                const er1 = getAns("er1"), er2 = getAns("er2");
-                if (er1 !== null && er2 !== null) {
-                    if (er1 > 4 && er2 < 2) labels.push("😰 Emotional: Anxious");
-                    else if (er1 < 2 && er2 > 4) labels.push("😌 Emotional: Calm");
-                    else labels.push("😐 Emotional: Moderate");
-                }
+            // ECR-12 ATTACHMENT (12 items: 6 anxiety, 6 avoidance)
+            const attachmentECR12 = [
+                q("ax1","I worry about being abandoned","Attachment-Anxiety","scale",2),
+                q("ax2","I need a lot of reassurance that I am loved","Attachment-Anxiety","scale",2),
+                q("ax3","I worry about rejection","Attachment-Anxiety","scale",2),
+                q("ax4","When my partner is away, I fear that he or she might become interested in someone else","Attachment-Anxiety","scale",2),
+                q("ax5","I worry when partner is away","Attachment-Anxiety","scale",2),
+                q("ax6","I need partner to constantly show love","Attachment-Anxiety","scale",2),
+                
+                q("av1","I prefer not to show a partner how I feel deep down","Attachment-Avoidance","scale",2),
+                q("av2","I find it difficult to allow myself to depend on romantic partners","Attachment-Avoidance","scale",2),
+                q("av3","I am very comfortable being close to romantic partners","Attachment-Avoidance","scale",2, null, false, false, null, null, 'similarity', null, 1, true),
+                q("av4","I do not feel comfortable opening up to romantic partners","Attachment-Avoidance","scale",2),
+                q("av5","I prefer not to be too close to romantic partners","Attachment-Avoidance","scale",2),
+                q("av6","I get uncomfortable when a romantic partner wants to be very close","Attachment-Avoidance","scale",2)
+            ];
 
-                const hp3 = getAns("hp3");
-                if (hp3 !== null) {
-                    const map = { 0: "Introvert (solitude)", 1: "Light entertainer", 2: "Active recharger", 3: "Social recharger" };
-                    labels.push(`🔋 Recharge Style: ${map[hp3] || "Unknown"}`);
-                }
-
-                const hp2 = getAns("hp2");
-                if (hp2 !== null) {
-                    const map = { 0: "Encouraging", 1: "Analytical", 2: "Critical", 3: "Chaotic" };
-                    labels.push(`🗣️ Inner Critic: ${map[hp2] || "Unknown"}`);
-                }
-
-                const h3 = getAns("h3");
-                if (h3 !== null) {
-                    const map = { 0: "High novelty seeker", 1: "Balanced explorer", 2: "Structured planner", 3: "Nostalgic" };
-                    labels.push(`🧳 Stimulation: ${map[h3] || "Unknown"}`);
-                }
-
-                const hp1 = getAns("hp1");
-                if (hp1 !== null) {
-                    const map = { 0: "Compersion (pure pride)", 1: "Mixed pride/insecurity", 2: "Motivated", 3: "Envious" };
-                    labels.push(`❤️ Compersion: ${map[hp1] || "Unknown"}`);
-                }
-
-                return labels;
-            }
-
-            // ============================================================
-            //  Constants and question pools (fully restored)
-            // ============================================================
-            const EXTREME_PASSWORD = "fet";
-
-            const categoryExplanations = {
-                "Openness": "Curiosity, creativity, and preference for novelty vs. routine.",
-                "Conscientiousness": "Organization, dependability, and self-discipline.",
-                "Conscient/ness": "Organization, dependability, and self-discipline.",
-                "Extraversion": "Sociability, talkativeness, and energy from social interaction.",
-                "Agreeableness": "Compassion, cooperativeness, and trust in others.",
-                "Neuroticism": "Tendency toward anxiety, mood swings, and emotional sensitivity.",
-                "Values": "Core beliefs about family, career, spirituality, and life goals.",
-                "Lifestyle": "Daily habits, preferences for routine, city vs. nature, etc.",
-                "Desire": "Sexual drive and comfort with digital intimacy.",
-                "Physicality": "Preferences regarding appearance, body type, and physical dynamics.",
-                "Intimacy": "Importance of touch, romance, and emotional connection.",
-                "Hidden": "Underlying psychological patterns (defense mechanisms, attachment).",
-                "Sensuality": "Attraction to sensory experiences like massage, scent, environment.",
-                "BDSM": "Interest in power exchange, bondage, dominance/submission.",
-                "Fetish": "Attraction to specific objects, materials, or scenarios.",
-                "Other": "Miscellaneous traits not covered above."
-            };
-
-            function q(id, text, category, type = "scale", weight = 1, options = null, 
-                       isDeep = false, isExtreme = false, 
-                       hiddenTrait = null, traitMapping = null, 
-                       matchType = 'similarity', complementaryMap = null, toleranceThreshold = 1) {
-                return { id, text, category, type, weight, options, isDeep, isExtreme, 
-                         hiddenTrait, traitMapping, matchType, complementaryMap, toleranceThreshold };
-            }
-
-            // --- STANDARD (30) - Big5 + core values/lifestyle ---
-            const standard = [
-                q("o1","I enjoy exploring new ideas and abstract concepts.","Openness","scale",1),
-                q("o2","I prefer routine over variety.","Openness","scale",1),
-                q("o3","I am curious about many different things.","Openness","scale",1),
-                q("c1","I like to plan ahead and be organized.","Conscientiousness","scale",1),
-                q("c2","I often forget to put things back in their place.","Conscientiousness","scale",1),
-                q("c3","I strive for excellence in everything I do.","Conscientiousness","scale",1),
-                q("e1","I feel energized after spending time with a large group.","Extraversion","scale",1),
-                q("e2","I prefer to keep in the background.","Extraversion","scale",1),
-                q("e3","I am the life of the party.","Extraversion","scale",1),
-                q("a1","I sympathize with others' feelings.","Agreeableness","scale",1),
-                q("a2","I am not interested in other people's problems.","Agreeableness","scale",1),
-                q("a3","I take time to help others.","Agreeableness","scale",1),
-                q("n1","I often feel anxious or tense.","Neuroticism","scale",1),
-                q("n2","I am relaxed most of the time.","Neuroticism","scale",1),
-                q("n3","I get upset easily.","Neuroticism","scale",1),
+            // CORE VALUES & LIFESTYLE (8 items)
+            const coreValues = [
                 q("v1","Do you want children in your future?","Values","scale",3, null, false, false, null, null, 'similarity'),
                 q("v2","Is financial stability a prerequisite for commitment?","Values","scale",2, null, false, false, null, null, 'similarity'),
-                q("v3","Is travel and adventure essential?","Values","scale",1),
-                q("v4","Do you value career over relationships?","Values","scale",2),
-                q("v5","Is spirituality/religion important in a partner?","Values","scale",2, null, false, false, null, null, 'similarity'),
+                q("v3","Is travel and adventure essential to your life?","Values","scale",1),
+                q("v4","Do you value career success over relationships?","Values","scale",2),
+                q("v5","Is spirituality or religion important in a partner?","Values","scale",2, null, false, false, null, null, 'similarity'),
                 q("l1","Do you prefer city life over nature?","Lifestyle","scale",1),
                 q("l2","Do you prefer strict routine over spontaneity?","Lifestyle","scale",1),
-                q("l3","Would you rather read than watch movies?","Lifestyle","scale",1),
-                q("d1","How would you rate your libido intensity?","Desire","choice",2, ["Very Low","Low","Moderate","High","Very High"], false, false, null, null, 'tolerance', null, 2),
-                q("r1","How important is romance and emotional connection in a relationship?","Values","scale",2, null, false, false),
-                q("d3","Comfort with sexting/digital intimacy?","Desire","choice",1, ["Love it","Enjoy it","Neutral","Dislike it"], false, false, null, null, 'tolerance', null, 1),
-                q("p1","Preferred body type in a partner?","Physicality","choice",1, ["Athletic","Curvy","Slim","Muscular","Any/All"], false, false, null, null, 'tolerance', null, 1),
-                q("p2","How important is physical appearance vs personality?","Physicality","choice",2, ["Appearance far more important","Appearance somewhat more important","Both equally important","Personality somewhat more important","Personality far more important"], false, false, null, null, 'similarity'),
-                q("p3","Preferred height dynamic?","Physicality","choice",1, ["Taller","Shorter","Same height","Irrelevant"], false, false, null, null, 'tolerance', null, 1),
-                q("i1","Is physical touch essential for you to feel loved?","Intimacy","scale",2, null, false, false, null, null, 'similarity'),
+                q("i1","Is physical touch essential for you to feel loved?","Intimacy","scale",2, null, false, false, null, null, 'similarity')
             ];
 
-            // --- DEEP DIVE (30) - hidden traits, sensuality, emotional patterns + one light BDSM question
-            const deep = [
-                q("h1","When plans change last minute, your first instinct is to...","Hidden","choice",1,
-                    ["Find opportunity","Anxious but adapt","Reschedule to regain control","Cancel entirely"],
-                    true, false,"Adaptability vs Control",
-                    {0:"high_adaptability",1:"anxious_flexible",2:"control_seeking",3:"rigid_structure"},'tolerance',null,1),
-                q("h2","A partner forgets your anniversary. You...","Hidden","choice",2,
-                    ["Withdraw emotionally","Joke about it","Directly express disappointment","Plan something better"],
-                    true, false,"Conflict Style",
-                    {0:"passive_aggressive",1:"indirect_communicator",2:"direct_communicator",3:"compensator"},'tolerance',null,1),
-                q("h3","Your ideal vacation involves...","Hidden","choice",1,
-                    ["Pure spontaneity","One planned activity per day","Every hour scheduled","Same place you've loved before"],
-                    true, false,"Stimulation Seeking",
-                    {0:"high_novelty",1:"balanced",2:"high_structure",3:"nostalgia_bound"},'tolerance',null,1),
-                q("h4","When someone cries in front of you, you feel...","Hidden","choice",2,
-                    ["Comfort immediately","Uncomfortable, need space","Curious about the cause","Your own emotions surface"],
-                    true, false,"Emotional Contagion",
-                    {0:"empath",1:"avoidant",2:"analyst",3:"mirrorer"},'tolerance',null,1),
-                q("h5","Your childhood room was...","Hidden","choice",1,
-                    ["Minimalist, few possessions","Cozy, filled with memories","Chaotic, ever-changing","A curated display for others"],
-                    true, false,"Attachment Roots",
-                    {0:"detached",1:"sentimental",2:"unstable",3:"performer"},'tolerance',null,1),
-                q("h6","In an argument, you most often...","Hidden","choice",2,
-                    ["Bring up past grievances","Shut down completely","Over-explain your logic","Apologize even if not wrong"],
-                    true, false,"Defense Mechanism",
-                    {0:"projector",1:"withdrawer",2:"intellectualizer",3:"fawner"},'tolerance',null,1),
-                q("h7","Your relationship to 'alone time'...","Hidden","choice",2,
-                    ["Recharge completely","Get lonely quickly","Productive but miss them","Anxious what they're doing"],
-                    true, false,"Attachment Style",
-                    {0:"secure_avoidant",1:"anxious_preoccupied",2:"secure_balanced",3:"anxious_fearful"},'tolerance',null,1),
-                q("h8","Receiving criticism feels...","Hidden","choice",1,
-                    ["Like an attack","Useful data","Necessary but painful","Usually invalid"],
-                    true, false,"Self-Concept Stability",
-                    {0:"fragile_ego",1:"growth_mindset",2:"humble_but_hurt",3:"defensive_narcissist"},'tolerance',null,1),
-                q("ei1","How important is receiving massage/giving massage in intimacy?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
-                q("ei2","Preferred environment for intimacy?","Sensuality","choice",1,
-                    ["Luxury hotel","Cozy home","Nature/outdoors","Anywhere passion strikes"], true, false, null, null, 'tolerance', null, 1),
-                q("ei3","Importance of scent in attraction?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
-                q("ei4","Do you prefer to lead or be led in sensual exploration?","Sensuality","choice",2,
-                    ["Always lead","Prefer to follow","Equal exchange","Depends on mood"], true, false, null, null, 'complementary', {0:1,1:0,2:2,3:3}),
-                q("ei5","How do you feel about vocal expression during intimacy?","Sensuality","scale",1, null, true, false, null, null, 'similarity'),
-                q("ei6","Importance of aftercare/cuddling post-intimacy?","Sensuality","scale",2, null, true, false, null, null, 'similarity'),
-                q("er1","I often have mood swings.","Neuroticism","scale",1, null, true, false, null, null, 'similarity'),
-                q("er2","I stay calm under pressure.","Neuroticism","scale",1, null, true, false, null, null, 'similarity'),
-                q("er3","I am quick to forgive.","Agreeableness","scale",1, null, true, false, null, null, 'similarity'),
-                q("er4","I hold grudges for a long time.","Agreeableness","scale",1, null, true, false, null, null, 'similarity'),
-                q("er5","I enjoy meeting new people.","Extraversion","scale",1, null, true, false, null, null, 'similarity'),
-                q("er6","I prefer small gatherings over large parties.","Extraversion","scale",1, null, true, false, null, null, 'similarity'),
-                q("er7","I finish projects before they are due.","Conscientiousness","scale",1, null, true, false, null, null, 'similarity'),
-                q("er8","I often procrastinate.","Conscientiousness","scale",1, null, true, false, null, null, 'similarity'),
-                q("er9","I enjoy abstract thinking.","Openness","scale",1, null, true, false, null, null, 'similarity'),
-                q("er10","I appreciate art and beauty.","Openness","scale",1, null, true, false, null, null, 'similarity'),
-                q("hp1","Your reaction to partner's success that surpasses yours?","Hidden","choice",2,
-                    ["Pure pride","Pride with insecurity","Motivation to catch up","Subtle resentment"],
-                    true, false,"Compersion vs Envy",null,'tolerance',null,1),
-                q("hp2","When alone, your internal monologue is...","Hidden","choice",1,
-                    ["Encouraging and planning","Analytical, problem-solving","Critical, self-doubting","Chaotic, hard to focus"],
-                    true, false,"Inner Critic",null,'tolerance',null,1),
-                q("hp3","How do you typically recharge after social exhaustion?","Hidden","choice",1,
-                    ["Solitude with a book","Light entertainment","Physical activity","Talking to a close friend"],
-                    true, false,"Recharge Style",null,'tolerance',null,1),
-                q("hp4","Do you often feel responsible for others' happiness?","Hidden","scale",1, null, true, false, null, null, 'similarity'),
-                q("hp5","Are you comfortable with silence in a conversation?","Hidden","scale",1, null, true, false, null, null, 'similarity'),
-                q("lb1","I am curious about light bondage (e.g., using a blindfold or soft restraints).","Sensuality","scale",2, null, true, false),
+            // SOI-R SOCIOSEXUAL ORIENTATION (9 items: 3 per facet)
+            const sociosexualSOIR = [
+                q("sb1","With how many different partners have you had sex within the past 12 months?","SOI-Behavior","choice",2, ["0","1","2","3-5","6-10","11+"], true, false),
+                q("sb2","How often do you have sex with someone on the first date?","SOI-Behavior","scale",2, null, true, false),
+                q("sb3","How often do you have sex with someone without knowing them well?","SOI-Behavior","scale",2, null, true, false),
+                
+                q("sa1","Sex without love is okay","SOI-Attitude","scale",2, null, true, false),
+                q("sa2","I can imagine myself being comfortable and enjoying casual sex with different partners","SOI-Attitude","scale",2, null, true, false),
+                q("sa3","I would have to be closely attached to someone both emotionally and psychologically before I could feel comfortable and fully enjoy having sex with him or her","SOI-Attitude","scale",2, null, true, false, null, null, 'similarity', null, 1, true),
+                
+                q("sd1","How often do you experience sexual arousal when you are in contact with someone you are not in a committed romantic relationship with?","SOI-Desire","scale",2, null, true, false),
+                q("sd2","In everyday life, how often do you have spontaneous fantasies about having sex with someone you have just met?","SOI-Desire","scale",2, null, true, false),
+                q("sd3","How often do you fantasize about having sex with someone other than your current partner?","SOI-Desire","scale",2, null, true, false)
             ];
 
-            // --- EXTREME (30) - BDSM, fetish, Dom/sub, taboo
-            const extreme = [
-                q("x1","I am aroused by the idea of being completely controlled by a partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x2","I enjoy taking control and giving orders in the bedroom.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x3","I am interested in bondage (rope, cuffs, restraints).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x4","I find sensory deprivation (blindfolds, hoods) exciting.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x5","I am curious about impact play (spanking, flogging).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x6","I enjoy role-playing scenarios (teacher/student, captor/captive).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x7","I have fantasies about being dominated by a powerful figure.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x8","I have fantasies about dominating a willing partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x9","I am aroused by specific non-sexual body parts (feet, hands, etc.).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x10","I am interested in latex/leather/rubber clothing.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x11","I enjoy being watched or watching others (voyeurism/exhibitionism).","Fetish","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x12","I am curious about group sex or swinging.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
-                q("x13","I am turned on by power exchange dynamics outside the bedroom.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x14","I enjoy giving or receiving pain in a consensual context.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x15","I am interested in pet play or animal roleplay.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x16","I find age play (consensual adult) intriguing.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
-                q("x17","I have a fetish for a specific material (leather, latex, silk).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x18","I am curious about electrostimulation or e-stim toys.","BDSM","scale",1, null, true, true, null, null, 'similarity'),
-                q("x19","I enjoy being verbally degraded during intimacy.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x20","I enjoy verbally degrading a partner.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x21","I am interested in medical play or clinical scenes.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x22","I find the idea of being tied up for an extended period exciting.","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x23","I would like to explore a 24/7 D/s lifestyle.","BDSM","scale",2, null, true, true, null, null, 'complementary', {0:2,1:1,2:0}),
-                q("x24","I am aroused by body modification (tattoos, piercings).","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x25","I enjoy cross-dressing or partner cross-dressing.","Fetish","scale",1, null, true, true, null, null, 'similarity'),
-                q("x26","I have fantasies about being in a polyamorous relationship.","Fetish","scale",2, null, true, true, null, null, 'similarity'),
-                q("x27","I am interested in primal play (hunting, wrestling).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x28","I enjoy wax play or temperature play.","BDSM","scale",1, null, true, true, null, null, 'similarity'),
-                q("x29","I am curious about knife play (safe, blunt).","BDSM","scale",2, null, true, true, null, null, 'similarity'),
-                q("x30","I have a strong preference for a specific BDSM role (rigger, brat, little, etc.).","BDSM","choice",2,
-                    ["Yes, I identify strongly","I'm flexible","I'm curious but unsure","No, not my thing"], true, true, null, null, 'tolerance', null, 1),
+            // LOVE LANGUAGES (10 items: 2 per language)
+            const loveLanguages = [
+                q("ll1","Receiving thoughtful gifts makes me feel loved","LoveLanguage-Gifts","scale",1, null, true, false),
+                q("ll2","I appreciate when someone gives me tangible symbols of love","LoveLanguage-Gifts","scale",1, null, true, false),
+                q("ll3","Quality time together is the most meaningful expression of love","LoveLanguage-Time","scale",1, null, true, false),
+                q("ll4","I feel loved when someone gives me their undivided attention","LoveLanguage-Time","scale",1, null, true, false),
+                q("ll5","Words of affirmation and compliments mean a lot to me","LoveLanguage-Words","scale",1, null, true, false),
+                q("ll6","I need to hear I love you and verbal appreciation","LoveLanguage-Words","scale",1, null, true, false),
+                q("ll7","Physical touch is essential for me to feel connected","LoveLanguage-Touch","scale",1, null, true, false),
+                q("ll8","Hugs, kisses, and physical closeness convey love to me","LoveLanguage-Touch","scale",1, null, true, false),
+                q("ll9","When someone helps me with tasks, I feel cared for","LoveLanguage-Service","scale",1, null, true, false),
+                q("ll10","Acts of service show me that someone truly loves me","LoveLanguage-Service","scale",1, null, true, false)
             ];
 
-            const standardMaster = standard.sort((a,b) => a.id.localeCompare(b.id));
-            const deepMaster = [...standardMaster, ...deep.sort((a,b) => a.id.localeCompare(b.id))];
-            const extremeMaster = [...deepMaster, ...extreme.sort((a,b) => a.id.localeCompare(b.id))];
+            // CONFLICT RESOLUTION (8 items - Gottman-inspired)
+            const conflictResolution = [
+                q("cr1","I stay calm and composed during disagreements","Conflict-Resolution","scale",2, null, true, false),
+                q("cr2","I listen to understand my partners perspective before responding","Conflict-Resolution","scale",2, null, true, false),
+                q("cr3","I use humor appropriately to defuse tension","Conflict-Resolution","scale",2, null, true, false),
+                q("cr4","I know when to take a break if I am feeling overwhelmed","Conflict-Resolution","scale",2, null, true, false),
+                q("cr5","I tend to criticize my partners character during arguments","Conflict-Resolution","scale",2, null, true, false, null, null, 'similarity', null, 1, true),
+                q("cr6","I become defensive when my partner brings up concerns","Conflict-Resolution","scale",2, null, true, false, null, null, 'similarity', null, 1, true),
+                q("cr7","I shut down or withdraw during conflict (stonewalling)","Conflict-Resolution","scale",2, null, true, false, null, null, 'similarity', null, 1, true),
+                q("cr8","I accept influence from my partner and compromise","Conflict-Resolution","scale",2, null, true, false)
+            ];
 
-            // ============================================================
-            //  STATE (with email fields)
-            // ============================================================
+            // DARK TRIAD (15 items: 5 per trait)
+            const darkTriad = [
+                q("dt1","I like to use clever manipulation to get my way","DarkTriad-Machiavellianism","scale",1, null, false, true),
+                q("dt2","Whatever it takes, you must get the important people on your side","DarkTriad-Machiavellianism","scale",1, null, false, true),
+                q("dt3","Avoid direct conflict with others because they may be useful in the future","DarkTriad-Machiavellianism","scale",1, null, false, true),
+                q("dt4","It is wise to keep track of information that you can use against people later","DarkTriad-Machiavellianism","scale",1, null, false, true),
+                q("dt5","You should wait for the right time to get back at people","DarkTriad-Machiavellianism","scale",1, null, false, true),
+                
+                q("dt6","People see me as a naturally superior person","DarkTriad-Narcissism","scale",1, null, false, true),
+                q("dt7","I have a pretty high opinion of myself","DarkTriad-Narcissism","scale",1, null, false, true),
+                q("dt8","I deserve to be seen as a great personality","DarkTriad-Narcissism","scale",1, null, false, true),
+                q("dt9","I like to show off every now and then","DarkTriad-Narcissism","scale",1, null, false, true),
+                q("dt10","I am a really special person","DarkTriad-Narcissism","scale",1, null, false, true),
+                
+                q("dt11","People often say I am out of control","DarkTriad-Psychopathy","scale",1, null, false, true),
+                q("dt12","I tend to lack remorse","DarkTriad-Psychopathy","scale",1, null, false, true),
+                q("dt13","I tend to not be too concerned with morality or the morality of my actions","DarkTriad-Psychopathy","scale",1, null, false, true),
+                q("dt14","I tend to be callous or insensitive","DarkTriad-Psychopathy","scale",1, null, false, true),
+                q("dt15","I have a tendency to exploit others","DarkTriad-Psychopathy","scale",1, null, false, true)
+            ];
+
+            // EMOTIONAL INTELLIGENCE (12 items)
+            const emotionalIntelligence = [
+                q("ei1","I can clearly identify what emotion I am feeling","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei2","I understand why I feel the way I do","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei3","I can control my emotions when I want to","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei4","I can calm myself down when I am stressed","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei5","I can cheer myself up when I am feeling down","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei6","I can tell how others are feeling by their body language","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei7","I am sensitive to the emotions of those around me","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei8","I can tell when someone is hiding their true feelings","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei9","I handle conflict with others effectively","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei10","I can influence others emotions positively","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei11","I adapt my communication style to different people","EmotionalIntelligence","scale",1, null, false, true),
+                q("ei12","I build rapport easily with strangers","EmotionalIntelligence","scale",1, null, false, true)
+            ];
+
+            // ADVANCED KINK/BDSM (15 items)
+            const advancedKink = [
+                q("k1","I am interested in exploring power exchange dynamics","Kink-PowerExchange","scale",2, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k2","I enjoy taking control in sexual situations","Kink-Dominance","scale",2, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k3","I enjoy being controlled or directed in sexual situations","Kink-Submission","scale",2, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k4","I am interested in bondage and restraint","Kink-Bondage","scale",2, null, false, true),
+                q("k5","I find sensory deprivation (blindfolds, etc.) exciting","Kink-Sensory","scale",2, null, false, true),
+                q("k6","I am curious about impact play (spanking, flogging)","Kink-Impact","scale",2, null, false, true),
+                q("k7","I enjoy role-playing scenarios","Kink-Roleplay","scale",2, null, false, true),
+                q("k8","I am interested in consensual pain as part of intimacy","Kink-Pain","scale",2, null, false, true),
+                q("k9","I find the idea of public or semi-public play exciting","Kink-Exhibition","scale",2, null, false, true),
+                q("k10","I am interested in specific fetishes (leather, latex, etc.)","Kink-Fetish","scale",1, null, false, true),
+                q("k11","I enjoy degradation or humiliation in a consensual context","Kink-Degradation","scale",2, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k12","I would be interested in a 24/7 power exchange relationship","Kink-24_7","scale",2, null, false, true),
+                q("k13","I enjoy edge play or high-risk activities","Kink-Edge","scale",2, null, false, true),
+                q("k14","I am interested in primal play or animal roleplay","Kink-Primal","scale",1, null, false, true),
+                q("k15","Aftercare and emotional check-ins are essential to me","Kink-Aftercare","scale",2, null, false, true)
+            ];
+
+            // Assemble question pools
+            const essentialPool = [...bigFive, ...attachmentECR12, ...coreValues];
+            const deepPool = [...essentialPool, ...sociosexualSOIR, ...loveLanguages, ...conflictResolution];
+            const extremePool = [...deepPool, ...darkTriad, ...emotionalIntelligence, ...advancedKink];
+
+            const essentialMaster = essentialPool.sort((a,b) => a.id.localeCompare(b.id));
+            const deepMaster = deepPool.sort((a,b) => a.id.localeCompare(b.id));
+            const extremeMaster = extremePool.sort((a,b) => a.id.localeCompare(b.id));
+
+            // STATE
             let state = {
-                questionCount: 30,
+                questionCount: 60,
                 mode: 'solo',
                 userName: '',
                 userEmail: '',
                 partnerName: '',
                 partnerEmail: '',
-                activeMaster: standardMaster,
+                activeMaster: essentialMaster,
                 presentation: [],
                 currentQuestionIndex: 0,
                 currentPlayer: 'user',
                 p1Answers: [],
                 p2Answers: [],
-                hiddenTraits: {},
             };
 
             let checkUserAnswers = null;
@@ -1603,6 +1403,26 @@
             let checkPartnerId = '';
             let checkPartnerEmail = null;
             let isNewCheckProfile = false;
+
+            // Block Randomization
+            function shuffleBlocks(questions) {
+                const blocks = {};
+                questions.forEach(q => {
+                    if (!blocks[q.category]) blocks[q.category] = [];
+                    blocks[q.category].push(q);
+                });
+                
+                for (let cat in blocks) {
+                    blocks[cat] = shuffle(blocks[cat]);
+                }
+                
+                const blockKeys = shuffle(Object.keys(blocks));
+                const result = [];
+                blockKeys.forEach(key => {
+                    result.push(...blocks[key]);
+                });
+                return result;
+            }
 
             function shuffle(arr) {
                 let a = [...arr];
@@ -1628,7 +1448,7 @@
             }
             initParticles();
 
-            // Views definition
+            // Views
             const views = {
                 intro: document.getElementById('view-intro'),
                 depth: document.getElementById('view-depth'),
@@ -1652,7 +1472,7 @@
                 if (viewName === 'setup') {
                     const passwordContainer = document.getElementById('extreme-password-container');
                     if (passwordContainer) {
-                        if (state.questionCount === 90) {
+                        if (state.questionCount === 120) {
                             passwordContainer.classList.remove('hidden');
                         } else {
                             passwordContainer.classList.add('hidden');
@@ -1680,19 +1500,18 @@
 
             window.restartToMain = function() {
                 state = {
-                    questionCount: 30,
+                    questionCount: 60,
                     mode: 'solo',
                     userName: '',
                     userEmail: '',
                     partnerName: '',
                     partnerEmail: '',
-                    activeMaster: standardMaster,
+                    activeMaster: essentialMaster,
                     presentation: [],
                     currentQuestionIndex: 0,
                     currentPlayer: 'user',
                     p1Answers: [],
                     p2Answers: [],
-                    hiddenTraits: {},
                 };
                 checkUserAnswers = null;
                 checkUserProfileId = '';
@@ -1705,18 +1524,20 @@
                 switchView('intro');
             };
 
-            window.startApp = function() { switchView('depth'); };
+            window.startApp = function() { 
+                switchView('depth'); 
+            };
 
             window.selectDepth = function(count) {
                 state.questionCount = count;
-                const btn30 = document.getElementById('btn-30');
                 const btn60 = document.getElementById('btn-60');
                 const btn90 = document.getElementById('btn-90');
-                if (btn30) btn30.classList.toggle('selected', count === 30);
+                const btn120 = document.getElementById('btn-120');
                 if (btn60) btn60.classList.toggle('selected', count === 60);
                 if (btn90) btn90.classList.toggle('selected', count === 90);
+                if (btn120) btn120.classList.toggle('selected', count === 120);
                 const subtitle = document.getElementById('mode-subtitle');
-                if (subtitle) subtitle.innerText = `${count} questions • Choose your path`;
+                if (subtitle) subtitle.innerText = count + ' questions • Choose your path';
                 setTimeout(() => switchView('mode'), 400);
             };
 
@@ -1750,23 +1571,20 @@
                     state.partnerEmail = document.getElementById('partner-email').value.trim() || null;
                 }
 
-                if (state.questionCount === 90) {
+                if (state.questionCount === 120) {
                     const passwordInput = document.getElementById('extreme-password').value;
                     if (passwordInput !== EXTREME_PASSWORD) {
                         const err = document.getElementById('password-error');
                         if (err) err.classList.remove('hidden');
                         return;
-                    } else {
-                        const err = document.getElementById('password-error');
-                        if (err) err.classList.add('hidden');
                     }
                 }
 
-                if (state.questionCount === 30) state.activeMaster = standardMaster;
-                else if (state.questionCount === 60) state.activeMaster = deepMaster;
+                if (state.questionCount === 60) state.activeMaster = essentialMaster;
+                else if (state.questionCount === 90) state.activeMaster = deepMaster;
                 else state.activeMaster = extremeMaster;
 
-                state.presentation = shuffle(state.activeMaster);
+                state.presentation = shuffleBlocks(state.activeMaster);
                 state.currentQuestionIndex = 0;
                 state.p1Answers = [];
                 state.p2Answers = [];
@@ -1788,14 +1606,19 @@
                 const container = document.getElementById('options-container');
                 const indicator = document.getElementById('player-indicator');
 
-                if (counter) counter.innerText = `${index+1} / ${total}`;
+                if (counter) counter.innerText = (index+1) + ' / ' + total;
                 if (bar) bar.style.width = ((index) / total * 100) + '%';
                 
                 const q = state.presentation[index];
                 if (!q) return;
                 
                 if (qText) qText.innerText = q.text;
-                if (catDisplay) catDisplay.innerText = q.category || 'General';
+                if (catDisplay) {
+                    let displayCat = q.category;
+                    if (displayCat.includes('Attachment')) displayCat = 'Attachment';
+                    if (displayCat.includes('LoveLanguage')) displayCat = 'Love Language';
+                    catDisplay.innerText = displayCat;
+                }
                 
                 if (deepBadge) deepBadge.classList.toggle('hidden', !q.isDeep);
                 if (extremeBadge) extremeBadge.classList.toggle('hidden', !q.isExtreme);
@@ -1808,33 +1631,25 @@
                             const btn = document.createElement('button');
                             btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
                             btn.innerText = i + ' - ' + (i === 1 ? 'Strongly Disagree' : i === 2 ? 'Disagree' : i === 3 ? 'Neutral' : i === 4 ? 'Agree' : 'Strongly Agree');
-                            btn.onclick = () => selectAnswer(i);
+                            btn.onclick = function() { selectAnswer(i); };
                             container.appendChild(btn);
                         }
                     } else if (q.options) {
-                        q.options.forEach((opt, idx) => {
+                        q.options.forEach(function(opt, idx) {
                             const btn = document.createElement('button');
                             btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
                             btn.innerText = opt;
-                            btn.onclick = () => selectAnswer(idx);
+                            btn.onclick = function() { selectAnswer(idx); };
                             container.appendChild(btn);
                         });
-                    } else {
-                        for (let i = 1; i <= 5; i++) {
-                            const btn = document.createElement('button');
-                            btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
-                            btn.innerText = `Option ${i}`;
-                            btn.onclick = () => selectAnswer(i);
-                            container.appendChild(btn);
-                        }
                     }
                 }
                 
                 if (indicator) {
                     if (state.mode === 'match') {
-                        indicator.innerText = state.currentPlayer === 'user' ? `${state.userName} (You) answering` : `${state.partnerName} answering`;
+                        indicator.innerText = state.currentPlayer === 'user' ? state.userName + ' (You) answering' : state.partnerName + ' answering';
                     } else {
-                        indicator.innerText = `${state.userName} answering`;
+                        indicator.innerText = state.userName + ' answering';
                     }
                 }
             }
@@ -1843,14 +1658,21 @@
                 const index = state.currentQuestionIndex;
                 const q = state.presentation[index];
                 
+                let processedValue = value;
+                if (q.reverseScored) {
+                    if (q.type === 'scale') {
+                        processedValue = 6 - value;
+                    }
+                }
+                
                 if (state.mode === 'match') {
                     if (state.currentPlayer === 'user') {
-                        state.p1Answers.push({ questionId: q.id, answer: value });
+                        state.p1Answers.push({ questionId: q.id, answer: processedValue, rawAnswer: value });
                     } else {
-                        state.p2Answers.push({ questionId: q.id, answer: value });
+                        state.p2Answers.push({ questionId: q.id, answer: processedValue, rawAnswer: value });
                     }
                 } else {
-                    state.p1Answers.push({ questionId: q.id, answer: value });
+                    state.p1Answers.push({ questionId: q.id, answer: processedValue, rawAnswer: value });
                 }
                 
                 if (index + 1 < state.presentation.length) {
@@ -1870,14 +1692,17 @@
             function finishQuiz() {
                 switchView('processing');
                 
-                setTimeout(() => {
+                setTimeout(function() {
                     if (state.mode === 'solo') {
                         const scores = computeCategoryScores(state.p1Answers, state.presentation);
-                        displaySoloResults(scores);
+                        const attachment = computeAttachmentScores(state.p1Answers);
+                        displaySoloResults(scores, attachment);
                     } else if (state.mode === 'match') {
                         const scores1 = computeCategoryScores(state.p1Answers, state.presentation);
                         const scores2 = computeCategoryScores(state.p2Answers, state.presentation);
-                        displayMatchResults(scores1, scores2);
+                        const attach1 = computeAttachmentScores(state.p1Answers);
+                        const attach2 = computeAttachmentScores(state.p2Answers);
+                        displayMatchResults(scores1, scores2, attach1, attach2);
                     } else if (state.mode === 'check') {
                         checkUserAnswers = state.p1Answers.slice();
                         const profileId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
@@ -1894,25 +1719,36 @@
                         if (userSec) userSec.classList.remove('hidden');
                         if (idSec) idSec.classList.remove('hidden');
                         if (userInput) userInput.value = profileId;
-                        if (loaded) loaded.innerText = `Profile loaded for ${state.userName}`;
+                        if (loaded) loaded.innerText = 'Profile loaded for ' + state.userName;
                         const err = document.getElementById('check-error');
                         if (err) err.classList.add('hidden');
                     }
                 }, 1500);
             }
 
+            // Scoring Functions
             function computeCategoryScores(answers, questions) {
                 const catMap = {};
                 const catCount = {};
                 const qMap = {};
-                questions.forEach(q => { qMap[q.id] = q; });
+                questions.forEach(function(q) { qMap[q.id] = q; });
                 
-                answers.forEach(ans => {
+                answers.forEach(function(ans) {
                     const q = qMap[ans.questionId];
                     if (!q) return;
                     const cat = q.category || 'Other';
                     if (!catMap[cat]) { catMap[cat] = 0; catCount[cat] = 0; }
-                    catMap[cat] += (ans.answer - 1) * 25;
+                    
+                    let normalized;
+                    if (q.type === 'scale') {
+                        normalized = (ans.answer - 1) * 25;
+                    } else if (q.options) {
+                        normalized = (ans.answer / (q.options.length - 1)) * 100;
+                    } else {
+                        normalized = ans.answer * 25;
+                    }
+                    
+                    catMap[cat] += normalized;
                     catCount[cat]++;
                 });
                 
@@ -1923,205 +1759,262 @@
                 return scores;
             }
 
+            function computeAttachmentScores(answers) {
+                const qMap = {};
+                essentialMaster.forEach(function(q) { qMap[q.id] = q; });
+                
+                let anxietySum = 0, anxietyCount = 0;
+                let avoidanceSum = 0, avoidanceCount = 0;
+                
+                answers.forEach(function(ans) {
+                    const q = qMap[ans.questionId];
+                    if (!q) return;
+                    
+                    if (q.category === 'Attachment-Anxiety') {
+                        anxietySum += ans.answer;
+                        anxietyCount++;
+                    } else if (q.category === 'Attachment-Avoidance') {
+                        avoidanceSum += ans.answer;
+                        avoidanceCount++;
+                    }
+                });
+                
+                const anxiety = anxietyCount > 0 ? (anxietySum / anxietyCount) : 3;
+                const avoidance = avoidanceCount > 0 ? (avoidanceSum / avoidanceCount) : 3;
+                
+                let style = 'Secure';
+                if (anxiety < 2.5 && avoidance < 2.5) style = 'Secure';
+                else if (anxiety >= 2.5 && avoidance < 2.5) style = 'Anxious-Preoccupied';
+                else if (anxiety < 2.5 && avoidance >= 2.5) style = 'Dismissive-Avoidant';
+                else style = 'Fearful-Avoidant';
+                
+                return { anxiety: anxiety, avoidance: avoidance, style: style };
+            }
+
+            function computeLoveLanguage(answers) {
+                const languages = {
+                    'LoveLanguage-Gifts': 0,
+                    'LoveLanguage-Time': 0,
+                    'LoveLanguage-Words': 0,
+                    'LoveLanguage-Touch': 0,
+                    'LoveLanguage-Service': 0
+                };
+                const counts = {};
+                
+                const qMap = {};
+                deepMaster.forEach(function(q) { qMap[q.id] = q; });
+                
+                answers.forEach(function(ans) {
+                    const q = qMap[ans.questionId];
+                    if (!q || !q.category.startsWith('LoveLanguage')) return;
+                    
+                    if (!counts[q.category]) counts[q.category] = 0;
+                    languages[q.category] += ans.answer;
+                    counts[q.category]++;
+                });
+                
+                let maxScore = 0;
+                let primary = 'Unknown';
+                
+                for (let lang in languages) {
+                    if (counts[lang]) {
+                        languages[lang] /= counts[lang];
+                        if (languages[lang] > maxScore) {
+                            maxScore = languages[lang];
+                            primary = lang.replace('LoveLanguage-', '');
+                        }
+                    }
+                }
+                
+                return { primary: primary, scores: languages };
+            }
+
+            // Dimensional Compatibility Algorithm
+            function calculateDimensionalCompatibility(answers1, answers2, questions) {
+                const dimensions = {
+                    bigFive: { weight: 0.30, score: 0 },
+                    attachment: { weight: 0.25, score: 0 },
+                    values: { weight: 0.20, score: 0 },
+                    sociosexual: { weight: 0.15, score: 0 },
+                    communication: { weight: 0.10, score: 0 }
+                };
+                
+                const qMap = {};
+                questions.forEach(function(q) { qMap[q.id] = q; });
+                
+                const a1 = {}, a2 = {};
+                answers1.forEach(function(a) { a1[a.questionId] = a.answer; });
+                answers2.forEach(function(a) { a2[a.questionId] = a.answer; });
+                
+                // Big Five
+                const bigFiveCats = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+                let bigFiveScore = 0;
+                let bigFiveCount = 0;
+                
+                bigFiveCats.forEach(function(cat) {
+                    const catQuestions = questions.filter(function(q) { return q.category === cat; });
+                    if (catQuestions.length === 0) return;
+                    
+                    let catScore = 0;
+                    catQuestions.forEach(function(q) {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        catScore += 1 - (diff / maxDiff);
+                    });
+                    
+                    bigFiveScore += catScore / catQuestions.length;
+                    bigFiveCount++;
+                });
+                
+                if (bigFiveCount > 0) dimensions.bigFive.score = bigFiveScore / bigFiveCount;
+                
+                // Attachment
+                const attach1 = computeAttachmentScores(answers1);
+                const attach2 = computeAttachmentScores(answers2);
+                
+                const anxietyDiff = Math.abs(attach1.anxiety - attach2.anxiety);
+                const avoidanceDiff = Math.abs(attach1.avoidance - attach2.avoidance);
+                const attachDistance = Math.sqrt(Math.pow(anxietyDiff/4, 2) + Math.pow(avoidanceDiff/4, 2));
+                dimensions.attachment.score = Math.max(0, 1 - attachDistance);
+                
+                // Values
+                const valueCats = ['Values', 'Lifestyle', 'Intimacy'];
+                let valuesScore = 0;
+                let valuesCount = 0;
+                
+                valueCats.forEach(function(cat) {
+                    const catQuestions = questions.filter(function(q) { return q.category === cat; });
+                    if (catQuestions.length === 0) return;
+                    
+                    let catScore = 0;
+                    let catWeight = 0;
+                    
+                    catQuestions.forEach(function(q) {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        catScore += (1 - (diff / maxDiff)) * q.weight;
+                        catWeight += q.weight;
+                    });
+                    
+                    if (catWeight > 0) {
+                        valuesScore += catScore / catWeight;
+                        valuesCount++;
+                    }
+                });
+                
+                if (valuesCount > 0) dimensions.values.score = valuesScore / valuesCount;
+                
+                // Sociosexual
+                const soiCats = ['SOI-Behavior', 'SOI-Attitude', 'SOI-Desire'];
+                let soiScore = 0;
+                let soiCount = 0;
+                
+                soiCats.forEach(function(cat) {
+                    const catQuestions = questions.filter(function(q) { return q.category === cat; });
+                    if (catQuestions.length === 0) return;
+                    
+                    let catScore = 0;
+                    catQuestions.forEach(function(q) {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        catScore += 1 - (diff / maxDiff);
+                    });
+                    
+                    if (catQuestions.length > 0) {
+                        soiScore += catScore / catQuestions.length;
+                        soiCount++;
+                    }
+                });
+                
+                if (soiCount > 0) dimensions.sociosexual.score = soiScore / soiCount;
+                
+                // Communication
+                const conflictQuestions = questions.filter(function(q) { return q.category === 'Conflict-Resolution'; });
+                if (conflictQuestions.length > 0) {
+                    let conflictScore = 0;
+                    conflictQuestions.forEach(function(q) {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        conflictScore += 1 - (diff / maxDiff);
+                    });
+                    dimensions.communication.score = conflictScore / conflictQuestions.length;
+                }
+                
+                let overall = 0;
+                let totalWeight = 0;
+                
+                for (let dim in dimensions) {
+                    overall += dimensions[dim].score * dimensions[dim].weight;
+                    totalWeight += dimensions[dim].weight;
+                }
+                
+                return {
+                    overall: Math.round((overall / totalWeight) * 100),
+                    dimensions: {
+                        bigFive: Math.round(dimensions.bigFive.score * 100),
+                        attachment: Math.round(dimensions.attachment.score * 100),
+                        values: Math.round(dimensions.values.score * 100),
+                        sociosexual: Math.round(dimensions.sociosexual.score * 100),
+                        communication: Math.round(dimensions.communication.score * 100)
+                    },
+                    attachment: { attach1: attach1, attach2: attach2 }
+                };
+            }
+
+            // Display Functions
             function buildBarChart(containerId, scores) {
                 const container = document.getElementById(containerId);
                 if (!container) return;
                 container.innerHTML = '';
-                const categories = Object.keys(scores).sort();
-                categories.forEach(cat => {
-                    let displayCat = cat === "Conscientiousness" ? "Conscient/ness" : cat;
+                
+                const priority = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+                const sortedCats = Object.keys(scores).sort(function(a,b) {
+                    const aIdx = priority.indexOf(a);
+                    const bIdx = priority.indexOf(b);
+                    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+                    if (aIdx !== -1) return -1;
+                    if (bIdx !== -1) return 1;
+                    return a.localeCompare(b);
+                });
+                
+                sortedCats.forEach(function(cat) {
+                    let displayCat = cat;
+                    if (cat === 'Conscientiousness') displayCat = 'Conscient.';
+                    
                     const val = scores[cat];
                     const item = document.createElement('div');
                     item.className = 'bar-item';
-                    item.innerHTML = `
-                        <span class="bar-label">${displayCat}</span>
-                        <div class="bar-track"><div class="bar-fill" style="width:${val}%"></div></div>
-                        <span class="bar-value">${val}%</span>
-                    `;
+                    
+                    let barColor = 'linear-gradient(90deg, #f472b6, #a855f7)';
+                    if (cat === 'Neuroticism') {
+                        barColor = 'linear-gradient(90deg, #fbbf24, #f59e0b)';
+                    }
+                    
+                    item.innerHTML = '<span class="bar-label">' + displayCat + '</span><div class="bar-track"><div class="bar-fill" style="width:' + val + '%; background: ' + barColor + '"></div></div><span class="bar-value">' + val + '%</span>';
                     container.appendChild(item);
                 });
             }
 
-            function buildLegend(containerId, categories) {
-                const container = document.getElementById(containerId);
-                if (!container) return;
-                container.innerHTML = '';
-                categories.sort().forEach(cat => {
-                    let displayCat = cat === "Conscientiousness" ? "Conscient/ness" : cat;
-                    const desc = categoryExplanations[cat] || "No description available.";
-                    const item = document.createElement('div');
-                    item.className = 'legend-item';
-                    item.innerHTML = `
-                        <div class="legend-color"></div>
-                        <span><strong>${displayCat}:</strong> ${desc}</span>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-
-            // --- Helper to parse ID string with optional base64 email ---
-            function parseIdString(str) {
-                const parts = str.split(':');
-                const id = parts[0].trim();
-                let email = null;
-                if (parts.length > 1) {
-                    try {
-                        email = atob(parts[1].trim());
-                    } catch (e) {
-                        email = null; // if not valid base64, ignore
-                    }
-                }
-                return { id, email };
-            }
-
-            // ============================================================
-            //  CORRECTED COMPATIBILITY ALGORITHM
-            //  This replaces the oversimplified version that ignored weights
-            //  and match types. Now properly handles:
-            //  - similarity (closer is better)
-            //  - complementary (opposites attract, uses mapping)
-            //  - tolerance (within threshold is good)
-            // ============================================================
-            function calculateTrueCompatibility(answers1, answers2, questions) {
-                let totalWeight = 0;
-                let weightedScore = 0;
-                
-                const qMap = {};
-                questions.forEach(q => qMap[q.id] = q);
-                
-                // Index answers by question ID
-                const a1 = {}, a2 = {};
-                answers1.forEach(a => a1[a.questionId] = a.answer);
-                answers2.forEach(a => a2[a.questionId] = a.answer);
-                
-                for (let qid in qMap) {
-                    const q = qMap[qid];
-                    const v1 = a1[qid], v2 = a2[qid];
-                    if (v1 === undefined || v2 === undefined) continue;
-                    
-                    let matchScore = 0;
-                    const maxDiff = 4; // 5-point scale (1-5), max diff is 4
-                    
-                    switch(q.matchType) {
-                        case 'similarity':
-                            // Closer is better (standard)
-                            // Normalize to 0-1 where 1 = identical, 0 = opposite
-                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
-                            break;
-                            
-                        case 'complementary':
-                            // Use complementaryMap if provided (maps values to their ideal complement)
-                            if (q.complementaryMap && q.complementaryMap[v1] !== undefined) {
-                                const idealMatch = q.complementaryMap[v1];
-                                if (v2 === idealMatch) {
-                                    matchScore = 1.0; // Perfect complement
-                                } else {
-                                    // Partial credit based on how close to ideal
-                                    const diffFromIdeal = Math.abs(v2 - idealMatch);
-                                    matchScore = Math.max(0, 1 - (diffFromIdeal / maxDiff));
-                                }
-                            } else {
-                                // Default complementary: opposite ends attract
-                                // Map 1->5, 2->4, 3->3, 4->2, 5->1
-                                const expected = 6 - v1;
-                                matchScore = 1 - (Math.abs(v2 - expected) / maxDiff);
-                            }
-                            break;
-                            
-                        case 'tolerance':
-                            // Within threshold is good, gradual falloff beyond
-                            const threshold = q.toleranceThreshold || 1;
-                            const actualDiff = Math.abs(v1 - v2);
-                            if (actualDiff <= threshold) {
-                                matchScore = 1.0;
-                            } else {
-                                // Linear falloff from threshold to max
-                                matchScore = Math.max(0, 1 - ((actualDiff - threshold) / (maxDiff - threshold)));
-                            }
-                            break;
-                            
-                        default:
-                            // Default to similarity
-                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
-                    }
-                    
-                    weightedScore += matchScore * q.weight;
-                    totalWeight += q.weight;
-                }
-                
-                // Return 0-100 percentage
-                if (totalWeight === 0) return 50; // Neutral if no comparable questions
-                return Math.round((weightedScore / totalWeight) * 100);
-            }
-
-            // ============================================================
-            //  CATEGORY-LEVEL COMPATIBILITY (for bridge recommendations)
-            // ============================================================
-            function calculateCategoryCompatibility(answers1, answers2, questions) {
-                const qMap = {};
-                questions.forEach(q => qMap[q.id] = q);
-                
-                const a1 = {}, a2 = {};
-                answers1.forEach(a => a1[a.questionId] = a.answer);
-                answers2.forEach(a => a2[a.questionId] = a.answer);
-                
-                const catScores = {};
-                const catWeights = {};
-                
-                for (let qid in qMap) {
-                    const q = qMap[qid];
-                    const v1 = a1[qid], v2 = a2[qid];
-                    if (v1 === undefined || v2 === undefined) continue;
-                    
-                    const cat = q.category || 'Other';
-                    if (!catScores[cat]) {
-                        catScores[cat] = 0;
-                        catWeights[cat] = 0;
-                    }
-                    
-                    let matchScore = 0;
-                    const maxDiff = 4;
-                    
-                    switch(q.matchType) {
-                        case 'similarity':
-                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
-                            break;
-                        case 'complementary':
-                            if (q.complementaryMap && q.complementaryMap[v1] !== undefined) {
-                                const idealMatch = q.complementaryMap[v1];
-                                matchScore = (v2 === idealMatch) ? 1.0 : Math.max(0, 1 - (Math.abs(v2 - idealMatch) / maxDiff));
-                            } else {
-                                matchScore = 1 - (Math.abs(v2 - (6 - v1)) / maxDiff);
-                            }
-                            break;
-                        case 'tolerance':
-                            const threshold = q.toleranceThreshold || 1;
-                            const actualDiff = Math.abs(v1 - v2);
-                            matchScore = (actualDiff <= threshold) ? 1.0 : Math.max(0, 1 - ((actualDiff - threshold) / (maxDiff - threshold)));
-                            break;
-                        default:
-                            matchScore = 1 - (Math.abs(v1 - v2) / maxDiff);
-                    }
-                    
-                    catScores[cat] += matchScore * q.weight;
-                    catWeights[cat] += q.weight;
-                }
-                
-                const result = {};
-                for (let cat in catScores) {
-                    result[cat] = Math.round((catScores[cat] / catWeights[cat]) * 100);
-                }
-                return result;
-            }
-
-            function displaySoloResults(scores) {
+            function displaySoloResults(scores, attachment) {
                 const label = document.getElementById('solo-mode-label');
-                if (label) label.innerText = state.questionCount + ' questions';
+                if (label) label.innerText = state.questionCount + ' questions • BFI-2 + ECR-12';
+                
                 const baseId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
                 const idEl = document.getElementById('solo-id');
-                if (idEl) idEl.innerText = baseId; // display only base ID
+                if (idEl) idEl.innerText = baseId;
                 
-                // Prepare full string for QR and copy (include encoded email if present)
                 const fullString = state.userEmail ? baseId + ':' + btoa(state.userEmail) : baseId;
                 
                 const qr = qrcode(0, 'H');
@@ -2142,28 +2035,27 @@
                 }
                 
                 buildBarChart('solo-bar-chart', scores);
-                buildLegend('solo-legend', Object.keys(scores));
+                
+                const anxietyEl = document.getElementById('attach-anxiety');
+                const avoidanceEl = document.getElementById('attach-avoidance');
+                const styleEl = document.getElementById('attach-style');
+                
+                if (anxietyEl) anxietyEl.innerText = attachment.anxiety.toFixed(2);
+                if (avoidanceEl) avoidanceEl.innerText = attachment.avoidance.toFixed(2);
+                if (styleEl) styleEl.innerText = 'Attachment Style: ' + attachment.style;
+                
+                if (state.questionCount >= 90) {
+                    const loveLang = computeLoveLanguage(state.p1Answers);
+                    const llSection = document.getElementById('love-languages-section');
+                    const llPrimary = document.getElementById('primary-love-language');
+                    if (llSection) llSection.classList.remove('hidden');
+                    if (llPrimary) llPrimary.innerText = loveLang.primary;
+                }
                 
                 const desc = generatePersonalityDescription(scores, state.userName);
                 const summary = document.getElementById('solo-personality-summary');
                 if (summary) summary.innerText = desc;
                 
-                if (state.questionCount >= 60) {
-                    const traitsContainer = document.getElementById('traits-container');
-                    if (traitsContainer) {
-                        const labels = extractPersonalityLabels(state.p1Answers, state.presentation);
-                        if (labels.length > 0) {
-                            traitsContainer.innerHTML = labels.map(l => `<div class="hidden-trait">${l}</div>`).join('');
-                        } else {
-                            traitsContainer.innerHTML = '<div class="hidden-trait">No additional patterns detected.</div>';
-                        }
-                    }
-                    document.getElementById('hidden-traits').classList.remove('hidden');
-                } else {
-                    document.getElementById('hidden-traits').classList.add('hidden');
-                }
-                
-                // Store fullString in a data attribute for copying
                 const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
                 if (copyBtn) {
                     copyBtn.dataset.fullString = fullString;
@@ -2172,106 +2064,158 @@
                 switchView('resultsSolo');
             }
 
-            function displayMatchResults(scores1, scores2) {
+            function displayMatchResults(scores1, scores2, attach1, attach2) {
                 const p1 = document.getElementById('res-p1');
                 const p2 = document.getElementById('res-p2');
                 if (p1) p1.innerText = state.userName || 'You';
                 if (p2) p2.innerText = state.partnerName || 'Partner';
                 
-                // Use CORRECTED algorithm instead of simple category averaging
-                const compatibility = calculateTrueCompatibility(state.p1Answers, state.p2Answers, state.presentation);
+                const compat = calculateDimensionalCompatibility(state.p1Answers, state.p2Answers, state.presentation);
+                
                 const scoreEl = document.getElementById('match-potential-score');
                 const descEl = document.getElementById('match-potential-desc');
-                if (scoreEl) scoreEl.innerText = compatibility + '%';
-                if (descEl) descEl.innerText = compatibility > 80 ? 'Strong alignment' : compatibility > 60 ? 'Moderate resonance' : 'Significant friction';
+                if (scoreEl) scoreEl.innerText = compat.overall + '%';
+                if (descEl) {
+                    const desc = compat.overall > 80 ? 'Exceptional alignment' : 
+                                compat.overall > 65 ? 'Strong compatibility' : 
+                                compat.overall > 50 ? 'Moderate resonance' : 
+                                compat.overall > 35 ? 'Significant differences' : 'Challenging alignment';
+                    descEl.innerText = desc;
+                }
+                
+                const breakdown = document.getElementById('dimensional-breakdown');
+                if (breakdown) {
+                    breakdown.innerHTML = '<div class="flex justify-between text-sm"><span>Big Five Personality</span><span class="text-pink-300">' + compat.dimensions.bigFive + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-pink-500 h-1 rounded" style="width:' + compat.dimensions.bigFive + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Attachment Styles</span><span class="text-purple-300">' + compat.dimensions.attachment + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-purple-500 h-1 rounded" style="width:' + compat.dimensions.attachment + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Core Values</span><span class="text-emerald-300">' + compat.dimensions.values + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-emerald-500 h-1 rounded" style="width:' + compat.dimensions.values + '%"></div></div>' + (state.questionCount >= 90 ? '<div class="flex justify-between text-sm mt-2"><span>Sociosexual</span><span class="text-amber-300">' + compat.dimensions.sociosexual + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-amber-500 h-1 rounded" style="width:' + compat.dimensions.sociosexual + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Communication</span><span class="text-cyan-300">' + compat.dimensions.communication + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-cyan-500 h-1 rounded" style="width:' + compat.dimensions.communication + '%"></div></div>' : '');
+                }
                 
                 buildBarChart('match-bar-chart1', scores1);
                 buildBarChart('match-bar-chart2', scores2);
-                buildLegend('match-legend', [...new Set([...Object.keys(scores1), ...Object.keys(scores2)])]);
                 
-                const sum1 = document.getElementById('match-personality-summary1');
-                const sum2 = document.getElementById('match-personality-summary2');
-                if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName);
-                if (sum2) sum2.innerText = generatePersonalityDescription(scores2, state.partnerName);
-                
-                // Use category-level compatibility for better bridge recommendations
-                const catCompat = calculateCategoryCompatibility(state.p1Answers, state.p2Answers, state.presentation);
                 const bridgeContainer = document.getElementById('match-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
-                    const sortedCats = Object.entries(catCompat).sort((a,b) => a[1] - b[1]); // Lowest first
-                    const problematic = sortedCats.filter(([cat, score]) => score < 60);
+                    const dims = [
+                        { name: 'Big Five personality', score: compat.dimensions.bigFive, tip: 'Explore your different approaches to life and find complementary strengths.' },
+                        { name: 'Attachment security', score: compat.dimensions.attachment, tip: 'Practice clear communication about needs for closeness and space.' },
+                        { name: 'Core values', score: compat.dimensions.values, tip: 'Discuss your priorities in life and find shared ground.' },
+                        { name: 'Sociosexual attitudes', score: compat.dimensions.sociosexual, tip: 'Have open conversations about intimacy expectations and boundaries.' },
+                        { name: 'Communication style', score: compat.dimensions.communication, tip: 'Learn each other\'s conflict resolution preferences.' }
+                    ];
                     
-                    if (problematic.length > 0) {
-                        problematic.slice(0, 3).forEach(([cat, score]) => {
-                            const diff = 100 - score;
-                            bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Work on ${cat}: ${diff}% difference detected – discuss expectations openly.</div>`;
+                    const weakDims = dims.filter(function(d) { return d.score < 60; }).sort(function(a,b) { return a.score - b.score; });
+                    
+                    if (weakDims.length > 0) {
+                        weakDims.slice(0, 2).forEach(function(d) {
+                            bridgeContainer.innerHTML += '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs"><strong>' + d.name + ' (' + d.score + '%)</strong>: ' + d.tip + '</div>';
                         });
                     } else {
-                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Excellent alignment across all categories!</div>';
+                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs">Excellent compatibility across all dimensions! Focus on maintaining open communication.</div>';
                     }
                 }
                 
                 switchView('resultsMatch');
             }
 
-            function displayCheckResults(scores1, scores2, name1 = 'You', name2 = 'Partner') {
+            function displayCheckResults(scores1, scores2, name1, name2) {
                 const p1 = document.getElementById('check-res-p1');
                 const p2 = document.getElementById('check-res-p2');
                 if (p1) p1.innerText = name1;
                 if (p2) p2.innerText = name2;
                 
-                // Use CORRECTED algorithm
-                const compatibility = calculateTrueCompatibility(checkUserAnswers, checkPartnerAnswers, standardMaster);
+                const compat = calculateDimensionalCompatibility(checkUserAnswers, checkPartnerAnswers, essentialMaster);
                 
                 const verdict = document.getElementById('check-verdict');
                 const sub = document.getElementById('check-verdict-sub');
-                const frictionScore = document.getElementById('check-friction-score');
-                const frictionDesc = document.getElementById('check-friction-desc');
-                if (verdict) verdict.innerText = compatibility + '%';
-                if (sub) sub.innerText = compatibility > 80 ? 'High resonance' : compatibility > 60 ? 'Moderate' : compatibility > 40 ? 'Neutral' : 'Low resonance';
-                if (frictionScore) frictionScore.innerText = (100 - compatibility) + '%';
-                if (frictionDesc) frictionDesc.innerText = (100 - compatibility) < 20 ? 'Low friction – promising' : (100 - compatibility) < 40 ? 'Moderate friction – requires communication' : 'High friction – significant differences';
+                if (verdict) verdict.innerText = compat.overall + '%';
+                if (sub) {
+                    const desc = compat.overall > 80 ? 'High resonance' : 
+                                compat.overall > 65 ? 'Good compatibility' : 
+                                compat.overall > 50 ? 'Moderate potential' : 
+                                compat.overall > 35 ? 'Significant work needed' : 'Low compatibility';
+                    sub.innerText = desc;
+                }
+                
+                const breakdown = document.getElementById('check-dimensional-breakdown');
+                if (breakdown) {
+                    breakdown.innerHTML = '<div class="flex justify-between text-sm"><span>Big Five Personality</span><span class="text-pink-300">' + compat.dimensions.bigFive + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-pink-500 h-1 rounded" style="width:' + compat.dimensions.bigFive + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Attachment Styles</span><span class="text-purple-300">' + compat.dimensions.attachment + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-purple-500 h-1 rounded" style="width:' + compat.dimensions.attachment + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Core Values</span><span class="text-emerald-300">' + compat.dimensions.values + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-emerald-500 h-1 rounded" style="width:' + compat.dimensions.values + '%"></div></div>';
+                }
                 
                 buildBarChart('check-bar-chart', scores2);
-                buildLegend('check-legend', Object.keys(scores2));
                 
-                const sum1 = document.getElementById('check-personality-summary1');
-                const sum2 = document.getElementById('check-personality-summary2');
-                if (sum1) sum1.innerText = generatePersonalityDescription(scores1, state.userName || 'You');
-                if (sum2) sum2.innerText = generatePersonalityDescription(scores2, name2);
-                
-                // Email reveal if compatibility > 90 and partner email exists
                 const emailArea = document.getElementById('email-reveal-area');
                 const emailSpan = document.getElementById('revealed-email');
-                if (compatibility > 90 && checkPartnerEmail) {
+                if (compat.overall > 90 && checkPartnerEmail) {
                     emailArea.classList.remove('hidden');
                     emailSpan.innerText = checkPartnerEmail;
                 } else {
                     emailArea.classList.add('hidden');
                 }
                 
-                // Use category-level compatibility for bridge recommendations
-                const catCompat = calculateCategoryCompatibility(checkUserAnswers, checkPartnerAnswers, standardMaster);
                 const bridgeContainer = document.getElementById('check-bridge-container');
                 if (bridgeContainer) {
                     bridgeContainer.innerHTML = '';
-                    const sortedCats = Object.entries(catCompat).sort((a,b) => a[1] - b[1]);
-                    const problematic = sortedCats.filter(([cat, score]) => score < 60);
+                    const dims = [
+                        { name: 'Personality', score: compat.dimensions.bigFive },
+                        { name: 'Attachment', score: compat.dimensions.attachment },
+                        { name: 'Values', score: compat.dimensions.values }
+                    ];
                     
-                    if (problematic.length > 0) {
-                        problematic.slice(0, 3).forEach(([cat, score]) => {
-                            const diff = 100 - score;
-                            bridgeContainer.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Focus area: ${cat} shows ${diff}% difference – explore this topic together.</div>`;
+                    const weakDims = dims.filter(function(d) { return d.score < 60; }).sort(function(a,b) { return a.score - b.score; });
+                    
+                    if (weakDims.length > 0) {
+                        weakDims.forEach(function(d) {
+                            bridgeContainer.innerHTML += '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Focus area: ' + d.name + ' compatibility (' + d.score + '%) – explore this topic together.</div>';
                         });
                     } else {
-                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Strong compatibility across all measured dimensions!</div>';
+                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Strong alignment across all key dimensions!</div>';
                     }
                 }
                 
                 switchView('resultsCheck');
             }
 
+            function generatePersonalityDescription(scores, name) {
+                if (!name) name = "You";
+                const parts = [];
+                
+                const big5 = ["Openness", "Conscientiousness", "Extraversion", "Agreeableness", "Neuroticism"];
+                const traitDescriptions = {
+                    "Openness": { low: "practical and conventional", high: "curious and open to new experiences" },
+                    "Conscientiousness": { low: "flexible and spontaneous", high: "organized and dependable" },
+                    "Extraversion": { low: "reserved and reflective", high: "outgoing and energetic" },
+                    "Agreeableness": { low: "competitive and straightforward", high: "compassionate and cooperative" },
+                    "Neuroticism": { low: "emotionally stable and secure", high: "sensitive and emotionally aware" }
+                };
+
+                big5.forEach(function(trait) {
+                    if (scores[trait] !== undefined) {
+                        const level = scores[trait];
+                        let desc;
+                        if (level < 35) desc = traitDescriptions[trait].low;
+                        else if (level > 65) desc = traitDescriptions[trait].high;
+                        else desc = "balanced in " + trait.toLowerCase();
+                        parts.push(desc);
+                    }
+                });
+
+                const uniqueParts = [...new Set(parts)];
+                let description = name + " presents as ";
+                if (uniqueParts.length === 0) description += "a unique individual with a balanced personality profile.";
+                else if (uniqueParts.length === 1) description += uniqueParts[0] + ".";
+                else {
+                    description += uniqueParts.slice(0, -1).join(", ") + ", and " + uniqueParts.slice(-1) + ".";
+                }
+                
+                if (scores['Attachment-Anxiety'] !== undefined) {
+                    const anxiety = scores['Attachment-Anxiety'];
+                    if (anxiety > 60) description += " You may experience some anxiety in relationships.";
+                    else if (anxiety < 40) description += " You tend to feel secure in relationships.";
+                }
+                
+                return description;
+            }
+
+            // Utility Functions
             window.previousQuestion = function() {
                 if (state.currentQuestionIndex > 0) {
                     if (state.mode === 'match') {
@@ -2303,11 +2247,11 @@
                 const name = document.getElementById('check-your-name').value.trim();
                 if (!name) { alert("Please enter your name."); return; }
                 state.userName = name;
-                state.userEmail = null; // no email for quick check profile
+                state.userEmail = null;
                 state.mode = 'check';
-                state.questionCount = 30; 
-                state.activeMaster = standardMaster;
-                state.presentation = shuffle(state.activeMaster);
+                state.questionCount = 60;
+                state.activeMaster = essentialMaster;
+                state.presentation = shuffleBlocks(state.activeMaster);
                 state.currentQuestionIndex = 0;
                 state.p1Answers = [];
                 isNewCheckProfile = true;
@@ -2324,12 +2268,12 @@
                     }
                     return;
                 }
-                const { id, email } = parseIdString(input);
-                checkUserAnswers = generateAnswersFromId(id, standardMaster);
-                checkUserProfileId = id;
-                checkUserEmail = email;
+                const parsed = parseIdString(input);
+                checkUserAnswers = generateAnswersFromId(parsed.id, essentialMaster);
+                checkUserProfileId = parsed.id;
+                checkUserEmail = parsed.email;
                 const loaded = document.getElementById('check-loaded-profile');
-                if (loaded) loaded.innerText = `Profile loaded from ID: ${id}` + (email ? ` (email embedded)` : '');
+                if (loaded) loaded.innerText = 'Profile loaded from ID: ' + parsed.id + (parsed.email ? ' (email embedded)' : '');
                 const err = document.getElementById('check-error');
                 if (err) err.classList.add('hidden');
                 const idSec = document.getElementById('check-id-section');
@@ -2354,14 +2298,14 @@
                     }
                     return;
                 }
-                const { id: partnerId, email: partnerEmail } = parseIdString(partnerInput);
-                checkPartnerAnswers = generateAnswersFromId(partnerId, standardMaster);
-                checkPartnerId = partnerId;
-                checkPartnerEmail = partnerEmail;
+                const parsed = parseIdString(partnerInput);
+                checkPartnerAnswers = generateAnswersFromId(parsed.id, essentialMaster);
+                checkPartnerId = parsed.id;
+                checkPartnerEmail = parsed.email;
                 
-                const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
-                const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
-                displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + partnerId.substr(-4));
+                const userScores = computeCategoryScores(checkUserAnswers, essentialMaster);
+                const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + parsed.id.substr(-4));
             };
 
             function generateAnswersFromId(id, questions) {
@@ -2381,26 +2325,40 @@
                 for (let i = 0; i < questions.length; i++) {
                     const q = questions[i];
                     const val = Math.floor(mulberry32() * 5) + 1;
-                    answers.push({ questionId: q.id, answer: val });
+                    answers.push({ questionId: q.id, answer: val, rawAnswer: val });
                 }
                 return answers;
             }
 
+            function parseIdString(str) {
+                const parts = str.split(':');
+                const id = parts[0].trim();
+                let email = null;
+                if (parts.length > 1) {
+                    try {
+                        email = atob(parts[1].trim());
+                    } catch (e) {
+                        email = null;
+                    }
+                }
+                return { id: id, email: email };
+            }
+
             window.showPartnerFullProfile = function() {
                 if (!checkPartnerAnswers) { alert("No partner profile."); return; }
-                const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                const partnerAttach = computeAttachmentScores(checkPartnerAnswers);
                 
                 const title = document.getElementById('solo-title');
                 const modeLabel = document.getElementById('solo-mode-label');
                 const idLabel = document.getElementById('solo-id-label');
                 const idEl = document.getElementById('solo-id');
                 if (title) title.innerText = "Partner's Dimensional Map";
-                if (modeLabel) modeLabel.innerText = "30 questions • Profile from ID";
+                if (modeLabel) modeLabel.innerText = "BFI-2 + ECR-12 Profile";
                 if (idLabel) idLabel.innerText = "Partner's Resonance ID";
                 const baseId = checkPartnerId || 'RS-****';
                 if (idEl) idEl.innerText = baseId;
                 
-                // Full string for QR (with email if present)
                 const fullString = checkPartnerEmail ? baseId + ':' + btoa(checkPartnerEmail) : baseId;
                 
                 const qr = qrcode(0, 'H');
@@ -2421,9 +2379,16 @@
                 }
                 
                 buildBarChart('solo-bar-chart', partnerScores);
-                buildLegend('solo-legend', Object.keys(partnerScores));
-                const hidden = document.getElementById('hidden-traits');
-                if (hidden) hidden.classList.add('hidden');
+                
+                const anxietyEl = document.getElementById('attach-anxiety');
+                const avoidanceEl = document.getElementById('attach-avoidance');
+                const styleEl = document.getElementById('attach-style');
+                if (anxietyEl) anxietyEl.innerText = partnerAttach.anxiety.toFixed(2);
+                if (avoidanceEl) avoidanceEl.innerText = partnerAttach.avoidance.toFixed(2);
+                if (styleEl) styleEl.innerText = 'Attachment Style: ' + partnerAttach.style;
+                
+                document.getElementById('love-languages-section').classList.add('hidden');
+                
                 const summary = document.getElementById('solo-personality-summary');
                 if (summary) summary.innerText = generatePersonalityDescription(partnerScores, 'Partner');
                 
@@ -2433,12 +2398,12 @@
                     copyBtn.innerText = 'Copy Partner ID';
                     copyBtn.dataset.fullString = fullString;
                     copyBtn.onclick = function() {
-                        navigator.clipboard.writeText(this.dataset.fullString).then(() => alert('Partner ID copied!'));
+                        navigator.clipboard.writeText(this.dataset.fullString).then(function() { alert('Partner ID copied!'); });
                     };
                 }
                 if (newBtn) {
                     newBtn.innerText = 'Back to Check';
-                    newBtn.onclick = () => {
+                    newBtn.onclick = function() {
                         if (copyBtn) {
                             copyBtn.innerText = 'Copy ID';
                             copyBtn.onclick = window.copySoloID;
@@ -2448,8 +2413,8 @@
                             newBtn.onclick = restartToMain;
                         }
                         if (checkUserAnswers && checkPartnerAnswers) {
-                            const userScores = computeCategoryScores(checkUserAnswers, standardMaster);
-                            const partnerScores = computeCategoryScores(checkPartnerAnswers, standardMaster);
+                            const userScores = computeCategoryScores(checkUserAnswers, essentialMaster);
+                            const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
                             displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + (checkPartnerId ? checkPartnerId.substr(-4) : ''));
                         } else { restartToMain(); }
                     };
@@ -2458,14 +2423,13 @@
                 switchView('resultsSolo');
             };
 
-            window.copySoloID = function() { 
+            window.copySoloID = function() {
                 const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
                 if (copyBtn && copyBtn.dataset.fullString) {
-                    navigator.clipboard.writeText(copyBtn.dataset.fullString).then(() => alert('ID copied!'));
+                    navigator.clipboard.writeText(copyBtn.dataset.fullString).then(function() { alert('ID copied!'); });
                 } else {
-                    // fallback to displayed ID (shouldn't happen)
                     const idEl = document.getElementById('solo-id');
-                    if (idEl) navigator.clipboard.writeText(idEl.innerText).then(() => alert('ID copied!'));
+                    if (idEl) navigator.clipboard.writeText(idEl.innerText).then(function() { alert('ID copied!'); });
                 }
             };
         })();
