@@ -1,0 +1,3036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resonance · Soul Signals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0518 0%, #1a0b2e 50%, #2d0a1f 100%);
+            color: #fce7f3;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; }
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(244, 114, 182, 0.5);
+            border-radius: 50%;
+            animation: float-particle 15s infinite;
+        }
+        @keyframes float-particle {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        .option-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        .option-card.selected {
+            background: rgba(244, 114, 182, 0.3);
+            border-color: #f472b6;
+            box-shadow: 0 0 20px rgba(244, 114, 182, 0.4);
+        }
+        .progress-fill { 
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+        }
+        .pulse-btn { 
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(244, 114, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
+        }
+        .result-reveal {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: inherit;
+            transition: all 0.3s;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #f472b6;
+            outline: none;
+            box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
+        }
+        .friction-green { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
+        .friction-yellow { background: rgba(234, 179, 8, 0.2); border-color: rgba(234, 179, 8, 0.5); color: #fde047; }
+        .friction-red { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
+        .deep-dive-badge {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+        }
+        .extreme-badge {
+            background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+        }
+        .hidden-trait {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            padding: 1rem 0;
+        }
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .bar-label {
+            width: 140px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
+        }
+        .bar-track {
+            flex: 1;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+            border-radius: 999px;
+            transition: width 1s ease;
+        }
+        .bar-value {
+            width: 45px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f472b6;
+            text-align: right;
+        }
+        .id-display {
+            font-family: monospace;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .mode-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .mode-card:hover::before, .mode-card.selected::before {
+            opacity: 1;
+        }
+        .mode-card.selected {
+            border-color: #f472b6;
+            background: rgba(244, 114, 182, 0.1);
+        }
+        .back-link {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .back-link:hover {
+            opacity: 1;
+        }
+        .scientific-summary {
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid #f472b6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.02);
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.3rem;
+        }
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            background: #f472b6;
+            border-radius: 2px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .sound-row {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .sound-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .sound-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #f472b6;
+        }
+        .visual-canvas {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+            display: block;
+            border-radius: 1rem;
+            background: rgba(0,0,0,0.2);
+        }
+        .personality-summary {
+            background: rgba(255,255,255,0.03);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border-left: 3px solid #f472b6;
+            margin: 1rem 0;
+        }
+        .attachment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .attachment-cell {
+            background: rgba(255,255,255,0.05);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        #scanner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        #scanner-container.hidden {
+            display: none;
+        }
+        #scanner-video {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 1rem;
+            border: 2px solid #f472b6;
+        }
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .scanner-close {
+            cursor: pointer;
+            font-size: 2rem;
+            line-height: 1;
+            color: #f472b6;
+        }
+        .scanner-close:hover {
+            color: white;
+        }
+        .facet-badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(244, 114, 182, 0.2);
+            color: #f472b6;
+            margin-left: 0.5rem;
+        }
+        .privacy-note {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #a7f3d0;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            margin-top: 0.5rem;
+        }
+        .lang-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 2rem;
+            padding: 0.25rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .lang-btn.active {
+            background: rgba(244, 114, 182, 0.5);
+            color: white;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div class="particles" id="particles"></div>
+
+    <div id="scanner-container" class="hidden">
+        <div class="scanner-header">
+            <span id="scanner-title">Scan QR Code</span>
+            <span class="scanner-close" onclick="stopScanner()">&times;</span>
+        </div>
+        <video id="scanner-video" playsinline autoplay></video>
+        <canvas id="scanner-canvas" style="display:none;"></canvas>
+        <p class="text-xs text-white/70 mt-2" id="scanner-instruction">Align the QR code within the frame</p>
+    </div>
+
+    <main id="app" class="glass-panel w-full max-w-4xl rounded-3xl p-6 md:p-12 relative min-h-[800px] flex flex-col justify-center">
+        
+        <!-- Language Toggle -->
+        <div class="lang-toggle">
+            <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">EN</button>
+            <button class="lang-btn" onclick="setLanguage('el')" id="lang-el">EL</button>
+        </div>
+
+        <header class="text-center mb-6 relative">
+            <div class="flex items-center justify-center gap-2">
+                <h1 class="text-5xl md:text-7xl font-light italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300">
+                    Resonance
+                </h1>
+            </div>
+            <p class="text-xs tracking-[0.4em] uppercase text-pink-200/70" id="header-subtitle">Evidence-Based Soul Alignment</p>
+        </header>
+
+        <!-- VIEW: Intro -->
+        <section id="view-intro" class="text-center space-y-6 result-reveal">
+            <div class="space-y-4 text-base font-light leading-relaxed opacity-90 max-w-lg mx-auto">
+                <p id="intro-line1">Scientifically-validated compatibility assessment.</p>
+                <p><span class="text-pink-300" id="intro-60">60 questions</span><span id="intro-60-desc"> – Essential: Big Five + Attachment (ECR-12) + Core Values</span></p>
+                <p><span class="text-purple-300" id="intro-90">90 questions</span><span id="intro-90-desc"> – Deep: + SOI-R Sociosexual + Love Languages + Conflict Styles</span></p>
+                <p><span class="text-red-300" id="intro-120">120 questions</span><span id="intro-120-desc"> – Extreme: + Dark Triad + Emotional Intelligence + Advanced Kink + SIDI-BDSM</span></p>
+            </div>
+            <div class="scientific-summary max-w-lg mx-auto">
+                <p class="font-semibold text-pink-300 mb-1" id="sci-title">🔬 Enhanced Psychometric Validity</p>
+                <p class="text-xs leading-relaxed opacity-80" id="sci-desc">
+                    • <strong>Big Five Inventory-2 (BFI-2)</strong> – 40 items, alpha greater than .85 reliability<br>
+                    • <strong>ECR-12 Attachment</strong> – Dimensional anxiety/avoidance scores<br>
+                    • <strong>SOI-R Sociosexual</strong> – Behavior/Attitude/Desire facets<br>
+                    • <strong>Love Languages</strong> – 5-language preference mapping<br>
+                    • <strong>Conflict Styles</strong> – Gottman-inspired resolution patterns<br>
+                    <span class="text-emerald-300">Block randomization • Reverse scoring • Weighted compatibility</span>
+                </p>
+            </div>
+            <!-- Privacy note added here -->
+            <div class="privacy-note max-w-lg mx-auto" id="privacy-note">
+                🔒 No personal data is ever stored on our servers. Your profile exists only as a QR code / ID.
+            </div>
+            <div class="pt-6">
+                <button onclick="startApp()" class="pulse-btn bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-medium py-4 px-12 rounded-full transition-all transform hover:scale-105 shadow-lg tracking-widest uppercase text-sm" id="begin-btn">
+                    Begin Exploration
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: Depth Selection -->
+        <section id="view-depth" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main">Exit to main</span>
+            </div>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl italic mb-2" id="depth-title">Select Depth</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]" id="depth-subtitle">Evidence-based assessment levels</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <button onclick="selectDepth(60)" id="btn-60" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl text-pink-300" id="depth-60-title">Essential</h3>
+                        <span class="text-3xl font-light opacity-50">60</span>
+                    </div>
+                    <ul class="space-y-2 text-sm opacity-70" id="depth-60-list">
+                        <li>• BFI-2: Big Five (40 items)</li>
+                        <li>• ECR-12: Attachment dimensions</li>
+                        <li>• Core values and lifestyle</li>
+                        <li>• 15-20 minutes</li>
+                    </ul>
+                </button>
+                <button onclick="selectDepth(90)" id="btn-90" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
+                    <div class="absolute top-4 right-4 deep-dive-badge" id="deep-badge">Deep</div>
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl text-purple-300" id="depth-90-title">Deep</h3>
+                        <span class="text-3xl font-light opacity-50">90</span>
+                    </div>
+                    <ul class="space-y-2 text-sm opacity-70" id="depth-90-list">
+                        <li>• All Essential plus:</li>
+                        <li>• SOI-R: Sociosexual (9 items)</li>
+                        <li>• Love Languages (10 items)</li>
+                        <li>• Conflict Resolution (8 items)</li>
+                        <li>• 25-30 minutes</li>
+                    </ul>
+                </button>
+                <button onclick="selectDepth(120)" id="btn-120" class="mode-card p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative">
+                    <div class="absolute top-4 right-4 extreme-badge" id="extreme-badge">Extreme</div>
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl text-red-300" id="depth-120-title">Extreme</h3>
+                        <span class="text-3xl font-light opacity-50">120</span>
+                    </div>
+                    <ul class="space-y-2 text-sm opacity-70" id="depth-120-list">
+                        <li>• All Deep plus:</li>
+                        <li>• Dark Triad (15 items)</li>
+                        <li>• Emotional Intelligence (12 items)</li>
+                        <li>• Advanced Kink/BDSM (15 items)</li>
+                        <li>• SIDI-BDSM (15 items)</li>
+                        <li>• 50-60 minutes</li>
+                    </ul>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: Mode Selection -->
+        <section id="view-mode" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main2">Exit to main</span>
+            </div>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl italic mb-2" id="mode-title">Select Protocol</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]" id="mode-subtitle">Choose your path</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                <button onclick="setMode('solo')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <h3 class="text-xl mb-2 text-pink-300" id="mode-solo-title">Solo Discovery</h3>
+                    <p class="text-sm opacity-70" id="mode-solo-desc">Complete psychological profile with dimensional scores.</p>
+                </button>
+                <button onclick="setMode('match')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <h3 class="text-xl mb-2 text-purple-300" id="mode-match-title">Live Matching</h3>
+                    <p class="text-sm opacity-70" id="mode-match-desc">Two people, one device. Real-time compatibility analysis.</p>
+                </button>
+                <button onclick="setMode('check')" class="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-green-500/20 text-green-300 text-[10px] px-2 py-1 rounded-bl-lg uppercase tracking-wider" id="new-badge">New</div>
+                    <h3 class="text-xl mb-2 text-emerald-300" id="mode-check-title">Check Compatibility</h3>
+                    <p class="text-sm opacity-70" id="mode-check-desc">Enter someone's ID. Instant multi-dimensional analysis.</p>
+                </button>
+            </div>
+            <button onclick="switchView('depth')" class="text-xs text-white/40 hover:text-white underline underline-offset-4 block mx-auto" id="change-depth">← Change depth</button>
+        </section>
+
+        <!-- VIEW: Check Compatibility -->
+        <section id="view-check" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main3">Exit to main</span>
+            </div>
+            <div class="text-center mb-6">
+                <h2 class="text-3xl italic mb-2" id="check-title">Compatibility Check</h2>
+                <p class="text-xs text-emerald-200/60 uppercase tracking-[0.3em]" id="check-subtitle">Enter their Resonance ID</p>
+            </div>
+            <div class="space-y-4 max-w-md mx-auto">
+                <div id="check-step1" class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300" id="check-step1-title">Step 1: Your Profile</p>
+                    <input type="text" id="check-your-name" placeholder="Your Name (for new profile)" class="w-full glass-input rounded-lg p-3 text-center mb-3 placeholder-white/30">
+                    <div class="flex gap-2">
+                        <button onclick="startCheckNew()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-2 rounded-lg text-xs uppercase tracking-wider" id="check-create-new">
+                            Create New (60q)
+                        </button>
+                        <button onclick="showCheckIdInput()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2 rounded-lg text-xs uppercase tracking-wider" id="check-have-id">
+                            I Have an ID
+                        </button>
+                    </div>
+                </div>
+
+                <div id="check-user-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300" id="check-user-title">Your Resonance ID</p>
+                    <input type="text" id="check-user-id" placeholder="Enter your ID" class="w-full glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
+                    <button onclick="submitUserID()" class="w-full bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg mt-3 text-sm uppercase tracking-wider" id="check-load-profile">
+                        Load Profile
+                    </button>
+                    <p class="text-xs text-center mt-2 opacity-60" id="check-loaded-profile"></p>
+                </div>
+
+                <div id="check-id-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-emerald-300" id="check-step2-title">Step 2: Their Resonance ID</p>
+                    <div class="flex gap-2 items-center">
+                        <input type="text" id="check-partner-id" placeholder="Enter their ID" class="flex-1 glass-input rounded-lg p-3 text-center text-sm placeholder-white/30 font-mono">
+                        <button onclick="startScanner()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-3 rounded-lg text-sm" id="scan-btn">📷 Scan</button>
+                    </div>
+                    <button onclick="runCompatibilityCheck()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white py-3 rounded-lg mt-3 text-sm uppercase tracking-wider" id="analyze-btn">
+                        Analyze Friction
+                    </button>
+                </div>
+
+                <p id="check-error" class="text-red-400 text-xs text-center hidden"></p>
+            </div>
+            <button onclick="switchView('mode')" class="text-xs text-white/40 hover:text-white underline underline-offset-4" id="back-to-mode">← Back</button>
+        </section>
+
+        <!-- VIEW: Setup -->
+        <section id="view-setup" class="hidden space-y-6 result-reveal">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main4">Exit to main</span>
+            </div>
+            <div class="text-center mb-6">
+                <h2 class="text-3xl italic mb-2" id="setup-title">Identity Protocol</h2>
+                <p class="text-xs text-pink-200/60 uppercase tracking-[0.3em]" id="setup-subtitle">Enter names to begin</p>
+            </div>
+            <div class="space-y-4 max-w-md mx-auto">
+                <input type="text" id="user-name" placeholder="Your Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                <input type="email" id="user-email" placeholder="Your Email (optional)" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                <!-- Email privacy note added here -->
+                <div class="text-emerald-300/70 text-xs text-center mt-0" id="email-note">Email is optional. If compatibility > 90%, your email will be revealed to the other user.</div>
+                <div id="partner-input" class="hidden">
+                    <input type="text" id="partner-name" placeholder="Partner's Name" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30 mt-3">
+                    <input type="email" id="partner-email" placeholder="Partner's Email (optional)" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30 mt-3">
+                    <div class="text-emerald-300/70 text-xs text-center mt-0" id="partner-email-note">Email is optional. If compatibility > 90%, their email will be revealed to you.</div>
+                </div>
+                <div id="extreme-password-container" class="hidden mt-4">
+                    <input type="password" id="extreme-password" placeholder="🔒 Extreme Mode Password" class="w-full glass-input rounded-xl p-4 text-center text-xl placeholder-white/30">
+                    <p id="password-error" class="text-red-400 text-xs mt-2 hidden">Incorrect password. Hint: 'resonanceX'</p>
+                </div>
+                <button onclick="beginAssessment()" class="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl transition-all uppercase tracking-wider text-sm mt-4 border border-white/10" id="begin-assessment">
+                    Begin Assessment
+                </button>
+                <div class="text-center mt-4">
+                    <span onclick="switchView('mode')" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="back-to-mode2">
+                        ← Back to protocol selection
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: Quiz -->
+        <section id="view-quiz" class="hidden flex flex-col h-full w-full relative">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <span onclick="previousQuestion()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4 flex items-center gap-1" id="quiz-back">← Back</span>
+                    <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4 flex items-center gap-1" id="quiz-exit">Exit to main</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="q-deep" class="hidden deep-dive-badge">Deep</span>
+                    <span id="q-extreme" class="hidden extreme-badge">Extreme</span>
+                    <span id="q-category-display">Category</span>
+                </div>
+            </div>
+            <div class="flex justify-between text-xs uppercase tracking-widest mb-2 opacity-70">
+                <span id="q-counter">01 / 60</span>
+                <span class="opacity-50" id="progress-label">progress</span>
+            </div>
+            <div class="w-full bg-white/10 h-2 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="progress-fill h-full w-0 rounded-full"></div>
+            </div>
+            <div class="flex-grow flex flex-col justify-center mb-4">
+                <h3 id="q-text" class="text-xl md:text-2xl font-light leading-relaxed mb-6 min-h-[100px] flex items-center justify-center text-center"></h3>
+                <div id="options-container" class="grid gap-3"></div>
+            </div>
+            <div class="text-center mt-4">
+                <p class="text-xs opacity-40 tracking-widest" id="player-indicator">SELECT AN IMPRINT TO CONTINUE</p>
+            </div>
+        </section>
+
+        <!-- VIEW: Processing -->
+        <section id="view-processing" class="hidden text-center space-y-6">
+            <div class="text-right">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main5">Exit to main</span>
+            </div>
+            <div class="relative w-32 h-32 mx-auto">
+                <div class="absolute inset-0 border-4 border-pink-500/30 rounded-full animate-ping"></div>
+                <div class="absolute inset-4 border-4 border-purple-500/50 rounded-full animate-pulse"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-2xl font-bold serif">AI</span>
+                </div>
+            </div>
+            <h3 class="text-2xl italic animate-pulse" id="processing-text">Synthesizing Dimensional Profile...</h3>
+        </section>
+
+        <!-- VIEW: Results - Solo -->
+        <section id="view-results-solo" class="hidden w-full max-h-[80vh] overflow-y-auto pr-2">
+            <div class="text-right mb-2">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main6">Exit to main</span>
+            </div>
+            <div class="result-reveal space-y-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl italic mb-1" id="solo-title">Your Dimensional Map</h2>
+                    <p class="text-xs uppercase tracking-[0.3em] text-pink-300/70" id="solo-mode-label">BFI-2 + ECR-12 Profile</p>
+                </div>
+                
+                <div id="solo-personality-summary" class="personality-summary"></div>
+                
+                <!-- Attachment Style Display -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-purple-300" id="attach-title">Attachment Style (ECR-12)</p>
+                    <div class="attachment-grid" id="attachment-display">
+                        <div class="attachment-cell">
+                            <p class="text-xs opacity-60" id="anxiety-label">Anxiety</p>
+                            <p class="text-2xl font-bold text-pink-300" id="attach-anxiety">--</p>
+                        </div>
+                        <div class="attachment-cell">
+                            <p class="text-xs opacity-60" id="avoidance-label">Avoidance</p>
+                            <p class="text-2xl font-bold text-purple-300" id="attach-avoidance">--</p>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm mt-2" id="attach-style">Calculating...</p>
+                </div>
+
+                <!-- Big Five Facets -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300" id="bigfive-title">Big Five Facets (BFI-2)</p>
+                    <div id="solo-bar-chart" class="bar-chart"></div>
+                </div>
+
+                <!-- Love Languages (if available) -->
+                <div id="love-languages-section" class="hidden bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-pink-300" id="lovelang-title">Primary Love Language</p>
+                    <p class="text-center text-lg" id="primary-love-language">--</p>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-center text-pink-300" id="legend-title">What do these scores mean?</p>
+                    <div id="solo-legend" class="legend-grid"></div>
+                </div>
+
+                <div id="hidden-traits" class="hidden max-w-2xl mx-auto">
+                    <p class="text-xs uppercase tracking-widest text-center mb-3 text-purple-300" id="traits-title">Discovered Psychological Patterns</p>
+                    <div class="space-y-2" id="traits-container"></div>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300" id="field-title">Your Resonance Field</p>
+                    <canvas id="solo-visual" class="visual-canvas" width="300" height="300"></canvas>
+                    <div class="flex justify-center gap-2 mt-2">
+                        <button onclick="generateVisual('solo')" class="sound-btn text-xs" id="refresh-btn">⟳ Refresh</button>
+                        <button onclick="downloadVisual('solo-visual')" class="sound-btn text-xs" id="download-btn">⬇ Download PNG</button>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-2 text-pink-300" id="solo-id-label">Your Shareable ID</p>
+                    <div class="flex justify-center mb-3">
+                        <canvas id="solo-qrcode" width="150" height="150"></canvas>
+                    </div>
+                    <p class="text-2xl text-center id-display" id="solo-id">---</p>
+                    <p class="text-xs text-center opacity-60 mt-2" id="scan-instruction">Scan or copy — others can enter this to compare</p>
+                </div>
+
+                <div class="flex gap-2 max-w-md mx-auto">
+                    <button onclick="copySoloID()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider" id="copy-id-btn">Copy ID</button>
+                    <button onclick="restartToMain()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider" id="new-session-btn">New Session</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: Results - Match -->
+        <section id="view-results-match" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
+            <div class="text-right mb-2">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main7">Exit to main</span>
+            </div>
+            <div class="result-reveal space-y-4">
+                <div class="text-center">
+                    <h2 class="text-3xl italic mb-1" id="match-title">Multi-Dimensional Analysis</h2>
+                    <div class="flex justify-center items-center gap-3 text-sm">
+                        <span id="res-p1" class="text-pink-300">You</span>
+                        <span class="opacity-50">×</span>
+                        <span id="res-p2" class="text-purple-300">Partner</span>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-4 text-center border border-purple-500/30">
+                    <p class="text-xs uppercase tracking-widest text-purple-300 mb-2" id="overall-label">Overall Compatibility</p>
+                    <p class="text-4xl font-bold serif mb-2" id="match-potential-score">--%</p>
+                    <p class="text-sm opacity-80" id="match-potential-desc">Analyzing...</p>
+                </div>
+
+                <!-- Dimensional Breakdown -->
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-emerald-300" id="dim-breakdown-title">Dimensional Compatibility</p>
+                    <div id="dimensional-breakdown" class="space-y-2"></div>
+                </div>
+
+                <div class="sound-row">
+                    <button onclick="playHarmony('match')" class="sound-btn" id="harmony-btn">🎵 Play Harmony</button>
+                    <button onclick="playTraits('match')" class="sound-btn" id="traits-btn">🎹 Play Traits</button>
+                    <button onclick="stopSound()" class="sound-btn" id="stop-btn">⏹ Stop</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                        <p class="text-xs text-center text-pink-300 mb-2" id="match-user1-name">You</p>
+                        <div id="match-bar-chart1" class="bar-chart"></div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                        <p class="text-xs text-center text-purple-300 mb-2" id="match-user2-name">Partner</p>
+                        <div id="match-bar-chart2" class="bar-chart"></div>
+                    </div>
+                </div>
+
+                <div id="match-bridge-recommendations" class="max-w-2xl mx-auto">
+                    <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300" id="bridge-title">🌉 Bridge Recommendations</p>
+                    <div class="space-y-2" id="match-bridge-container"></div>
+                </div>
+
+                <button onclick="restartToMain()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider" id="new-analysis-btn">New Analysis</button>
+            </div>
+        </section>
+
+        <!-- VIEW: Results - Check -->
+        <section id="view-results-check" class="hidden w-full max-h-[85vh] overflow-y-auto pr-2">
+            <div class="text-right mb-2">
+                <span onclick="restartToMain()" class="back-link text-xs text-white/40 hover:text-white underline underline-offset-4" id="exit-to-main8">Exit to main</span>
+            </div>
+            <div class="result-reveal space-y-4">
+                <div class="text-center">
+                    <h2 class="text-3xl italic mb-1" id="check-res-title">Instant Compatibility</h2>
+                    <div class="flex justify-center items-center gap-3 text-sm">
+                        <span id="check-res-p1" class="text-pink-300">You</span>
+                        <span class="opacity-50">×</span>
+                        <span id="check-res-p2" class="text-emerald-300">Their Profile</span>
+                    </div>
+                </div>
+
+                <div class="compatibility-instant rounded-xl p-4 text-center bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30">
+                    <p class="text-xs uppercase tracking-widest text-emerald-300 mb-2" id="verdict-label">Compatibility Verdict</p>
+                    <p class="text-4xl font-bold serif mb-2" id="check-verdict">--%</p>
+                    <p class="text-sm" id="check-verdict-sub">Analyzing...</p>
+                </div>
+
+                <div id="email-reveal-area" class="hidden bg-emerald-500/20 border border-emerald-500/30 rounded-xl p-4 text-center">
+                    <p class="text-emerald-300 font-bold text-sm mb-1" id="reveal-title">✨ High Compatibility – Contact Info Revealed ✨</p>
+                    <p id="revealed-email" class="text-sm break-all">email@example.com</p>
+                </div>
+
+                <div class="sound-row">
+                    <button onclick="playHarmony('check')" class="sound-btn" id="harmony-btn2">🎵 Play Harmony</button>
+                    <button onclick="playTraits('check')" class="sound-btn" id="traits-btn2">🎹 Play Traits</button>
+                    <button onclick="stopSound()" class="sound-btn" id="stop-btn2">⏹ Stop</button>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p class="text-xs uppercase tracking-widest mb-3 text-center text-emerald-300" id="dim-analysis-title">Dimensional Analysis</p>
+                    <div id="check-dimensional-breakdown" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                    <p class="text-xs text-center text-emerald-300 mb-2" id="profile-percentiles">Their Profile Percentiles</p>
+                    <div id="check-bar-chart" class="bar-chart"></div>
+                </div>
+
+                <div id="check-bridge-recommendations" class="max-w-2xl mx-auto">
+                    <p class="text-xs uppercase tracking-widest text-center mb-3 text-emerald-300" id="bridge-title2">🌉 Bridge Recommendations</p>
+                    <div class="space-y-2" id="check-bridge-container"></div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="restartToMain()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-lg text-xs uppercase tracking-wider" id="new-check-btn">New Check</button>
+                    <button onclick="showPartnerFullProfile()" class="flex-1 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 py-3 rounded-lg text-xs uppercase tracking-wider text-emerald-300" id="full-details-btn">
+                        See Full Details
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            // Language handling
+            let currentLang = 'en'; // default
+
+            // Translation dictionaries
+            const translations = {
+                en: {
+                    // Header
+                    'header-subtitle': 'Evidence-Based Soul Alignment',
+                    // Intro
+                    'intro-line1': 'Scientifically-validated compatibility assessment.',
+                    'intro-60': '60 questions',
+                    'intro-60-desc': ' – Essential: Big Five + Attachment (ECR-12) + Core Values',
+                    'intro-90': '90 questions',
+                    'intro-90-desc': ' – Deep: + SOI-R Sociosexual + Love Languages + Conflict Styles',
+                    'intro-120': '120 questions',
+                    'intro-120-desc': ' – Extreme: + Dark Triad + Emotional Intelligence + Advanced Kink + SIDI-BDSM',
+                    'sci-title': '🔬 Enhanced Psychometric Validity',
+                    'sci-desc': '• <strong>Big Five Inventory-2 (BFI-2)</strong> – 40 items, alpha greater than .85 reliability<br>• <strong>ECR-12 Attachment</strong> – Dimensional anxiety/avoidance scores<br>• <strong>SOI-R Sociosexual</strong> – Behavior/Attitude/Desire facets<br>• <strong>Love Languages</strong> – 5-language preference mapping<br>• <strong>Conflict Styles</strong> – Gottman-inspired resolution patterns<br><span class="text-emerald-300">Block randomization • Reverse scoring • Weighted compatibility</span>',
+                    'privacy-note': '🔒 No personal data is ever stored on our servers. Your profile exists only as a QR code / ID.',
+                    'begin-btn': 'Begin Exploration',
+                    // Depth
+                    'exit-to-main': 'Exit to main',
+                    'depth-title': 'Select Depth',
+                    'depth-subtitle': 'Evidence-based assessment levels',
+                    'depth-60-title': 'Essential',
+                    'depth-60-list': '• BFI-2: Big Five (40 items)<br>• ECR-12: Attachment dimensions<br>• Core values and lifestyle<br>• 15-20 minutes',
+                    'deep-badge': 'Deep',
+                    'depth-90-title': 'Deep',
+                    'depth-90-list': '• All Essential plus:<br>• SOI-R: Sociosexual (9 items)<br>• Love Languages (10 items)<br>• Conflict Resolution (8 items)<br>• 25-30 minutes',
+                    'extreme-badge': 'Extreme',
+                    'depth-120-title': 'Extreme',
+                    'depth-120-list': '• All Deep plus:<br>• Dark Triad (15 items)<br>• Emotional Intelligence (12 items)<br>• Advanced Kink/BDSM (15 items)<br>• SIDI-BDSM (15 items)<br>• 50-60 minutes',
+                    // Mode
+                    'mode-title': 'Select Protocol',
+                    'mode-subtitle': 'Choose your path',
+                    'mode-solo-title': 'Solo Discovery',
+                    'mode-solo-desc': 'Complete psychological profile with dimensional scores.',
+                    'mode-match-title': 'Live Matching',
+                    'mode-match-desc': 'Two people, one device. Real-time compatibility analysis.',
+                    'new-badge': 'New',
+                    'mode-check-title': 'Check Compatibility',
+                    'mode-check-desc': 'Enter someone\'s ID. Instant multi-dimensional analysis.',
+                    'change-depth': '← Change depth',
+                    // Check
+                    'check-title': 'Compatibility Check',
+                    'check-subtitle': 'Enter their Resonance ID',
+                    'check-step1-title': 'Step 1: Your Profile',
+                    'check-create-new': 'Create New (60q)',
+                    'check-have-id': 'I Have an ID',
+                    'check-user-title': 'Your Resonance ID',
+                    'check-load-profile': 'Load Profile',
+                    'check-step2-title': 'Step 2: Their Resonance ID',
+                    'scan-btn': '📷 Scan',
+                    'analyze-btn': 'Analyze Friction',
+                    'back-to-mode': '← Back',
+                    // Setup
+                    'setup-title': 'Identity Protocol',
+                    'setup-subtitle': 'Enter names to begin',
+                    'email-note': 'Email is optional. If compatibility > 90%, your email will be revealed to the other user.',
+                    'partner-email-note': 'Email is optional. If compatibility > 90%, their email will be revealed to you.',
+                    'begin-assessment': 'Begin Assessment',
+                    'back-to-mode2': '← Back to protocol selection',
+                    // Quiz
+                    'quiz-back': '← Back',
+                    'quiz-exit': 'Exit to main',
+                    'progress-label': 'progress',
+                    // Processing
+                    'processing-text': 'Synthesizing Dimensional Profile...',
+                    // Solo Results
+                    'solo-title': 'Your Dimensional Map',
+                    'solo-mode-label': 'BFI-2 + ECR-12 Profile',
+                    'attach-title': 'Attachment Style (ECR-12)',
+                    'anxiety-label': 'Anxiety',
+                    'avoidance-label': 'Avoidance',
+                    'bigfive-title': 'Big Five Facets (BFI-2)',
+                    'lovelang-title': 'Primary Love Language',
+                    'legend-title': 'What do these scores mean?',
+                    'traits-title': 'Discovered Psychological Patterns',
+                    'field-title': 'Your Resonance Field',
+                    'refresh-btn': '⟳ Refresh',
+                    'download-btn': '⬇ Download PNG',
+                    'solo-id-label': 'Your Shareable ID',
+                    'scan-instruction': 'Scan or copy — others can enter this to compare',
+                    'copy-id-btn': 'Copy ID',
+                    'new-session-btn': 'New Session',
+                    // Match Results
+                    'match-title': 'Multi-Dimensional Analysis',
+                    'overall-label': 'Overall Compatibility',
+                    'dim-breakdown-title': 'Dimensional Compatibility',
+                    'harmony-btn': '🎵 Play Harmony',
+                    'traits-btn': '🎹 Play Traits',
+                    'stop-btn': '⏹ Stop',
+                    'bridge-title': '🌉 Bridge Recommendations',
+                    'new-analysis-btn': 'New Analysis',
+                    // Check Results
+                    'check-res-title': 'Instant Compatibility',
+                    'verdict-label': 'Compatibility Verdict',
+                    'reveal-title': '✨ High Compatibility – Contact Info Revealed ✨',
+                    'dim-analysis-title': 'Dimensional Analysis',
+                    'profile-percentiles': 'Their Profile Percentiles',
+                    'bridge-title2': '🌉 Bridge Recommendations',
+                    'new-check-btn': 'New Check',
+                    'full-details-btn': 'See Full Details',
+                    // Scanner
+                    'scanner-title': 'Scan QR Code',
+                    'scanner-instruction': 'Align the QR code within the frame',
+                },
+                el: {
+                    // Header
+                    'header-subtitle': 'Επιστημονική Ευθυγράμμιση Συντρόφων',
+                    // Intro
+                    'intro-line1': 'Επιστημονικά επικυρωμένη αξιολόγηση συμβατότητας.',
+                    'intro-60': '60 ερωτήσεις',
+                    'intro-60-desc': ' – Βασικό: Big Five + Προσκόλληση (ECR-12) + Βασικές Αξίες',
+                    'intro-90': '90 ερωτήσεις',
+                    'intro-90-desc': ' – Βαθύ: + SOI-R Κοινωνικοσεξουαλικό + Γλώσσες Αγάπης + Στυλ Σύγκρουσης',
+                    'intro-120': '120 ερωτήσεις',
+                    'intro-120-desc': ' – Ακραίο: + Σκοτεινή Τριάδα + Συναισθηματική Νοημοσύνη + Προχωρημένο Kink + SIDI-BDSM',
+                    'sci-title': '🔬 Ενισχυμένη Ψυχομετρική Εγκυρότητα',
+                    'sci-desc': ' • Big Five Inventory-2 (BFI-2) – 40 στοιχεία, alpha > .85 αξιοπιστία • ECR-12 Προσκόλληση – Διαστασιακές βαθμολογίες άγχους/αποφυγής • SOI-R Κοινωνικοσεξουαλικό – Πτυχές Συμπεριφοράς/Στάσης/Επιθυμίας • Γλώσσες Αγάπης</strong> – Χαρτογράφηση προτίμησης 5 γλωσσών •Στυλ Σύγκρουσης – Μοτίβα επίλυσης εμπνευσμένα από Gottman Τυχαιοποίηση μπλοκ • Αντίστροφη βαθμολόγηση • Σταθμισμένη συμβατότητα',
+                    'privacy-note': '🔒 Κανένα προσωπικό δεδομένο δεν αποθηκεύεται ποτέ στους διακομιστές μας. Το προφίλ σας υπάρχει μόνο ως κωδικός QR / ID.',
+                    'begin-btn': 'Ξεκινήστε Εξερεύνηση',
+                    // Depth
+                    'exit-to-main': 'Έξοδος στην αρχή',
+                    'depth-title': 'Επιλέξτε Βάθος',
+                    'depth-subtitle': 'Επίπεδα αξιολόγησης βάσει στοιχείων',
+                    'depth-60-title': 'Βασικό',
+                    'depth-60-list': ' • BFI-2: Big Five (40 στοιχεία) • ECR-12: Διαστάσεις προσκόλλησης • Βασικές αξίες και τρόπος ζωής • 15-20 λεπτά',
+                    'deep-badge': 'Βαθύ',
+                    'depth-90-title': 'Βαθύ',
+                    'depth-90-list': '• Όλα τα Βασικά συν: • SOI-R: Κοινωνικοσεξουαλικό (9 στοιχεία) • Γλώσσες Αγάπης (10 στοιχεία) • Επίλυση Συγκρούσεων (8 στοιχεία) • 25-30 λεπτά',
+                    'extreme-badge': 'Ακραίο',
+                    'depth-120-title': 'Ακραίο',
+                    'depth-120-list': '• Όλα τα Βαθιά συν: • Σκοτεινή Τριάδα (15 στοιχεία)• Συναισθηματική Νοημοσύνη (12 στοιχεία) • Προχωρημένο Kink/BDSM (15 στοιχεία) • SIDI-BDSM (15 στοιχεία) • 50-60 λεπτά',
+                    // Mode
+                    'mode-title': 'Επιλέξτε Πρωτόκολλο',
+                    'mode-subtitle': 'Διαλέξτε το μονοπάτι σας',
+                    'mode-solo-title': 'Ατομική Ανακάλυψη',
+                    'mode-solo-desc': 'Πλήρες ψυχολογικό προφίλ με διαστασιακές βαθμολογίες.',
+                    'mode-match-title': 'Ζωντανή Αντιστοίχιση',
+                    'mode-match-desc': 'Δύο άτομα, μία συσκευή. Ανάλυση συμβατότητας σε πραγματικό χρόνο.',
+                    'new-badge': 'Νέο',
+                    'mode-check-title': 'Έλεγχος Συμβατότητας',
+                    'mode-check-desc': 'Εισαγάγετε το ID κάποιου. Στιγμιαία πολυδιάστατη ανάλυση.',
+                    'change-depth': '← Αλλαγή βάθους',
+                    // Check
+                    'check-title': 'Έλεγχος Συμβατότητας',
+                    'check-subtitle': 'Εισαγάγετε το Resonance ID τους',
+                    'check-step1-title': 'Βήμα 1: Το Προφίλ σας',
+                    'check-create-new': 'Δημιουργία Νέου (60q)',
+                    'check-have-id': 'Έχω ID',
+                    'check-user-title': 'Το Resonance ID σας',
+                    'check-load-profile': 'Φόρτωση Προφίλ',
+                    'check-step2-title': 'Βήμα 2: Το Resonance ID τους',
+                    'scan-btn': '📷 Σάρωση',
+                    'analyze-btn': 'Ανάλυση Τριβής',
+                    'back-to-mode': '← Πίσω',
+                    // Setup
+                    'setup-title': 'Πρωτόκολλο Ταυτότητας',
+                    'setup-subtitle': 'Εισαγάγετε ονόματα για να ξεκινήσετε',
+                    'email-note': 'Το email είναι προαιρετικό. Αν η συμβατότητα > 90%, το email σας θα αποκαλυφθεί στον άλλο χρήστη.',
+                    'partner-email-note': 'Το email είναι προαιρετικό. Αν η συμβατότητα > 90%, το email τους θα αποκαλυφθεί σε εσάς.',
+                    'begin-assessment': 'Ξεκινήστε Αξιολόγηση',
+                    'back-to-mode2': '← Πίσω στην επιλογή πρωτοκόλλου',
+                    // Quiz
+                    'quiz-back': '← Πίσω',
+                    'quiz-exit': 'Έξοδος στην αρχή',
+                    'progress-label': 'πρόοδος',
+                    // Processing
+                    'processing-text': 'Σύνθεση Διαστασιακού Προφίλ...',
+                    // Solo Results
+                    'solo-title': 'Ο Διαστασιακός σας Χάρτης',
+                    'solo-mode-label': 'Προφίλ BFI-2 + ECR-12',
+                    'attach-title': 'Στυλ Προσκόλλησης (ECR-12)',
+                    'anxiety-label': 'Άγχος',
+                    'avoidance-label': 'Αποφυγή',
+                    'bigfive-title': 'Πτυχές Big Five (BFI-2)',
+                    'lovelang-title': 'Κύρια Γλώσσα Αγάπης',
+                    'legend-title': 'Τι σημαίνουν αυτές οι βαθμολογίες;',
+                    'traits-title': 'Ανακαλυφθέντα Ψυχολογικά Μοτίβα',
+                    'field-title': 'Το Πεδίο Συντονισμού σας',
+                    'refresh-btn': '⟳ Ανανέωση',
+                    'download-btn': '⬇ Λήψη PNG',
+                    'solo-id-label': 'Το Κοινόχρηστο ID σας',
+                    'scan-instruction': 'Σαρώστε ή αντιγράψτε — άλλοι μπορούν να το εισαγάγουν για σύγκριση',
+                    'copy-id-btn': 'Αντιγραφή ID',
+                    'new-session-btn': 'Νέα Συνεδρία',
+                    // Match Results
+                    'match-title': 'Πολυδιάστατη Ανάλυση',
+                    'overall-label': 'Συνολική Συμβατότητα',
+                    'dim-breakdown-title': 'Διαστασιακή Συμβατότητα',
+                    'harmony-btn': '🎵 Αναπαραγωγή Αρμονίας',
+                    'traits-btn': '🎹 Αναπαραγωγή Χαρακτηριστικών',
+                    'stop-btn': '⏹ Διακοπή',
+                    'bridge-title': '🌉 Προτάσεις Γεφύρωσης',
+                    'new-analysis-btn': 'Νέα Ανάλυση',
+                    // Check Results
+                    'check-res-title': 'Στιγμιαία Συμβατότητα',
+                    'verdict-label': 'Ετυμηγορία Συμβατότητας',
+                    'reveal-title': '✨ Υψηλή Συμβατότητα – Αποκαλύφθηκαν Στοιχεία Επικοινωνίας ✨',
+                    'dim-analysis-title': 'Διαστασιακή Ανάλυση',
+                    'profile-percentiles': 'Εκατοστημόρια Προφίλ τους',
+                    'bridge-title2': '🌉 Προτάσεις Γεφύρωσης',
+                    'new-check-btn': 'Νέος Έλεγχος',
+                    'full-details-btn': 'Δείτε Πλήρεις Λεπτομέρειες',
+                    // Scanner
+                    'scanner-title': 'Σάρωση QR Code',
+                    'scanner-instruction': 'Ευθυγραμμίστε τον κωδικό QR στο πλαίσιο',
+                }
+            };
+
+            // Function to update UI text based on current language
+            function updateUILanguage() {
+                const elements = document.querySelectorAll('[id]');
+                elements.forEach(el => {
+                    const id = el.id;
+                    if (translations[currentLang] && translations[currentLang][id] !== undefined) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            el.placeholder = translations[currentLang][id];
+                        } else if (el.tagName === 'BUTTON' || el.tagName === 'SPAN' || el.tagName === 'P' || el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || el.tagName === 'DIV' || el.tagName === 'LABEL') {
+                            if (id.includes('list') || id.includes('desc')) {
+                                el.innerHTML = translations[currentLang][id];
+                            } else {
+                                el.innerText = translations[currentLang][id];
+                            }
+                        } else {
+                            el.innerText = translations[currentLang][id];
+                        }
+                    }
+                });
+                // Update language toggle buttons
+                document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+                document.getElementById('lang-el').classList.toggle('active', currentLang === 'el');
+            }
+
+            window.setLanguage = function(lang) {
+                currentLang = lang;
+                updateUILanguage();
+                // If we are in quiz view, re-render current question to update text
+                if (views.quiz && !views.quiz.classList.contains('hidden')) {
+                    renderQuestion(); // re-render with new language
+                }
+            };
+
+            // QR Scanner Functions
+            let scannerStream = null;
+            let scanning = false;
+
+            window.startScanner = function() {
+                const container = document.getElementById('scanner-container');
+                if (!container) return;
+                container.classList.remove('hidden');
+                const video = document.getElementById('scanner-video');
+                const canvas = document.getElementById('scanner-canvas');
+                const ctx = canvas.getContext('2d');
+
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                        .then(function(stream) {
+                            scannerStream = stream;
+                            video.srcObject = stream;
+                            video.setAttribute('playsinline', true);
+                            video.play();
+                            requestAnimationFrame(tick);
+                        })
+                        .catch(function(err) {
+                            alert('Camera access denied or not available.');
+                            stopScanner();
+                        });
+                } else {
+                    alert('Sorry, your browser does not support camera access.');
+                    stopScanner();
+                }
+
+                function tick() {
+                    if (!scanning) return;
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, canvas.width, canvas.height, {
+                            inversionAttempts: 'dontInvert',
+                        });
+                        if (code) {
+                            document.getElementById('check-partner-id').value = code.data;
+                            stopScanner();
+                        }
+                    }
+                    if (scanning) {
+                        requestAnimationFrame(tick);
+                    }
+                }
+                scanning = true;
+            };
+
+            window.stopScanner = function() {
+                if (scannerStream) {
+                    scannerStream.getTracks().forEach(track => track.stop());
+                    scannerStream = null;
+                }
+                scanning = false;
+                const container = document.getElementById('scanner-container');
+                if (container) container.classList.add('hidden');
+            };
+
+            // Audio functions
+            let audioCtx = null;
+            let oscillators = [];
+            let gainNode = null;
+            let sequenceTimeout = null;
+            let currentFreqs = [];
+
+            function initAudio() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    gainNode = audioCtx.createGain();
+                    gainNode.gain.value = 0.1;
+                    gainNode.connect(audioCtx.destination);
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+
+            window.stopSound = function() {
+                if (sequenceTimeout) {
+                    clearTimeout(sequenceTimeout);
+                    sequenceTimeout = null;
+                }
+                if (oscillators.length) {
+                    oscillators.forEach(osc => { try { osc.stop(); } catch (e) {} });
+                    oscillators = [];
+                }
+            };
+
+            function getRatioFromCompatibility(comp) {
+                comp = Math.min(100, Math.max(0, comp));
+                const points = [
+                    { c: 100, r: 1.0 },
+                    { c: 80, r: 1.5 },
+                    { c: 60, r: 1.3333 },
+                    { c: 40, r: 1.25 },
+                    { c: 20, r: 1.2 },
+                    { c: 0, r: 1.414 }
+                ];
+                for (let i = 0; i < points.length - 1; i++) {
+                    if (comp >= points[i+1].c && comp <= points[i].c) {
+                        const t = (comp - points[i+1].c) / (points[i].c - points[i+1].c);
+                        return points[i+1].r + t * (points[i].r - points[i+1].r);
+                    }
+                }
+                return 1.414;
+            }
+
+            window.playHarmony = function(mode) {
+                initAudio();
+                stopSound();
+                let compatibility;
+                if (mode === 'match') {
+                    const scoreEl = document.getElementById('match-potential-score');
+                    compatibility = parseInt(scoreEl.innerText) || 50;
+                } else {
+                    const verdictEl = document.getElementById('check-verdict');
+                    compatibility = parseInt(verdictEl.innerText) || 50;
+                }
+                const ratio = getRatioFromCompatibility(compatibility);
+                const baseFreq = 440;
+                const freq1 = baseFreq;
+                const freq2 = baseFreq * ratio;
+
+                const osc1 = audioCtx.createOscillator();
+                osc1.type = 'sine';
+                osc1.frequency.value = freq1;
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.value = freq2;
+
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+
+                oscillators = [osc1, osc2];
+                osc1.start();
+                osc2.start();
+            };
+
+            window.playTraits = function(mode) {
+                initAudio();
+                stopSound();
+
+                let scores1, scores2;
+                if (mode === 'match') {
+                    if (state.p1Answers.length && state.p2Answers.length) {
+                        scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                        scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                    } else {
+                        alert("Trait data not available.");
+                        return;
+                    }
+                } else {
+                    if (checkUserAnswers && checkPartnerAnswers) {
+                        scores1 = computeCategoryScores(checkUserAnswers, essentialMaster);
+                        scores2 = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                    } else {
+                        alert("Trait data not available.");
+                        return;
+                    }
+                }
+
+                const freqs = [];
+                for (let cat in scores1) {
+                    const val = scores1[cat];
+                    const freq = 200 + val * 6;
+                    freqs.push(freq);
+                }
+                for (let cat in scores2) {
+                    const val = scores2[cat];
+                    const freq = 200 + val * 6;
+                    freqs.push(freq);
+                }
+                currentFreqs = freqs;
+
+                let index = 0;
+                const duration = 2;
+                const fadeTime = 0.05;
+
+                function playNext() {
+                    if (index >= freqs.length) index = 0;
+                    const freq = freqs[index];
+
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+
+                    const gain = audioCtx.createGain();
+                    gain.gain.value = 0;
+
+                    osc.connect(gain);
+                    gain.connect(gainNode);
+
+                    const now = audioCtx.currentTime;
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.1, now + fadeTime);
+                    gain.gain.setValueAtTime(0.1, now + duration - fadeTime);
+                    gain.gain.linearRampToValueAtTime(0, now + duration);
+
+                    oscillators.push(osc);
+                    osc.start(now);
+                    osc.stop(now + duration);
+
+                    osc.onended = () => {
+                        const idx = oscillators.indexOf(osc);
+                        if (idx > -1) oscillators.splice(idx, 1);
+                    };
+
+                    index++;
+                    sequenceTimeout = setTimeout(playNext, duration * 1000);
+                }
+
+                playNext();
+            };
+
+            // Generative Visual
+            window.generateVisual = function(mode) {
+                let canvas;
+                if (mode === 'solo') {
+                    canvas = document.getElementById('solo-visual');
+                } else if (mode === 'match') {
+                    canvas = document.getElementById('match-visual');
+                } else if (mode === 'check') {
+                    canvas = document.getElementById('check-visual');
+                }
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const w = canvas.width;
+                const h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+
+                let scores1 = null, scores2 = null;
+                if (mode === 'solo') {
+                    if (state.p1Answers.length) {
+                        scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                    } else {
+                        scores1 = { "Openness": 70, "Conscientiousness": 50, "Extraversion": 30, "Agreeableness": 60, "Neuroticism": 40 };
+                    }
+                } else if (mode === 'match') {
+                    if (state.p1Answers.length && state.p2Answers.length) {
+                        scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                        scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                    } else {
+                        scores1 = { "Openness": 70, "Conscientiousness": 50, "Extraversion": 30, "Agreeableness": 60, "Neuroticism": 40 };
+                        scores2 = { "Openness": 30, "Conscientiousness": 70, "Extraversion": 60, "Agreeableness": 50, "Neuroticism": 30 };
+                    }
+                } else if (mode === 'check') {
+                    if (checkUserAnswers && checkPartnerAnswers) {
+                        scores1 = computeCategoryScores(checkUserAnswers, essentialMaster);
+                        scores2 = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                    } else {
+                        scores1 = { "Openness": 70, "Conscientiousness": 50, "Extraversion": 30, "Agreeableness": 60, "Neuroticism": 40 };
+                        scores2 = { "Openness": 30, "Conscientiousness": 70, "Extraversion": 60, "Agreeableness": 50, "Neuroticism": 30 };
+                    }
+                }
+
+                let categories = [];
+                let diffs = [];
+                if (mode === 'solo') {
+                    categories = Object.keys(scores1);
+                    diffs = categories.map(cat => scores1[cat] / 100);
+                } else {
+                    const allCats = new Set([...Object.keys(scores1), ...Object.keys(scores2)]);
+                    categories = Array.from(allCats);
+                    diffs = categories.map(cat => {
+                        const v1 = scores1[cat] || 50;
+                        const v2 = scores2[cat] || 50;
+                        return Math.abs(v1 - v2) / 100;
+                    });
+                }
+
+                const baseRadius = 80;
+                const numPoints = categories.length * 2;
+                const angles = [];
+                for (let i = 0; i < numPoints; i++) {
+                    angles.push((i / numPoints) * 2 * Math.PI);
+                }
+
+                const catAngles = categories.map((_, idx) => (idx / categories.length) * 2 * Math.PI);
+                const radii = angles.map(angle => {
+                    let totalInfluence = 0;
+                    let weightedSum = 0;
+                    for (let j = 0; j < categories.length; j++) {
+                        const catAngle = catAngles[j];
+                        const diff = Math.abs(angle - catAngle);
+                        const dist = Math.min(diff, 2*Math.PI - diff);
+                        const influence = Math.exp(-dist * 3);
+                        totalInfluence += influence;
+                        weightedSum += influence * diffs[j];
+                    }
+                    const avgDiff = totalInfluence > 0 ? weightedSum / totalInfluence : 0.5;
+                    return baseRadius + avgDiff * 60;
+                });
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+                ctx.beginPath();
+                for (let i = 0; i <= angles.length; i++) {
+                    const idx = i % angles.length;
+                    const angle = angles[idx];
+                    const r = radii[idx] * 0.95;
+                    const x = w/2 + r * Math.cos(angle);
+                    const y = h/2 + r * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.beginPath();
+                for (let i = 0; i <= angles.length; i++) {
+                    const idx = i % angles.length;
+                    const angle = angles[idx];
+                    const r = radii[idx];
+                    const x = w/2 + r * Math.cos(angle);
+                    const y = h/2 + r * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+
+                let compatibility = 50;
+                if (mode !== 'solo') {
+                    if (mode === 'match') {
+                        const scoreEl = document.getElementById('match-potential-score');
+                        compatibility = parseInt(scoreEl.innerText) || 50;
+                    } else {
+                        const verdictEl = document.getElementById('check-verdict');
+                        compatibility = parseInt(verdictEl.innerText) || 50;
+                    }
+                }
+                const baseHue = (compatibility * 2.5) % 360;
+                const gradient = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, 150);
+                gradient.addColorStop(0, `hsl(${baseHue}, 90%, 70%)`);
+                gradient.addColorStop(0.3, `hsl(${(baseHue + 60) % 360}, 90%, 60%)`);
+                gradient.addColorStop(0.6, `hsl(${(baseHue + 120) % 360}, 90%, 50%)`);
+                gradient.addColorStop(0.8, `hsl(${(baseHue + 180) % 360}, 90%, 40%)`);
+                gradient.addColorStop(1, `hsl(${(baseHue + 240) % 360}, 90%, 30%)`);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetX = -2;
+                ctx.shadowOffsetY = -2;
+                ctx.beginPath();
+                for (let i = 0; i <= angles.length; i++) {
+                    const idx = i % angles.length;
+                    const angle = angles[idx];
+                    const r = radii[idx] * 0.98;
+                    const x = w/2 + r * Math.cos(angle);
+                    const y = h/2 + r * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.strokeStyle = `hsl(${baseHue}, 90%, 80%)`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                for (let p = 0; p < 60; p++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const r = Math.random() * baseRadius * 1.2;
+                    const x = w/2 + r * Math.cos(angle);
+                    const y = h/2 + r * Math.sin(angle);
+                    const size = Math.random() * 3 + 1;
+                    const hue = (baseHue + Math.random() * 180) % 360;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, 2*Math.PI);
+                    ctx.fillStyle = `hsla(${hue}, 90%, 70%, ${Math.random()*0.7})`;
+                    ctx.fill();
+                }
+            };
+
+            window.downloadVisual = function(canvasId) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                const link = document.createElement('a');
+                link.download = 'resonance_field.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+
+            // ENHANCED QUESTION POOLS (Evidence-Based) with bilingual support
+            const EXTREME_PASSWORD = "resonanceX";
+
+            function q(id, text_en, text_el, category, type, weight, options_en, options_el, isDeep, isExtreme, hiddenTrait, traitMapping, matchType, complementaryMap, toleranceThreshold, reverseScored) {
+                return { 
+                    id, 
+                    text_en, 
+                    text_el,
+                    category, 
+                    type, 
+                    weight, 
+                    options_en, 
+                    options_el,
+                    isDeep, 
+                    isExtreme, 
+                    hiddenTrait, 
+                    traitMapping, 
+                    matchType, 
+                    complementaryMap, 
+                    toleranceThreshold, 
+                    reverseScored 
+                };
+            }
+
+            // BIG FIVE INVENTORY-2 (40 items: 8 per trait) – English and Greek
+            const bigFive = [
+                // Openness - 8 items
+                q("o1","I am someone who is curious about many different things","Είμαι κάποιος που είναι περίεργος για πολλά διαφορετικά πράγματα","Openness","scale",1, null, null, false, false),
+                q("o2","I am someone who is ingenious, a deep thinker","Είμαι κάποιος που είναι ευφυής, βαθύς στοχαστής","Openness","scale",1, null, null, false, false),
+                q("o3","I am someone who has an active imagination","Είμαι κάποιος που έχει ενεργή φαντασία","Openness","scale",1, null, null, false, false),
+                q("o4","I am someone who is sophisticated in art, music, or literature","Είμαι κάποιος που είναι εκλεπτυσμένος στην τέχνη, τη μουσική ή τη λογοτεχνία","Openness","scale",1, null, null, false, false),
+                q("o5","I am someone who prefers work that is routine","Είμαι κάποιος που προτιμά εργασία που είναι ρουτίνα","Openness","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("o6","I am someone who has few artistic interests","Είμαι κάποιος που έχει λίγα καλλιτεχνικά ενδιαφέροντα","Openness","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("o7","I am someone who likes to reflect, play with ideas","Είμαι κάποιος που του αρέσει να στοχάζεται, να παίζει με ιδέες","Openness","scale",1, null, null, false, false),
+                q("o8","I am someone who is not interested in abstract ideas","Είμαι κάποιος που δεν ενδιαφέρεται για αφηρημένες ιδέες","Openness","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+
+                // Conscientiousness - 8 items
+                q("c1","I am someone who is always prepared","Είμαι κάποιος που είναι πάντα προετοιμασμένος","Conscientiousness","scale",1, null, null, false, false),
+                q("c2","I am someone who pays attention to details","Είμαι κάποιος που δίνει προσοχή στις λεπτομέρειες","Conscientiousness","scale",1, null, null, false, false),
+                q("c3","I am someone who gets chores done right away","Είμαι κάποιος που κάνει τις δουλειές αμέσως","Conscientiousness","scale",1, null, null, false, false),
+                q("c4","I am someone who likes order","Είμαι κάποιος που του αρέσει η τάξη","Conscientiousness","scale",1, null, null, false, false),
+                q("c5","I am someone who follows a schedule","Είμαι κάποιος που ακολουθεί ένα πρόγραμμα","Conscientiousness","scale",1, null, null, false, false),
+                q("c6","I am someone who is exacting in my work","Είμαι κάποιος που είναι απαιτητικός στη δουλειά μου","Conscientiousness","scale",1, null, null, false, false),
+                q("c7","I am someone who leaves my belongings around","Είμαι κάποιος που αφήνει τα υπάρχοντά μου τριγύρω","Conscientiousness","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("c8","I am someone who makes plans and sticks to them","Είμαι κάποιος που κάνει σχέδια και τα τηρεί","Conscientiousness","scale",1, null, null, false, false),
+
+                // Extraversion - 8 items
+                q("e1","I am someone who is the life of the party","Είμαι κάποιος που είναι η ψυχή της παρέας","Extraversion","scale",1, null, null, false, false),
+                q("e2","I am someone who feels comfortable around people","Είμαι κάποιος που νιώθει άνετα με κόσμο","Extraversion","scale",1, null, null, false, false),
+                q("e3","I am someone who starts conversations","Είμαι κάποιος που ξεκινά συζητήσεις","Extraversion","scale",1, null, null, false, false),
+                q("e4","I am someone who talks to a lot of different people at parties","Είμαι κάποιος που μιλά με πολλά διαφορετικά άτομα σε πάρτι","Extraversion","scale",1, null, null, false, false),
+                q("e5","I am someone who does not mind being the center of attention","Είμαι κάποιος που δεν τον πειράζει να είναι το κέντρο της προσοχής","Extraversion","scale",1, null, null, false, false),
+                q("e6","I am someone who is quiet around strangers","Είμαι κάποιος που είναι ήσυχος με αγνώστους","Extraversion","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("e7","I am someone who has little to say","Είμαι κάποιος που έχει λίγα να πει","Extraversion","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("e8","I am someone who keeps in the background","Είμαι κάποιος που μένει στο παρασκήνιο","Extraversion","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+
+                // Agreeableness - 8 items
+                q("a1","I am someone who is interested in people","Είμαι κάποιος που ενδιαφέρεται για τους ανθρώπους","Agreeableness","scale",1, null, null, false, false),
+                q("a2","I am someone who sympathizes with others feelings","Είμαι κάποιος που συμπάσχει με τα συναισθήματα των άλλων","Agreeableness","scale",1, null, null, false, false),
+                q("a3","I am someone who has a soft heart","Είμαι κάποιος που έχει μαλακή καρδιά","Agreeableness","scale",1, null, null, false, false),
+                q("a4","I am someone who takes time out for others","Είμαι κάποιος που βρίσκει χρόνο για τους άλλους","Agreeableness","scale",1, null, null, false, false),
+                q("a5","I am someone who feels others emotions","Είμαι κάποιος που νιώθει τα συναισθήματα των άλλων","Agreeableness","scale",1, null, null, false, false),
+                q("a6","I am someone who makes people feel at ease","Είμαι κάποιος που κάνει τους ανθρώπους να νιώθουν άνετα","Agreeableness","scale",1, null, null, false, false),
+                q("a7","I am someone who is not really interested in others","Είμαι κάποιος που δεν ενδιαφέρεται πραγματικά για τους άλλους","Agreeableness","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("a8","I am someone who insults people","Είμαι κάποιος που προσβάλλει ανθρώπους","Agreeableness","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+
+                // Neuroticism - 8 items
+                q("n1","I am someone who gets stressed out easily","Είμαι κάποιος που αγχώνεται εύκολα","Neuroticism","scale",1, null, null, false, false),
+                q("n2","I am someone who worries about things","Είμαι κάποιος που ανησυχεί για πράγματα","Neuroticism","scale",1, null, null, false, false),
+                q("n3","I am someone who is easily disturbed","Είμαι κάποιος που ενοχλείται εύκολα","Neuroticism","scale",1, null, null, false, false),
+                q("n4","I am someone who gets upset easily","Είμαι κάποιος που αναστατώνεται εύκολα","Neuroticism","scale",1, null, null, false, false),
+                q("n5","I am someone who changes my mood a lot","Είμαι κάποιος που αλλάζει πολύ η διάθεσή μου","Neuroticism","scale",1, null, null, false, false),
+                q("n6","I am someone who has frequent mood swings","Είμαι κάποιος που έχει συχνές εναλλαγές διάθεσης","Neuroticism","scale",1, null, null, false, false),
+                q("n7","I am someone who is relaxed most of the time","Είμαι κάποιος που είναι χαλαρός τις περισσότερες φορές","Neuroticism","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("n8","I am someone who seldom feel blue","Είμαι κάποιος που σπάνια νιώθει μελαγχολία","Neuroticism","scale",1, null, null, false, false, null, null, 'similarity', null, 1, true)
+            ];
+
+            // ECR-12 ATTACHMENT (12 items: 6 anxiety, 6 avoidance)
+            const attachmentECR12 = [
+                q("ax1","I worry about being abandoned","Ανησυχώ μήπως εγκαταλειφθώ","Attachment-Anxiety","scale",2, null, null, false, false),
+                q("ax2","I need a lot of reassurance that I am loved","Χρειάζομαι πολλή επιβεβαίωση ότι με αγαπούν","Attachment-Anxiety","scale",2, null, null, false, false),
+                q("ax3","I worry about rejection","Ανησυχώ για την απόρριψη","Attachment-Anxiety","scale",2, null, null, false, false),
+                q("ax4","When my partner is away, I fear that he or she might become interested in someone else","Όταν ο σύντροφός μου λείπει, φοβάμαι ότι μπορεί να ενδιαφερθεί για κάποιον άλλο","Attachment-Anxiety","scale",2, null, null, false, false),
+                q("ax5","I worry when partner is away","Ανησυχώ όταν ο σύντροφος λείπει","Attachment-Anxiety","scale",2, null, null, false, false),
+                q("ax6","I need partner to constantly show love","Χρειάζομαι ο σύντροφος να δείχνει συνεχώς αγάπη","Attachment-Anxiety","scale",2, null, null, false, false),
+                
+                q("av1","I prefer not to show a partner how I feel deep down","Προτιμώ να μην δείχνω σε έναν σύντροφο πώς νιώθω βαθιά μέσα μου","Attachment-Avoidance","scale",2, null, null, false, false),
+                q("av2","I find it difficult to allow myself to depend on romantic partners","Δυσκολεύομαι να επιτρέψω στον εαυτό μου να εξαρτάται από ρομαντικούς συντρόφους","Attachment-Avoidance","scale",2, null, null, false, false),
+                q("av3","I am very comfortable being close to romantic partners","Είμαι πολύ άνετος όταν είμαι κοντά σε ρομαντικούς συντρόφους","Attachment-Avoidance","scale",2, null, null, false, false, null, null, 'similarity', null, 1, true),
+                q("av4","I do not feel comfortable opening up to romantic partners","Δεν νιώθω άνετα να ανοίγομαι σε ρομαντικούς συντρόφους","Attachment-Avoidance","scale",2, null, null, false, false),
+                q("av5","I prefer not to be too close to romantic partners","Προτιμώ να μην είμαι πολύ κοντά σε ρομαντικούς συντρόφους","Attachment-Avoidance","scale",2, null, null, false, false),
+                q("av6","I get uncomfortable when a romantic partner wants to be very close","Νιώθω άβολα όταν ένας ρομαντικός σύντροφος θέλει να είναι πολύ κοντά","Attachment-Avoidance","scale",2, null, null, false, false)
+            ];
+
+            // CORE VALUES & LIFESTYLE (8 items)
+            const coreValues = [
+                q("v1","Do you want children in your future?","Θέλετε παιδιά στο μέλλον σας;","Values","scale",3, null, null, false, false, null, null, 'similarity'),
+                q("v2","Is financial stability a prerequisite for commitment?","Είναι η οικονομική σταθερότητα προϋπόθεση για δέσμευση;","Values","scale",2, null, null, false, false, null, null, 'similarity'),
+                q("v3","Is travel and adventure essential to your life?","Είναι το ταξίδι και η περιπέτεια απαραίτητα για τη ζωή σας;","Values","scale",1, null, null, false, false),
+                q("v4","Do you value career success over relationships?","Εκτιμάτε την επαγγελματική επιτυχία πάνω από τις σχέσεις;","Values","scale",2, null, null, false, false),
+                q("v5","Is spirituality or religion important in a partner?","Είναι η πνευματικότητα ή η θρησκεία σημαντική σε έναν σύντροφο;","Values","scale",2, null, null, false, false, null, null, 'similarity'),
+                q("l1","Do you prefer city life over nature?","Προτιμάτε τη ζωή στην πόλη από τη φύση;","Lifestyle","scale",1, null, null, false, false),
+                q("l2","Do you prefer strict routine over spontaneity?","Προτιμάτε την αυστηρή ρουτίνα από τον αυθορμητισμό;","Lifestyle","scale",1, null, null, false, false),
+                q("i1","Is physical touch essential for you to feel loved?","Είναι η σωματική επαφή απαραίτητη για να νιώθετε αγάπη;","Intimacy","scale",2, null, null, false, false, null, null, 'similarity')
+            ];
+
+            // SOI-R SOCIOSEXUAL ORIENTATION (9 items: 3 per facet)
+            const sociosexualSOIR = [
+                q("sb1","With how many different partners have you had sex within the past 12 months?","Με πόσους διαφορετικούς συντρόφους είχατε σεξ τους τελευταίους 12 μήνες;","SOI-Behavior","choice",2, ["0","1","2","3-5","6-10","11+"], ["0","1","2","3-5","6-10","11+"], true, false),
+                q("sb2","Πόσο συχνά κάνετε σεξ με κάποιον στο πρώτο ραντεβού;","Πόσο συχνά κάνετε σεξ με κάποιον στο πρώτο ραντεβού;","SOI-Behavior","choice",2, ["Ποτέ","Σπάνια","Μερικές φορές","Συχνά","Πολύ συχνά"], ["Ποτέ","Σπάνια","Μερικές φορές","Συχνά","Πολύ συχνά"], true, false),
+                q("sb3","Πόσο συχνά κάνετε σεξ με κάποιον χωρίς να τον γνωρίζετε καλά;","Πόσο συχνά κάνετε σεξ με κάποιον χωρίς να τον γνωρίζετε καλά;","SOI-Behavior","choice",2, ["Ποτέ","Σπάνια","Μερικές φορές","Συχνά","Πολύ συχνά"], ["Ποτέ","Σπάνια","Μερικές φορές","Συχνά","Πολύ συχνά"], true, false),
+                
+                q("sa1","Sex without love is okay","Το σεξ χωρίς αγάπη είναι εντάξει","SOI-Attitude","scale",2, null, null, true, false),
+                q("sa2","I can imagine myself being comfortable and enjoying casual sex with different partners","Μπορώ να φανταστώ τον εαυτό μου άνετο και να απολαμβάνω περιστασιακό σεξ με διαφορετικούς συντρόφους","SOI-Attitude","scale",2, null, null, true, false),
+                q("sa3","I would have to be closely attached to someone both emotionally and psychologically before I could feel comfortable and fully enjoy having sex with him or her","Θα έπρεπε να είμαι στενά συνδεδεμένος με κάποιον συναισθηματικά και ψυχολογικά πριν νιώσω άνετα και απολαύσω πλήρως το σεξ μαζί του/της","SOI-Attitude","scale",2, null, null, true, false, null, null, 'similarity', null, 1, true),
+                
+                q("sd1","How often do you experience sexual arousal when you are in contact with someone you are not in a committed romantic relationship with?","Πόσο συχνά βιώνετε σεξουαλική διέγερση όταν είστε σε επαφή με κάποιον με τον οποίο δεν έχετε δεσμευτική ρομαντική σχέση;","SOI-Desire","scale",2, null, null, true, false),
+                q("sd2","In everyday life, how often do you have spontaneous fantasies about having sex with someone you have just met?","Στην καθημερινή ζωή, πόσο συχνά έχετε αυθόρμητες φαντασιώσεις για σεξ με κάποιον που μόλις γνωρίσατε;","SOI-Desire","scale",2, null, null, true, false),
+                q("sd3","How often do you fantasize about having sex with someone other than your current partner?","Πόσο συχνά φαντασιώνεστε σεξ με κάποιον άλλο εκτός από τον τρέχοντα σύντροφό σας;","SOI-Desire","scale",2, null, null, true, false)
+            ];
+
+            // LOVE LANGUAGES (10 items: 2 per language)
+            const loveLanguages = [
+                q("ll1","Receiving thoughtful gifts makes me feel loved","Το να λαμβάνω στοχαστικά δώρα με κάνει να νιώθω αγάπη","LoveLanguage-Gifts","scale",1, null, null, true, false),
+                q("ll2","I appreciate when someone gives me tangible symbols of love","Εκτιμώ όταν κάποιος μου δίνει απτά σύμβολα αγάπης","LoveLanguage-Gifts","scale",1, null, null, true, false),
+                q("ll3","Quality time together is the most meaningful expression of love","Ο ποιοτικός χρόνος μαζί είναι η πιο ουσιαστική έκφραση αγάπης","LoveLanguage-Time","scale",1, null, null, true, false),
+                q("ll4","I feel loved when someone gives me their undivided attention","Νιώθω αγάπη όταν κάποιος μου δίνει την αμέριστη προσοχή του","LoveLanguage-Time","scale",1, null, null, true, false),
+                q("ll5","Words of affirmation and compliments mean a lot to me","Οι λέξεις επιβεβαίωσης και τα κομπλιμέντα σημαίνουν πολλά για μένα","LoveLanguage-Words","scale",1, null, null, true, false),
+                q("ll6","I need to hear I love you and verbal appreciation","Χρειάζομαι να ακούω 'σ'αγαπώ' και λεκτική εκτίμηση","LoveLanguage-Words","scale",1, null, null, true, false),
+                q("ll7","Physical touch is essential for me to feel connected","Η σωματική επαφή είναι απαραίτητη για να νιώθω συνδεδεμένος","LoveLanguage-Touch","scale",1, null, null, true, false),
+                q("ll8","Hugs, kisses, and physical closeness convey love to me","Οι αγκαλιές, τα φιλιά και η σωματική εγγύτητα μου μεταδίδουν αγάπη","LoveLanguage-Touch","scale",1, null, null, true, false),
+                q("ll9","When someone helps me with tasks, I feel cared for","Όταν κάποιος με βοηθά σε εργασίες, νιώθω ότι με φροντίζουν","LoveLanguage-Service","scale",1, null, null, true, false),
+                q("ll10","Acts of service show me that someone truly loves me","Οι πράξεις υπηρεσίας μου δείχνουν ότι κάποιος με αγαπά πραγματικά","LoveLanguage-Service","scale",1, null, null, true, false)
+            ];
+
+            // CONFLICT RESOLUTION (8 items - Gottman-inspired)
+            const conflictResolution = [
+                q("cr1","I stay calm and composed during disagreements","Παραμένω ήρεμος και συγκροτημένος κατά τις διαφωνίες","Conflict-Resolution","scale",2, null, null, true, false),
+                q("cr2","I listen to understand my partners perspective before responding","Ακούω για να κατανοήσω την οπτική του συντρόφου μου πριν απαντήσω","Conflict-Resolution","scale",2, null, null, true, false),
+                q("cr3","I use humor appropriately to defuse tension","Χρησιμοποιώ το χιούμορ κατάλληλα για να εκτονώσω την ένταση","Conflict-Resolution","scale",2, null, null, true, false),
+                q("cr4","I know when to take a break if I am feeling overwhelmed","Ξέρω πότε να κάνω ένα διάλειμμα αν νιώθω καταβεβλημένος","Conflict-Resolution","scale",2, null, null, true, false),
+                q("cr5","I tend to criticize my partners character during arguments","Τείνω να επικρίνω τον χαρακτήρα του συντρόφου μου κατά τη διάρκεια καυγάδων","Conflict-Resolution","scale",2, null, null, true, false, null, null, 'similarity', null, 1, true),
+                q("cr6","I become defensive when my partner brings up concerns","Γίνομαι αμυντικός όταν ο σύντροφός μου φέρνει ανησυχίες","Conflict-Resolution","scale",2, null, null, true, false, null, null, 'similarity', null, 1, true),
+                q("cr7","I shut down or withdraw during conflict (stonewalling)","Κλείνομαι ή αποσύρομαι κατά τη διάρκεια σύγκρουσης (stonewalling)","Conflict-Resolution","scale",2, null, null, true, false, null, null, 'similarity', null, 1, true),
+                q("cr8","I accept influence from my partner and compromise","Δέχομαι επιρροή από τον σύντροφό μου και συμβιβάζομαι","Conflict-Resolution","scale",2, null, null, true, false)
+            ];
+
+            // DARK TRIAD (15 items: 5 per trait)
+            const darkTriad = [
+                q("dt1","I like to use clever manipulation to get my way","Μου αρέσει να χρησιμοποιώ έξυπνη χειραγώγηση για να πετυχαίνω αυτό που θέλω","DarkTriad-Machiavellianism","scale",1, null, null, false, true),
+                q("dt2","Whatever it takes, you must get the important people on your side","Ό,τι και να γίνει, πρέπει να έχετε τους σημαντικούς ανθρώπους με το μέρος σας","DarkTriad-Machiavellianism","scale",1, null, null, false, true),
+                q("dt3","Avoid direct conflict with others because they may be useful in the future","Αποφύγετε την άμεση σύγκρουση με άλλους γιατί μπορεί να είναι χρήσιμοι στο μέλλον","DarkTriad-Machiavellianism","scale",1, null, null, false, true),
+                q("dt4","It is wise to keep track of information that you can use against people later","Είναι συνετό να παρακολουθείτε πληροφορίες που μπορείτε να χρησιμοποιήσετε εναντίον ανθρώπων αργότερα","DarkTriad-Machiavellianism","scale",1, null, null, false, true),
+                q("dt5","You should wait for the right time to get back at people","Θα πρέπει να περιμένετε τη σωστή στιγμή για να εκδικηθείτε ανθρώπους","DarkTriad-Machiavellianism","scale",1, null, null, false, true),
+                
+                q("dt6","People see me as a naturally superior person","Οι άνθρωποι με βλέπουν ως φυσικά ανώτερο άτομο","DarkTriad-Narcissism","scale",1, null, null, false, true),
+                q("dt7","I have a pretty high opinion of myself","Έχω αρκετά υψηλή γνώμη για τον εαυτό μου","DarkTriad-Narcissism","scale",1, null, null, false, true),
+                q("dt8","I deserve to be seen as a great personality","Αξίζω να θεωρούμαι μεγάλη προσωπικότητα","DarkTriad-Narcissism","scale",1, null, null, false, true),
+                q("dt9","I like to show off every now and then","Μου αρέσει να κάνω επίδειξη πού και πού","DarkTriad-Narcissism","scale",1, null, null, false, true),
+                q("dt10","I am a really special person","Είμαι πραγματικά ξεχωριστό άτομο","DarkTriad-Narcissism","scale",1, null, null, false, true),
+                
+                q("dt11","People often say I am out of control","Οι άνθρωποι συχνά λένε ότι είμαι εκτός ελέγχου","DarkTriad-Psychopathy","scale",1, null, null, false, true),
+                q("dt12","I tend to lack remorse","Τείνω να μην έχω τύψεις","DarkTriad-Psychopathy","scale",1, null, null, false, true),
+                q("dt13","I tend to not be too concerned with morality or the morality of my actions","Τείνω να μην με απασχολεί ιδιαίτερα η ηθική ή η ηθική των πράξεών μου","DarkTriad-Psychopathy","scale",1, null, null, false, true),
+                q("dt14","I tend to be callous or insensitive","Τείνω να είμαι άκαρδος ή αδιάφορος","DarkTriad-Psychopathy","scale",1, null, null, false, true),
+                q("dt15","I have a tendency to exploit others","Έχω τάση να εκμεταλλεύομαι τους άλλους","DarkTriad-Psychopathy","scale",1, null, null, false, true)
+            ];
+
+            // EMOTIONAL INTELLIGENCE (12 items)
+            const emotionalIntelligence = [
+                q("ei1","I can clearly identify what emotion I am feeling","Μπορώ να αναγνωρίσω καθαρά ποιο συναίσθημα νιώθω","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei2","I understand why I feel the way I do","Καταλαβαίνω γιατί νιώθω όπως νιώθω","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei3","I can control my emotions when I want to","Μπορώ να ελέγξω τα συναισθήματά μου όταν θέλω","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei4","I can calm myself down when I am stressed","Μπορώ να ηρεμήσω όταν είμαι αγχωμένος","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei5","I can cheer myself up when I am feeling down","Μπορώ να φτιάξω τη διάθεσή μου όταν είμαι πεσμένος","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei6","I can tell how others are feeling by their body language","Μπορώ να καταλάβω πώς νιώθουν οι άλλοι από τη γλώσσα του σώματός τους","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei7","I am sensitive to the emotions of those around me","Είμαι ευαίσθητος στα συναισθήματα αυτών γύρω μου","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei8","I can tell when someone is hiding their true feelings","Μπορώ να καταλάβω πότε κάποιος κρύβει τα αληθινά του συναισθήματα","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei9","I handle conflict with others effectively","Χειρίζομαι αποτελεσματικά τις συγκρούσεις με άλλους","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei10","I can influence others emotions positively","Μπορώ να επηρεάσω θετικά τα συναισθήματα των άλλων","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei11","I adapt my communication style to different people","Προσαρμόζω το στυλ επικοινωνίας μου σε διαφορετικούς ανθρώπους","EmotionalIntelligence","scale",1, null, null, false, true),
+                q("ei12","I build rapport easily with strangers","Χτίζω εύκολα σχέσεις με αγνώστους","EmotionalIntelligence","scale",1, null, null, false, true)
+            ];
+
+            // ADVANCED KINK/BDSM (15 items) - original
+            const advancedKink = [
+                q("k1","I am interested in exploring power exchange dynamics","Με ενδιαφέρει η εξερεύνηση δυναμικών ανταλλαγής εξουσίας","Kink-PowerExchange","scale",2, null, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k2","I enjoy taking control in sexual situations","Απολαμβάνω να παίρνω τον έλεγχο σε σεξουαλικές καταστάσεις","Kink-Dominance","scale",2, null, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k3","I enjoy being controlled or directed in sexual situations","Απολαμβάνω να ελέγχομαι ή να κατευθύνομαι σε σεξουαλικές καταστάσεις","Kink-Submission","scale",2, null, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k4","I am interested in bondage and restraint","Με ενδιαφέρει το δέσιμο και η συγκράτηση","Kink-Bondage","scale",2, null, null, false, true),
+                q("k5","I find sensory deprivation (blindfolds, etc.) exciting","Βρίσκω τη στέρηση αισθήσεων (μαντήλια κλπ.) συναρπαστική","Kink-Sensory","scale",2, null, null, false, true),
+                q("k6","I am curious about impact play (spanking, flogging)","Είμαι περίεργος για το impact play (χαστούκια, μαστίγωμα)","Kink-Impact","scale",2, null, null, false, true),
+                q("k7","I enjoy role-playing scenarios","Απολαμβάνω σενάρια παιχνιδιού ρόλων","Kink-Roleplay","scale",2, null, null, false, true),
+                q("k8","I am interested in consensual pain as part of intimacy","Με ενδιαφέρει ο συναινετικός πόνος ως μέρος της οικειότητας","Kink-Pain","scale",2, null, null, false, true),
+                q("k9","I find the idea of public or semi-public play exciting","Βρίσκω την ιδέα του δημόσιου ή ημιδημόσιου παιχνιδιού συναρπαστική","Kink-Exhibition","scale",2, null, null, false, true),
+                q("k10","I am interested in specific fetishes (leather, latex, etc.)","Με ενδιαφέρουν συγκεκριμένα φετίχ (δέρμα, latex κλπ.)","Kink-Fetish","scale",1, null, null, false, true),
+                q("k11","I enjoy degradation or humiliation in a consensual context","Απολαμβάνω τον εξευτελισμό ή την ταπείνωση σε συναινετικό πλαίσιο","Kink-Degradation","scale",2, null, null, false, true, null, null, 'complementary', {0:2,1:1,2:0}),
+                q("k12","I would be interested in a 24/7 power exchange relationship","Θα με ενδιέφερε μια σχέση ανταλλαγής εξουσίας 24/7","Kink-24_7","scale",2, null, null, false, true),
+                q("k13","I enjoy edge play or high-risk activities","Απολαμβάνω το edge play ή δραστηριότητες υψηλού ρίσκου","Kink-Edge","scale",2, null, null, false, true),
+                q("k14","I am interested in primal play or animal roleplay","Με ενδιαφέρει το primal play ή το ζωόμορφο παιχνίδι ρόλων","Kink-Primal","scale",1, null, null, false, true),
+                q("k15","Aftercare and emotional check-ins are essential to me","Η μεταφροντίδα και οι συναισθηματικοί έλεγχοι είναι απαραίτητοι για μένα","Kink-Aftercare","scale",2, null, null, false, true)
+            ];
+
+            // SIDI-BDSM (The Sexual Interest and Desire Inventory - BDSM) – 15 new items
+            const sidiBDSM = [
+                q("sidi1","I am aroused by the idea of being dominated (controlled, ordered) during sex","Με διεγείρει η ιδέα να κυριαρχούμαι (να ελέγχομαι, να διατάζομαι) κατά τη διάρκεια του σεξ","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi2","I am aroused by the idea of dominating (controlling, ordering) someone during sex","Με διεγείρει η ιδέα να κυριαρχώ (να ελέγχω, να διατάζω) κάποιον κατά τη διάρκεια του σεξ","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi3","I fantasize about being tied up or restrained","Φαντασιώνομαι να είμαι δεμένος ή περιορισμένος","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi4","I fantasize about tying up or restraining a partner","Φαντασιώνομαι να δένω ή να περιορίζω έναν σύντροφο","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi5","I enjoy giving pain (e.g., spanking, flogging) in a sexual context","Απολαμβάνω να προκαλώ πόνο (π.χ. χαστούκια, μαστίγωμα) σε σεξουαλικό πλαίσιο","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi6","I enjoy receiving pain (e.g., spanking, flogging) in a sexual context","Απολαμβάνω να δέχομαι πόνο (π.χ. χαστούκια, μαστίγωμα) σε σεξουαλικό πλαίσιο","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi7","I am interested in role-playing that involves power differences (e.g., teacher/student, boss/employee)","Με ενδιαφέρει το παιχνίδι ρόλων που περιλαμβάνει διαφορές εξουσίας (π.χ. δάσκαλος/μαθητής, αφεντικό/υπάλληλος)","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi8","I find the idea of being humiliated or degraded arousing","Βρίσκω την ιδέα του να ταπεινώνομαι ή να εξευτελίζομαι διεγερτική","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi9","I find the idea of humiliating or degrading someone arousing","Βρίσκω την ιδέα του να ταπεινώνω ή να εξευτελίζω κάποιον διεγερτική","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi10","I enjoy sensory play (e.g., blindfolds, wax, ice)","Απολαμβάνω το αισθητηριακό παιχνίδι (π.χ. μαντήλια, κερί, πάγος)","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi11","I am interested in exploring fetish objects (e.g., leather, latex, shoes)","Με ενδιαφέρει η εξερεύνηση φετιχιστικών αντικειμένων (π.χ. δέρμα, latex, παπούτσια)","SIDI-BDSM","scale",1, null, null, false, true),
+                q("sidi12","I enjoy public or semi-public sexual activities","Απολαμβάνω δημόσιες ή ημιδημόσιες σεξουαλικές δραστηριότητες","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi13","I am interested in edge play (activities involving risk, e.g., breath play, knife play)","Με ενδιαφέρει το edge play (δραστηριότητες που περιλαμβάνουν κίνδυνο, π.χ. παιχνίδι με την αναπνοή, μαχαίρια)","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi14","I value aftercare (emotional care after intense scenes) as an important part of BDSM","Εκτιμώ τη μεταφροντίδα (συναισθηματική φροντίδα μετά από έντονες σκηνές) ως σημαντικό μέρος του BDSM","SIDI-BDSM","scale",2, null, null, false, true),
+                q("sidi15","I have experience with or a strong desire to try BDSM activities","Έχω εμπειρία ή έντονη επιθυμία να δοκιμάσω δραστηριότητες BDSM","SIDI-BDSM","scale",2, null, null, false, true)
+            ];
+
+            // Assemble question pools
+            const essentialPool = [...bigFive, ...attachmentECR12, ...coreValues];
+            const deepPool = [...essentialPool, ...sociosexualSOIR, ...loveLanguages, ...conflictResolution];
+            const extremePool = [...deepPool, ...darkTriad, ...emotionalIntelligence, ...advancedKink, ...sidiBDSM];
+
+            const essentialMaster = essentialPool.sort((a,b) => a.id.localeCompare(b.id));
+            const deepMaster = deepPool.sort((a,b) => a.id.localeCompare(b.id));
+            const extremeMaster = extremePool.sort((a,b) => a.id.localeCompare(b.id));
+
+            // STATE
+            let state = {
+                questionCount: 60,
+                mode: 'solo',
+                userName: '',
+                userEmail: '',
+                partnerName: '',
+                partnerEmail: '',
+                activeMaster: essentialMaster,
+                presentation: [],
+                currentQuestionIndex: 0,
+                currentPlayer: 'user',
+                p1Answers: [],
+                p2Answers: [],
+            };
+
+            let checkUserAnswers = null;
+            let checkUserProfileId = '';
+            let checkUserEmail = null;
+            let checkPartnerAnswers = null;
+            let checkPartnerId = '';
+            let checkPartnerEmail = null;
+            let isNewCheckProfile = false;
+
+            // Block Randomization
+            function shuffleBlocks(questions) {
+                const blocks = {};
+                questions.forEach(q => {
+                    if (!blocks[q.category]) blocks[q.category] = [];
+                    blocks[q.category].push(q);
+                });
+                
+                for (let cat in blocks) {
+                    blocks[cat] = shuffle(blocks[cat]);
+                }
+                
+                const blockKeys = shuffle(Object.keys(blocks));
+                const result = [];
+                blockKeys.forEach(key => {
+                    result.push(...blocks[key]);
+                });
+                return result;
+            }
+
+            function shuffle(arr) {
+                let a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            // Particles
+            function initParticles() {
+                const container = document.getElementById('particles');
+                if (!container) return;
+                for(let i=0; i<20; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 15 + 's';
+                    p.style.animationDuration = (10 + Math.random() * 10) + 's';
+                    container.appendChild(p);
+                }
+            }
+            initParticles();
+
+            // Views
+            const views = {
+                intro: document.getElementById('view-intro'),
+                depth: document.getElementById('view-depth'),
+                mode: document.getElementById('view-mode'),
+                setup: document.getElementById('view-setup'),
+                check: document.getElementById('view-check'),
+                quiz: document.getElementById('view-quiz'),
+                processing: document.getElementById('view-processing'),
+                resultsSolo: document.getElementById('view-results-solo'),
+                resultsMatch: document.getElementById('view-results-match'),
+                resultsCheck: document.getElementById('view-results-check')
+            };
+
+            window.switchView = function(viewName) {
+                Object.values(views).forEach(el => {
+                    if (el) el.classList.add('hidden');
+                });
+                const target = views[viewName];
+                if (target) target.classList.remove('hidden');
+                
+                if (viewName === 'setup') {
+                    const passwordContainer = document.getElementById('extreme-password-container');
+                    if (passwordContainer) {
+                        if (state.questionCount === 120) {
+                            passwordContainer.classList.remove('hidden');
+                        } else {
+                            passwordContainer.classList.add('hidden');
+                        }
+                    }
+                    const err = document.getElementById('password-error');
+                    if (err) err.classList.add('hidden');
+                }
+                if (viewName === 'check') {
+                    const step1 = document.getElementById('check-step1');
+                    const userSec = document.getElementById('check-user-id-section');
+                    const idSec = document.getElementById('check-id-section');
+                    const err = document.getElementById('check-error');
+                    const loaded = document.getElementById('check-loaded-profile');
+                    if (step1) step1.classList.remove('hidden');
+                    if (userSec) userSec.classList.add('hidden');
+                    if (idSec) idSec.classList.add('hidden');
+                    if (err) err.classList.add('hidden');
+                    if (loaded) loaded.innerText = '';
+                }
+                if (viewName === 'resultsSolo') generateVisual('solo');
+                if (viewName === 'resultsMatch') generateVisual('match');
+                if (viewName === 'resultsCheck') generateVisual('check');
+            };
+
+            window.restartToMain = function() {
+                state = {
+                    questionCount: 60,
+                    mode: 'solo',
+                    userName: '',
+                    userEmail: '',
+                    partnerName: '',
+                    partnerEmail: '',
+                    activeMaster: essentialMaster,
+                    presentation: [],
+                    currentQuestionIndex: 0,
+                    currentPlayer: 'user',
+                    p1Answers: [],
+                    p2Answers: [],
+                };
+                checkUserAnswers = null;
+                checkUserProfileId = '';
+                checkUserEmail = null;
+                checkPartnerAnswers = null;
+                checkPartnerId = '';
+                checkPartnerEmail = null;
+                stopSound();
+                stopScanner();
+                switchView('intro');
+            };
+
+            window.startApp = function() { 
+                switchView('depth'); 
+            };
+
+            window.selectDepth = function(count) {
+                state.questionCount = count;
+                const btn60 = document.getElementById('btn-60');
+                const btn90 = document.getElementById('btn-90');
+                const btn120 = document.getElementById('btn-120');
+                if (btn60) btn60.classList.toggle('selected', count === 60);
+                if (btn90) btn90.classList.toggle('selected', count === 90);
+                if (btn120) btn120.classList.toggle('selected', count === 120);
+                const subtitle = document.getElementById('mode-subtitle');
+                if (subtitle) subtitle.innerText = count + (currentLang === 'en' ? ' questions • Choose your path' : ' ερωτήσεις • Διαλέξτε το μονοπάτι σας');
+                setTimeout(() => switchView('mode'), 400);
+            };
+
+            window.setMode = function(mode) {
+                state.mode = mode;
+                if (mode === 'check') {
+                    switchView('check');
+                } else {
+                    const partnerInput = document.getElementById('partner-input');
+                    if (partnerInput) partnerInput.classList.toggle('hidden', mode === 'solo');
+                    switchView('setup');
+                }
+            };
+
+            window.beginAssessment = function() {
+                const userName = document.getElementById('user-name').value.trim();
+                if (!userName) {
+                    alert(currentLang === 'en' ? "Please enter your name." : "Παρακαλώ εισάγετε το όνομά σας.");
+                    return;
+                }
+                state.userName = userName;
+                state.userEmail = document.getElementById('user-email').value.trim() || null;
+                
+                if (state.mode === 'match') {
+                    const partnerName = document.getElementById('partner-name').value.trim();
+                    if (!partnerName) {
+                        alert(currentLang === 'en' ? "Please enter partner's name." : "Παρακαλώ εισάγετε το όνομα του συντρόφου.");
+                        return;
+                    }
+                    state.partnerName = partnerName;
+                    state.partnerEmail = document.getElementById('partner-email').value.trim() || null;
+                }
+
+                if (state.questionCount === 120) {
+                    const passwordInput = document.getElementById('extreme-password').value;
+                    if (passwordInput !== EXTREME_PASSWORD) {
+                        const err = document.getElementById('password-error');
+                        if (err) err.classList.remove('hidden');
+                        return;
+                    }
+                }
+
+                if (state.questionCount === 60) state.activeMaster = essentialMaster;
+                else if (state.questionCount === 90) state.activeMaster = deepMaster;
+                else state.activeMaster = extremeMaster;
+
+                state.presentation = shuffleBlocks(state.activeMaster);
+                state.currentQuestionIndex = 0;
+                state.p1Answers = [];
+                state.p2Answers = [];
+                state.currentPlayer = 'user';
+
+                renderQuestion();
+                switchView('quiz');
+            };
+
+            function renderQuestion() {
+                const index = state.currentQuestionIndex;
+                const total = state.presentation.length;
+                const counter = document.getElementById('q-counter');
+                const bar = document.getElementById('progress-bar');
+                const qText = document.getElementById('q-text');
+                const catDisplay = document.getElementById('q-category-display');
+                const deepBadge = document.getElementById('q-deep');
+                const extremeBadge = document.getElementById('q-extreme');
+                const container = document.getElementById('options-container');
+                const indicator = document.getElementById('player-indicator');
+
+                if (counter) counter.innerText = (index+1) + ' / ' + total;
+                if (bar) bar.style.width = ((index) / total * 100) + '%';
+                
+                const q = state.presentation[index];
+                if (!q) return;
+                
+                // Choose language
+                qText.innerText = currentLang === 'en' ? q.text_en : q.text_el;
+                if (catDisplay) {
+                    let displayCat = q.category;
+                    if (displayCat.includes('Attachment')) displayCat = currentLang === 'en' ? 'Attachment' : 'Προσκόλληση';
+                    if (displayCat.includes('LoveLanguage')) displayCat = currentLang === 'en' ? 'Love Language' : 'Γλώσσα Αγάπης';
+                    if (displayCat.includes('SIDI-BDSM')) displayCat = 'SIDI-BDSM';
+                    catDisplay.innerText = displayCat;
+                }
+                
+                if (deepBadge) deepBadge.classList.toggle('hidden', !q.isDeep);
+                if (extremeBadge) extremeBadge.classList.toggle('hidden', !q.isExtreme);
+                
+                if (container) {
+                    container.innerHTML = '';
+                    
+                    if (q.type === 'scale') {
+                        const scaleLabels = currentLang === 'en' 
+                            ? ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
+                            : ['Διαφωνώ Απόλυτα', 'Διαφωνώ', 'Ουδέτερο', 'Συμφωνώ', 'Συμφωνώ Απόλυτα'];
+                        for (let i = 1; i <= 5; i++) {
+                            const btn = document.createElement('button');
+                            btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
+                            btn.innerText = i + ' - ' + scaleLabels[i-1];
+                            btn.onclick = function() { selectAnswer(i); };
+                            container.appendChild(btn);
+                        }
+                    } else if (q.options_en) {
+                        const options = currentLang === 'en' ? q.options_en : q.options_el;
+                        options.forEach(function(opt, idx) {
+                            const btn = document.createElement('button');
+                            btn.className = 'option-card p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/15 transition-all text-left';
+                            btn.innerText = opt;
+                            btn.onclick = function() { selectAnswer(idx); };
+                            container.appendChild(btn);
+                        });
+                    }
+                }
+                
+                if (indicator) {
+                    if (state.mode === 'match') {
+                        indicator.innerText = (state.currentPlayer === 'user' ? state.userName + (currentLang === 'en' ? ' (You) answering' : ' (Εσείς) απαντά') : state.partnerName + (currentLang === 'en' ? ' answering' : ' απαντά'));
+                    } else {
+                        indicator.innerText = state.userName + (currentLang === 'en' ? ' answering' : ' απαντά');
+                    }
+                }
+            }
+
+            function selectAnswer(value) {
+                const index = state.currentQuestionIndex;
+                const q = state.presentation[index];
+                
+                let processedValue = value;
+                if (q.reverseScored) {
+                    if (q.type === 'scale') {
+                        processedValue = 6 - value;
+                    }
+                }
+                
+                if (state.mode === 'match') {
+                    if (state.currentPlayer === 'user') {
+                        state.p1Answers.push({ questionId: q.id, answer: processedValue, rawAnswer: value });
+                    } else {
+                        state.p2Answers.push({ questionId: q.id, answer: processedValue, rawAnswer: value });
+                    }
+                } else {
+                    state.p1Answers.push({ questionId: q.id, answer: processedValue, rawAnswer: value });
+                }
+                
+                if (index + 1 < state.presentation.length) {
+                    state.currentQuestionIndex++;
+                    renderQuestion();
+                } else {
+                    if (state.mode === 'match' && state.currentPlayer === 'user') {
+                        state.currentPlayer = 'partner';
+                        state.currentQuestionIndex = 0;
+                        renderQuestion();
+                    } else {
+                        finishQuiz();
+                    }
+                }
+            }
+
+            function finishQuiz() {
+                switchView('processing');
+                
+                setTimeout(function() {
+                    if (state.mode === 'solo') {
+                        const scores = computeCategoryScores(state.p1Answers, state.presentation);
+                        const attachment = computeAttachmentScores(state.p1Answers);
+                        displaySoloResults(scores, attachment);
+                    } else if (state.mode === 'match') {
+                        const scores1 = computeCategoryScores(state.p1Answers, state.presentation);
+                        const scores2 = computeCategoryScores(state.p2Answers, state.presentation);
+                        const attach1 = computeAttachmentScores(state.p1Answers);
+                        const attach2 = computeAttachmentScores(state.p2Answers);
+                        displayMatchResults(scores1, scores2, attach1, attach2);
+                    } else if (state.mode === 'check') {
+                        checkUserAnswers = state.p1Answers.slice();
+                        const profileId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
+                        checkUserProfileId = profileId;
+                        checkUserEmail = state.userEmail;
+                        
+                        switchView('check');
+                        const step1 = document.getElementById('check-step1');
+                        const userSec = document.getElementById('check-user-id-section');
+                        const idSec = document.getElementById('check-id-section');
+                        const userInput = document.getElementById('check-user-id');
+                        const loaded = document.getElementById('check-loaded-profile');
+                        if (step1) step1.classList.add('hidden');
+                        if (userSec) userSec.classList.remove('hidden');
+                        if (idSec) idSec.classList.remove('hidden');
+                        if (userInput) userInput.value = profileId;
+                        if (loaded) loaded.innerText = (currentLang === 'en' ? 'Profile loaded for ' : 'Προφίλ φορτώθηκε για ') + state.userName;
+                        const err = document.getElementById('check-error');
+                        if (err) err.classList.add('hidden');
+                    }
+                }, 1500);
+            }
+
+            // Scoring Functions
+            function computeCategoryScores(answers, questions) {
+                const catMap = {};
+                const catCount = {};
+                const qMap = {};
+                questions.forEach(function(q) { qMap[q.id] = q; });
+                
+                answers.forEach(function(ans) {
+                    const q = qMap[ans.questionId];
+                    if (!q) return;
+                    const cat = q.category || 'Other';
+                    if (!catMap[cat]) { catMap[cat] = 0; catCount[cat] = 0; }
+                    
+                    let normalized;
+                    if (q.type === 'scale') {
+                        normalized = (ans.answer - 1) * 25;
+                    } else if (q.options_en) {
+                        normalized = (ans.answer / (q.options_en.length - 1)) * 100;
+                    } else {
+                        normalized = ans.answer * 25;
+                    }
+                    
+                    catMap[cat] += normalized;
+                    catCount[cat]++;
+                });
+                
+                const scores = {};
+                for (let cat in catMap) {
+                    scores[cat] = Math.round(catMap[cat] / catCount[cat]);
+                }
+                return scores;
+            }
+
+            function computeAttachmentScores(answers) {
+                const qMap = {};
+                essentialMaster.forEach(function(q) { qMap[q.id] = q; });
+                
+                let anxietySum = 0, anxietyCount = 0;
+                let avoidanceSum = 0, avoidanceCount = 0;
+                
+                answers.forEach(function(ans) {
+                    const q = qMap[ans.questionId];
+                    if (!q) return;
+                    
+                    if (q.category === 'Attachment-Anxiety') {
+                        anxietySum += ans.answer;
+                        anxietyCount++;
+                    } else if (q.category === 'Attachment-Avoidance') {
+                        avoidanceSum += ans.answer;
+                        avoidanceCount++;
+                    }
+                });
+                
+                const anxiety = anxietyCount > 0 ? (anxietySum / anxietyCount) : 3;
+                const avoidance = avoidanceCount > 0 ? (avoidanceSum / avoidanceCount) : 3;
+                
+                let style = currentLang === 'en' ? 'Secure' : 'Ασφαλής';
+                if (anxiety < 2.5 && avoidance < 2.5) style = currentLang === 'en' ? 'Secure' : 'Ασφαλής';
+                else if (anxiety >= 2.5 && avoidance < 2.5) style = currentLang === 'en' ? 'Anxious-Preoccupied' : 'Αγχώδης-Απασχολημένος';
+                else if (anxiety < 2.5 && avoidance >= 2.5) style = currentLang === 'en' ? 'Dismissive-Avoidant' : 'Απορριπτικός-Αποφευκτικός';
+                else style = currentLang === 'en' ? 'Fearful-Avoidant' : 'Φοβισμένος-Αποφευκτικός';
+                
+                return { anxiety: anxiety, avoidance: avoidance, style: style };
+            }
+
+            function computeLoveLanguage(answers) {
+                const languages = {
+                    'LoveLanguage-Gifts': 0,
+                    'LoveLanguage-Time': 0,
+                    'LoveLanguage-Words': 0,
+                    'LoveLanguage-Touch': 0,
+                    'LoveLanguage-Service': 0
+                };
+                const counts = {};
+                
+                const qMap = {};
+                deepMaster.forEach(q => qMap[q.id] = q);
+                
+                answers.forEach(ans => {
+                    const q = qMap[ans.questionId];
+                    if (!q || !q.category.startsWith('LoveLanguage')) return;
+                    
+                    if (!counts[q.category]) counts[q.category] = 0;
+                    languages[q.category] += ans.answer;
+                    counts[q.category]++;
+                });
+                
+                let maxScore = 0;
+                let primary = currentLang === 'en' ? 'Unknown' : 'Άγνωστο';
+                
+                for (let lang in languages) {
+                    if (counts[lang]) {
+                        languages[lang] /= counts[lang];
+                        if (languages[lang] > maxScore) {
+                            maxScore = languages[lang];
+                            primary = lang.replace('LoveLanguage-', '');
+                            if (currentLang === 'el') {
+                                // Translate primary language names
+                                const translations = {
+                                    'Gifts': 'Δώρα',
+                                    'Time': 'Χρόνος',
+                                    'Words': 'Λέξεις',
+                                    'Touch': 'Αφή',
+                                    'Service': 'Υπηρεσία'
+                                };
+                                primary = translations[primary] || primary;
+                            }
+                        }
+                    }
+                }
+                
+                return { primary: primary, scores: languages };
+            }
+
+            // Dimensional Compatibility Algorithm
+            function calculateDimensionalCompatibility(answers1, answers2, questions) {
+                const dimensions = {
+                    bigFive: { weight: 0.30, score: 0 },
+                    attachment: { weight: 0.25, score: 0 },
+                    values: { weight: 0.20, score: 0 },
+                    sociosexual: { weight: 0.15, score: 0 },
+                    communication: { weight: 0.10, score: 0 },
+                    kink: { weight: 0.10, score: 0 } // Includes SIDI-BDSM
+                };
+                
+                const qMap = {};
+                questions.forEach(q => qMap[q.id] = q);
+                
+                const a1 = {}, a2 = {};
+                answers1.forEach(a => a1[a.questionId] = a.answer);
+                answers2.forEach(a => a2[a.questionId] = a.answer);
+                
+                // Big Five (similarity-based)
+                const bigFiveCats = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+                let bigFiveScore = 0;
+                let bigFiveCount = 0;
+                
+                bigFiveCats.forEach(cat => {
+                    const catQuestions = questions.filter(q => q.category === cat);
+                    if (catQuestions.length === 0) return;
+                    
+                    let catScore = 0;
+                    catQuestions.forEach(q => {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        catScore += 1 - (diff / maxDiff);
+                    });
+                    
+                    bigFiveScore += catScore / catQuestions.length;
+                    bigFiveCount++;
+                });
+                
+                if (bigFiveCount > 0) dimensions.bigFive.score = bigFiveScore / bigFiveCount;
+                
+                // Attachment (similarity-based)
+                const attach1 = computeAttachmentScores(answers1);
+                const attach2 = computeAttachmentScores(answers2);
+                
+                const anxietyDiff = Math.abs(attach1.anxiety - attach2.anxiety);
+                const avoidanceDiff = Math.abs(attach1.avoidance - attach2.avoidance);
+                const attachDistance = Math.sqrt(Math.pow(anxietyDiff/4, 2) + Math.pow(avoidanceDiff/4, 2));
+                dimensions.attachment.score = Math.max(0, 1 - attachDistance);
+                
+                // Values (similarity-based)
+                const valueCats = ['Values', 'Lifestyle', 'Intimacy'];
+                let valuesScore = 0;
+                let valuesCount = 0;
+                
+                valueCats.forEach(cat => {
+                    const catQuestions = questions.filter(q => q.category === cat);
+                    if (catQuestions.length === 0) return;
+                    
+                    let catScore = 0;
+                    let catWeight = 0;
+                    
+                    catQuestions.forEach(q => {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        catScore += (1 - (diff / maxDiff)) * q.weight;
+                        catWeight += q.weight;
+                    });
+                    
+                    if (catWeight > 0) {
+                        valuesScore += catScore / catWeight;
+                        valuesCount++;
+                    }
+                });
+                
+                if (valuesCount > 0) dimensions.values.score = valuesScore / valuesCount;
+                
+                // Sociosexual (similarity-based)
+                const soiCats = ['SOI-Behavior', 'SOI-Attitude', 'SOI-Desire'];
+                let soiScore = 0;
+                let soiCount = 0;
+                
+                soiCats.forEach(cat => {
+                    const catQuestions = questions.filter(q => q.category === cat);
+                    if (catQuestions.length === 0) return;
+                    
+                    let catScore = 0;
+                    catQuestions.forEach(q => {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        catScore += 1 - (diff / maxDiff);
+                    });
+                    
+                    if (catQuestions.length > 0) {
+                        soiScore += catScore / catQuestions.length;
+                        soiCount++;
+                    }
+                });
+                
+                if (soiCount > 0) dimensions.sociosexual.score = soiScore / soiCount;
+                
+                // Communication (similarity-based)
+                const conflictQuestions = questions.filter(q => q.category === 'Conflict-Resolution');
+                if (conflictQuestions.length > 0) {
+                    let conflictScore = 0;
+                    conflictQuestions.forEach(q => {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        const diff = Math.abs(v1 - v2);
+                        const maxDiff = 4;
+                        conflictScore += 1 - (diff / maxDiff);
+                    });
+                    dimensions.communication.score = conflictScore / conflictQuestions.length;
+                }
+                
+                // KINK/COMPLEMENTARY TRAITS (complementary-based) including SIDI-BDSM
+                const kinkQuestions = questions.filter(q => (q.category.startsWith('Kink-') || q.category === 'SIDI-BDSM') && q.complementaryMap);
+                if (kinkQuestions.length > 0) {
+                    let kinkScore = 0;
+                    let kinkCount = 0;
+                    
+                    kinkQuestions.forEach(q => {
+                        const v1 = a1[q.id], v2 = a2[q.id];
+                        if (v1 === undefined || v2 === undefined) return;
+                        
+                        // Use complementaryMap if available
+                        if (q.complementaryMap) {
+                            // Map v1 (1-5) to preferred complementary value (0-2)
+                            const mappedIndex = Math.min(Math.max(Math.round(v1 - 1), 0), 2);
+                            const preferredV2 = q.complementaryMap[mappedIndex];
+                            
+                            if (preferredV2 !== undefined) {
+                                const p2 = Math.min(Math.max(Math.round(v2 - 1), 0), 2);
+                                const diff = Math.abs(p2 - preferredV2);
+                                kinkScore += 1 - diff * 0.5; // perfect = 1, off by 1 = 0.5, off by 2 = 0
+                            } else {
+                                // fallback to similarity
+                                const diff = Math.abs(v1 - v2);
+                                kinkScore += 1 - (diff / 4);
+                            }
+                        } else {
+                            const diff = Math.abs(v1 - v2);
+                            kinkScore += 1 - (diff / 4);
+                        }
+                        kinkCount++;
+                    });
+                    
+                    if (kinkCount > 0) {
+                        dimensions.kink.score = kinkScore / kinkCount;
+                    }
+                } else {
+                    // If no kink questions, redistribute weight to other dimensions
+                    dimensions.kink.weight = 0;
+                }
+                
+                // Calculate weighted overall score
+                let overall = 0;
+                let totalWeight = 0;
+                
+                for (let dim in dimensions) {
+                    overall += dimensions[dim].score * dimensions[dim].weight;
+                    totalWeight += dimensions[dim].weight;
+                }
+                
+                const rawOverall = overall / totalWeight;
+                
+                return {
+                    overall: Math.round(rawOverall * 100),
+                    rawOverall: rawOverall, // Keep raw for threshold checks
+                    dimensions: {
+                        bigFive: Math.round(dimensions.bigFive.score * 100),
+                        attachment: Math.round(dimensions.attachment.score * 100),
+                        values: Math.round(dimensions.values.score * 100),
+                        sociosexual: Math.round(dimensions.sociosexual.score * 100),
+                        communication: Math.round(dimensions.communication.score * 100),
+                        kink: Math.round(dimensions.kink.score * 100)
+                    },
+                    attachment: { attach1: attach1, attach2: attach2 }
+                };
+            }
+            function displayCheckResults(scores1, scores2, name1, name2) {
+                const p1 = document.getElementById('check-res-p1');
+                const p2 = document.getElementById('check-res-p2');
+                if (p1) p1.innerText = name1;
+                if (p2) p2.innerText = name2;
+                
+                const compat = calculateDimensionalCompatibility(checkUserAnswers, checkPartnerAnswers, essentialMaster);
+                
+                const verdict = document.getElementById('check-verdict');
+                const sub = document.getElementById('check-verdict-sub');
+                if (verdict) verdict.innerText = compat.overall + '%';
+                if (sub) {
+                    const desc = compat.overall > 80 ? 'High resonance' : 
+                                compat.overall > 65 ? 'Good compatibility' : 
+                                compat.overall > 50 ? 'Moderate potential' : 
+                                compat.overall > 35 ? 'Significant work needed' : 'Low compatibility';
+                    sub.innerText = desc;
+                }
+                
+                const breakdown = document.getElementById('check-dimensional-breakdown');
+                if (breakdown) {
+                    breakdown.innerHTML = '<div class="flex justify-between text-sm"><span>Big Five Personality</span><span class="text-pink-300">' + compat.dimensions.bigFive + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-pink-500 h-1 rounded" style="width:' + compat.dimensions.bigFive + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Attachment Styles</span><span class="text-purple-300">' + compat.dimensions.attachment + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-purple-500 h-1 rounded" style="width:' + compat.dimensions.attachment + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Core Values</span><span class="text-emerald-300">' + compat.dimensions.values + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-emerald-500 h-1 rounded" style="width:' + compat.dimensions.values + '%"></div></div>';
+                }
+                
+                buildBarChart('check-bar-chart', scores2);
+                
+                const emailArea = document.getElementById('email-reveal-area');
+                const emailSpan = document.getElementById('revealed-email');
+               if (compat.rawOverall > 0.75 && checkPartnerEmail) {
+                    emailArea.classList.remove('hidden');
+                    emailSpan.innerText = checkPartnerEmail;
+                } else {
+                    emailArea.classList.add('hidden');
+                }
+                
+                const bridgeContainer = document.getElementById('check-bridge-container');
+                if (bridgeContainer) {
+                    bridgeContainer.innerHTML = '';
+                    const dims = [
+                        { name: 'Personality', score: compat.dimensions.bigFive },
+                        { name: 'Attachment', score: compat.dimensions.attachment },
+                        { name: 'Values', score: compat.dimensions.values }
+                    ];
+                    
+                    const weakDims = dims.filter(function(d) { return d.score < 60; }).sort(function(a,b) { return a.score - b.score; });
+                    
+                    if (weakDims.length > 0) {
+                        weakDims.forEach(function(d) {
+                            bridgeContainer.innerHTML += '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Focus area: ' + d.name + ' compatibility (' + d.score + '%) – explore this topic together.</div>';
+                        });
+                    } else {
+                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 text-xs">Strong alignment across all key dimensions!</div>';
+                    }
+                }
+                
+                switchView('resultsCheck');
+            }
+window.displayCheckResults = displayCheckResults;
+
+            // Display Functions
+            function buildBarChart(containerId, scores) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '';
+                
+                const priority = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+                const sortedCats = Object.keys(scores).sort(function(a,b) {
+                    const aIdx = priority.indexOf(a);
+                    const bIdx = priority.indexOf(b);
+                    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+                    if (aIdx !== -1) return -1;
+                    if (bIdx !== -1) return 1;
+                    return a.localeCompare(b);
+                });
+                
+                sortedCats.forEach(function(cat) {
+                    let displayCat = cat;
+                    if (cat === 'Conscientiousness') displayCat = currentLang === 'en' ? 'Conscient.' : 'Συνείδηση';
+                    if (cat === 'Openness') displayCat = currentLang === 'en' ? 'Openness' : 'Δεκτικότητα';
+                    if (cat === 'Extraversion') displayCat = currentLang === 'en' ? 'Extraversion' : 'Εξωστρέφεια';
+                    if (cat === 'Agreeableness') displayCat = currentLang === 'en' ? 'Agreeableness' : 'Προσήνεια';
+                    if (cat === 'Neuroticism') displayCat = currentLang === 'en' ? 'Neuroticism' : 'Νευρωτισμός';
+                    
+                    const val = scores[cat];
+                    const item = document.createElement('div');
+                    item.className = 'bar-item';
+                    
+                    let barColor = 'linear-gradient(90deg, #f472b6, #a855f7)';
+                    if (cat === 'Neuroticism') {
+                        barColor = 'linear-gradient(90deg, #fbbf24, #f59e0b)';
+                    }
+                    
+                    item.innerHTML = '<span class="bar-label">' + displayCat + '</span><div class="bar-track"><div class="bar-fill" style="width:' + val + '%; background: ' + barColor + '"></div></div><span class="bar-value">' + val + '%</span>';
+                    container.appendChild(item);
+                });
+            }
+
+            function displaySoloResults(scores, attachment) {
+                const label = document.getElementById('solo-mode-label');
+                if (label) label.innerText = state.questionCount + (currentLang === 'en' ? ' questions • BFI-2 + ECR-12 Profile' : ' ερωτήσεις • Προφίλ BFI-2 + ECR-12');
+                
+                const baseId = 'RS-' + Math.random().toString(36).substring(2,10).toUpperCase();
+                const idEl = document.getElementById('solo-id');
+                if (idEl) idEl.innerText = baseId;
+                
+                const fullString = state.userEmail ? baseId + ':' + btoa(state.userEmail) : baseId;
+                
+                const qr = qrcode(0, 'H');
+                qr.addData(fullString);
+                qr.make();
+                const canvas = document.getElementById('solo-qrcode');
+                if (canvas) {
+                    canvas.width = 150;
+                    canvas.height = 150;
+                    const ctx = canvas.getContext('2d');
+                    const cellSize = 150 / qr.getModuleCount();
+                    for (let row = 0; row < qr.getModuleCount(); row++) {
+                        for (let col = 0; col < qr.getModuleCount(); col++) {
+                            ctx.fillStyle = qr.isDark(row, col) ? '#f472b6' : 'transparent';
+                            ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+                
+                buildBarChart('solo-bar-chart', scores);
+                // Populate the "What do these scores mean?" legend
+                populateSoloLegend(scores, attachment);
+
+                // Detect and display hidden psychological patterns
+                const hiddenTraits = detectHiddenTraits(scores, state.p1Answers, state.presentation);
+                const traitsContainer = document.getElementById('traits-container');
+                const hiddenTraitsSection = document.getElementById('hidden-traits');
+
+                if (hiddenTraits.length > 0 && traitsContainer && hiddenTraitsSection) {
+                    traitsContainer.innerHTML = '';
+                    hiddenTraits.forEach(trait => {
+                        traitsContainer.innerHTML += `
+                            <div class="hidden-trait">
+                                <h4 class="text-pink-300 font-bold text-sm mb-1">${trait.name}</h4>
+                                <p class="text-xs opacity-80 leading-relaxed">${trait.desc}</p>
+                            </div>
+                        `;
+                    });
+                    hiddenTraitsSection.classList.remove('hidden');
+                } else if (hiddenTraitsSection) {
+                    hiddenTraitsSection.classList.add('hidden');
+                }
+                const anxietyEl = document.getElementById('attach-anxiety');
+                const avoidanceEl = document.getElementById('attach-avoidance');
+                const styleEl = document.getElementById('attach-style');
+                
+                if (anxietyEl) anxietyEl.innerText = attachment.anxiety.toFixed(2);
+                if (avoidanceEl) avoidanceEl.innerText = attachment.avoidance.toFixed(2);
+                if (styleEl) styleEl.innerText = (currentLang === 'en' ? 'Attachment Style: ' : 'Στυλ Προσκόλλησης: ') + attachment.style;
+                
+                if (state.questionCount >= 90) {
+                    const loveLang = computeLoveLanguage(state.p1Answers);
+                    const llSection = document.getElementById('love-languages-section');
+                    const llPrimary = document.getElementById('primary-love-language');
+                    if (llSection) llSection.classList.remove('hidden');
+                    if (llPrimary) llPrimary.innerText = loveLang.primary;
+                }
+                
+                const desc = generatePersonalityDescription(scores, state.userName);
+                const summary = document.getElementById('solo-personality-summary');
+                if (summary) summary.innerText = desc;
+                
+                const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
+                if (copyBtn) {
+                    copyBtn.dataset.fullString = fullString;
+                }
+                
+                switchView('resultsSolo');
+            }
+
+            function detectHiddenTraits(scores, answers, questions) {
+                const traits = [];
+                const qMap = {};
+                questions.forEach(q => qMap[q.id] = q);
+                
+                // Trait 1: High Sensitivity (High Neuroticism + High Openness)
+                if (scores['Neuroticism'] > 70 && scores['Openness'] > 70) {
+                    traits.push({
+                        name: currentLang === 'en' ? "The Creative Worrier" : "Ο Δημιουργικός Αγχώδης",
+                        desc: currentLang === 'en' ? "High emotional depth combined with vivid imagination creates rich inner worlds but potential anxiety spirals." : "Το υψηλό συναισθηματικό βάθος σε συνδυασμό με ζωηρή φαντασία δημιουργεί πλούσιους εσωτερικούς κόσμους αλλά πιθανές σπείρες άγχους.",
+                        color: "purple"
+                    });
+                }
+                
+                // Trait 2: Controlled Chaos (Low Conscientiousness + High Extraversion)
+                if (scores['Conscientiousness'] < 35 && scores['Extraversion'] > 65) {
+                    traits.push({
+                        name: currentLang === 'en' ? "Spontaneous Catalyst" : "Αυθόρμητος Καταλύτης",
+                        desc: currentLang === 'en' ? "You generate energy and ideas but may struggle with follow-through. Partners often become the 'organizer'." : "Δημιουργείτε ενέργεια και ιδέες αλλά μπορεί να δυσκολεύεστε με την ολοκλήρωση. Οι σύντροφοι συχνά γίνονται οι 'διοργανωτές'.",
+                        color: "pink"
+                    });
+                }
+                
+                // Trait 3: Warm Strategist (High Agreeableness + High Conscientiousness)
+                if (scores['Agreeableness'] > 70 && scores['Conscientiousness'] > 70) {
+                    traits.push({
+                        name: currentLang === 'en' ? "The Reliable Anchor" : "Η Αξιόπιστη Άγκυρα",
+                        desc: currentLang === 'en' ? "Others depend on your consistency and care. Be mindful of resentment from unvoiced needs." : "Οι άλλοι βασίζονται στη συνέπεια και τη φροντίδα σας. Προσέξτε την πικρία από ανέκφραστες ανάγκες.",
+                        color: "emerald"
+                    });
+                }
+                
+                // Trait 4: Detached Observer (Low Extraversion + Low Agreeableness)
+                if (scores['Extraversion'] < 35 && scores['Agreeableness'] < 45) {
+                    traits.push({
+                        name: currentLang === 'en' ? "Sovereign Self" : "Κυρίαρχος Εαυτός",
+                        desc: currentLang === 'en' ? "You value autonomy and truth over harmony. Direct communication is essential with partners." : "Εκτιμάτε την αυτονομία και την αλήθεια πάνω από την αρμονία. Η άμεση επικοινωνία είναι απαραίτητη με τους συντρόφους.",
+                        color: "slate"
+                    });
+                }
+                
+                // Trait 5: Anxious-Avoidant Trap (High Anxiety + High Avoidance)
+                const attach = computeAttachmentScores(answers);
+                if (attach.anxiety > 3.5 && attach.avoidance > 3.5) {
+                    traits.push({
+                        name: currentLang === 'en' ? "The Approach-Avoid Dance" : "Ο Χορός Προσέγγισης-Αποφυγής",
+                        desc: currentLang === 'en' ? "You crave closeness but fear it simultaneously. This creates push-pull dynamics in relationships." : "Λαχταράτε την εγγύτητα αλλά ταυτόχρονα τη φοβάστε. Αυτό δημιουργεί δυναμικές ώθησης-έλξης στις σχέσεις.",
+                        color: "red"
+                    });
+                }
+                
+                // Trait 6: Secure Base (Low Anxiety + Low Avoidance)
+                if (attach.anxiety < 2.5 && attach.avoidance < 2.5) {
+                    traits.push({
+                        name: currentLang === 'en' ? "The Secure Harbor" : "Το Ασφαλές Λιμάνι",
+                        desc: currentLang === 'en' ? "Rare combination of low anxiety and comfort with intimacy. You likely had consistent early caregivers." : "Σπάνιος συνδυασμός χαμηλού άγχους και άνεσης με την οικειότητα. Πιθανόν είχατε συνεπείς φροντιστές στην πρώιμη ζωή.",
+                        color: "teal"
+                    });
+                }
+                
+                // Trait 7: Opposite Values Conflict (Deep mode only)
+                if (state.questionCount >= 90) {
+                    const loveLang = computeLoveLanguage(answers);
+                    if (loveLang.scores) {
+                        const scores = Object.values(loveLang.scores);
+                        const max = Math.max(...scores);
+                        const min = Math.min(...scores);
+                        if (max - min < 0.5) {
+                            traits.push({
+                                name: currentLang === 'en' ? "Love Language Universalist" : "Οικουμενικός στις Γλώσσες Αγάπης",
+                                desc: currentLang === 'en' ? "You appreciate all forms of affection equally—flexible, but may confuse partners who have strong preferences." : "Εκτιμάτε όλες τις μορφές στοργής εξίσου—ευέλικτο, αλλά μπορεί να μπερδεύει συντρόφους με ισχυρές προτιμήσεις.",
+                                color: "amber"
+                            });
+                        }
+                    }
+                }
+                
+                // Trait 8: Dark Triad Risk (Extreme mode only)
+                if (state.questionCount === 120) {
+                    const darkTriadCats = ['DarkTriad-Machiavellianism', 'DarkTriad-Narcissism', 'DarkTriad-Psychopathy'];
+                    let darkTotal = 0;
+                    darkTriadCats.forEach(cat => {
+                        if (scores[cat]) darkTotal += scores[cat];
+                    });
+                    if (darkTotal / 3 > 70) {
+                        traits.push({
+                            name: currentLang === 'en' ? "High Dark Triad Profile" : "Υψηλό Προφίλ Σκοτεινής Τριάδας",
+                            desc: currentLang === 'en' ? "Above-average scores in manipulation, grandiosity, or callousness. May indicate strategic mating approach." : "Υψηλότερες του μέσου όρου βαθμολογίες σε χειραγώγηση, μεγαλοπρέπεια ή αναισθησία. Μπορεί να υποδηλώνει στρατηγική προσέγγιση συντρόφων.",
+                            color: "rose"
+                        });
+                    }
+                }
+                
+                return traits;
+            }
+
+            function displayMatchResults(scores1, scores2, attach1, attach2) {
+                const p1 = document.getElementById('res-p1');
+                const p2 = document.getElementById('res-p2');
+                if (p1) p1.innerText = state.userName || (currentLang === 'en' ? 'You' : 'Εσείς');
+                if (p2) p2.innerText = state.partnerName || (currentLang === 'en' ? 'Partner' : 'Σύντροφος');
+
+                const compat = calculateDimensionalCompatibility(state.p1Answers, state.p2Answers, state.presentation);
+
+                const scoreEl = document.getElementById('match-potential-score');
+                const descEl = document.getElementById('match-potential-desc');
+                if (scoreEl) scoreEl.innerText = compat.overall + '%';
+                if (descEl) {
+                    const desc = compat.overall > 80 ? (currentLang === 'en' ? 'Exceptional alignment' : 'Εξαιρετική ευθυγράμμιση') :
+                                compat.overall > 65 ? (currentLang === 'en' ? 'Strong compatibility' : 'Ισχυρή συμβατότητα') :
+                                compat.overall > 50 ? (currentLang === 'en' ? 'Moderate resonance' : 'Μέτριος συντονισμός') :
+                                compat.overall > 35 ? (currentLang === 'en' ? 'Significant differences' : 'Σημαντικές διαφορές') : (currentLang === 'en' ? 'Challenging alignment' : 'Δύσκολη ευθυγράμμιση');
+                    descEl.innerText = desc;
+                }
+
+                const breakdown = document.getElementById('dimensional-breakdown');
+                if (breakdown) {
+                    let html = `
+                        <div class="flex justify-between text-sm"><span>${currentLang === 'en' ? 'Big Five Personality' : 'Προσωπικότητα Big Five'}</span><span class="text-pink-300">${compat.dimensions.bigFive}%</span></div>
+                        <div class="w-full bg-white/10 h-1 rounded"><div class="bg-pink-500 h-1 rounded" style="width:${compat.dimensions.bigFive}%"></div></div>
+                        <div class="flex justify-between text-sm mt-2"><span>${currentLang === 'en' ? 'Attachment Styles' : 'Στυλ Προσκόλλησης'}</span><span class="text-purple-300">${compat.dimensions.attachment}%</span></div>
+                        <div class="w-full bg-white/10 h-1 rounded"><div class="bg-purple-500 h-1 rounded" style="width:${compat.dimensions.attachment}%"></div></div>
+                        <div class="flex justify-between text-sm mt-2"><span>${currentLang === 'en' ? 'Core Values' : 'Βασικές Αξίες'}</span><span class="text-emerald-300">${compat.dimensions.values}%</span></div>
+                        <div class="w-full bg-white/10 h-1 rounded"><div class="bg-emerald-500 h-1 rounded" style="width:${compat.dimensions.values}%"></div></div>
+                    `;
+                    
+                    // Deep mode dimensions (90+)
+                    if (state.questionCount >= 90) {
+                        html += `
+                            <div class="flex justify-between text-sm mt-2"><span>${currentLang === 'en' ? 'Sociosexual' : 'Κοινωνικοσεξουαλικό'}</span><span class="text-amber-300">${compat.dimensions.sociosexual}%</span></div>
+                            <div class="w-full bg-white/10 h-1 rounded"><div class="bg-amber-500 h-1 rounded" style="width:${compat.dimensions.sociosexual}%"></div></div>
+                            <div class="flex justify-between text-sm mt-2"><span>${currentLang === 'en' ? 'Communication' : 'Επικοινωνία'}</span><span class="text-cyan-300">${compat.dimensions.communication}%</span></div>
+                            <div class="w-full bg-white/10 h-1 rounded"><div class="bg-cyan-500 h-1 rounded" style="width:${compat.dimensions.communication}%"></div></div>
+                        `;
+                    }
+
+                    // Extreme mode: Kink compatibility (120+)
+                    if (state.questionCount >= 120 && compat.dimensions.kink !== undefined) {
+                        html += `
+                            <div class="flex justify-between text-sm mt-2"><span>${currentLang === 'en' ? 'Kink Compatibility' : 'Συμβατότητα Kink'}</span><span class="text-rose-300">${compat.dimensions.kink}%</span></div>
+                            <div class="w-full bg-white/10 h-1 rounded"><div class="bg-rose-500 h-1 rounded" style="width:${compat.dimensions.kink}%"></div></div>
+                        `;
+                        // Optional complementary note (if score is high enough)
+                        if (compat.dimensions.kink > 50) {
+                            html += `<div class="text-xs text-rose-300 mt-1">${currentLang === 'en' ? 'Strong complementary dynamics detected' : 'Ισχυρές συμπληρωματικές δυναμικές ανιχνεύθηκαν'}</div>`;
+                        }
+                    }
+
+                    breakdown.innerHTML = html;
+                }
+
+                // Build bar charts for both individuals
+                buildBarChart('match-bar-chart1', scores1);
+                buildBarChart('match-bar-chart2', scores2);
+
+                // Bridge recommendations (unchanged)
+                const bridgeContainer = document.getElementById('match-bridge-container');
+                if (bridgeContainer) {
+                    bridgeContainer.innerHTML = '';
+                    const dims = [
+                        { name: currentLang === 'en' ? 'Big Five personality' : 'Προσωπικότητα Big Five', score: compat.dimensions.bigFive, tip: currentLang === 'en' ? 'Explore your different approaches to life and find complementary strengths.' : 'Εξερευνήστε τις διαφορετικές προσεγγίσεις σας στη ζωή και βρείτε συμπληρωματικά δυνατά σημεία.' },
+                        { name: currentLang === 'en' ? 'Attachment security' : 'Ασφάλεια προσκόλλησης', score: compat.dimensions.attachment, tip: currentLang === 'en' ? 'Practice clear communication about needs for closeness and space.' : 'Εξασκήστε σαφή επικοινωνία σχετικά με τις ανάγκες για εγγύτητα και χώρο.' },
+                        { name: currentLang === 'en' ? 'Core values' : 'Βασικές αξίες', score: compat.dimensions.values, tip: currentLang === 'en' ? 'Discuss your priorities in life and find shared ground.' : 'Συζητήστε τις προτεραιότητές σας στη ζωή και βρείτε κοινό έδαφος.' },
+                        { name: currentLang === 'en' ? 'Sociosexual attitudes' : 'Κοινωνικοσεξουαλικές στάσεις', score: compat.dimensions.sociosexual, tip: currentLang === 'en' ? 'Have open conversations about intimacy expectations and boundaries.' : 'Κάντε ανοιχτές συζητήσεις για τις προσδοκίες οικειότητας και τα όρια.' },
+                        { name: currentLang === 'en' ? 'Communication style' : 'Στυλ επικοινωνίας', score: compat.dimensions.communication, tip: currentLang === 'en' ? 'Learn each other\'s conflict resolution preferences.' : 'Μάθετε τις προτιμήσεις επίλυσης συγκρούσεων ο ένας του άλλου.' }
+                    ];
+
+                    const weakDims = dims.filter(function(d) { return d.score < 60; }).sort(function(a, b) { return a.score - b.score; });
+
+                    if (weakDims.length > 0) {
+                        weakDims.slice(0, 2).forEach(function(d) {
+                            bridgeContainer.innerHTML += '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs"><strong>' + d.name + ' (' + d.score + '%)</strong>: ' + d.tip + '</div>';
+                        });
+                    } else {
+                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs">' + (currentLang === 'en' ? 'Excellent compatibility across all dimensions! Focus on maintaining open communication.' : 'Εξαιρετική συμβατότητα σε όλες τις διαστάσεις! Επικεντρωθείτε στη διατήρηση ανοιχτής επικοινωνίας.') + '</div>';
+                    }
+                }
+
+                switchView('resultsMatch');
+            }
+
+            function populateSoloLegend(scores, attachment) {
+                const legend = document.getElementById('solo-legend');
+                if (!legend) return;
+                legend.innerHTML = ''; // clear any existing content
+
+                // Trait explanations
+                const traitExplanations = {
+                    'Openness': currentLang === 'en' ? 'Openness reflects imagination, curiosity, and willingness to try new things.' : 'Η Δεκτικότητα αντανακλά φαντασία, περιέργεια και προθυμία να δοκιμάζει κανείς νέα πράγματα.',
+                    'Conscientiousness': currentLang === 'en' ? 'Conscientiousness indicates organization, dependability, and discipline.' : 'Η Συνείδηση υποδηλώνει οργάνωση, αξιοπιστία και πειθαρχία.',
+                    'Extraversion': currentLang === 'en' ? 'Extraversion measures sociability, talkativeness, and energy in social settings.' : 'Η Εξωστρέφεια μετρά την κοινωνικότητα, την ομιλητικότητα και την ενέργεια σε κοινωνικά περιβάλλοντα.',
+                    'Agreeableness': currentLang === 'en' ? 'Agreeableness involves trust, cooperation, and compassion toward others.' : 'Η Προσήνεια περιλαμβάνει εμπιστοσύνη, συνεργασία και συμπόνια προς τους άλλους.',
+                    'Neuroticism': currentLang === 'en' ? 'Neuroticism represents emotional sensitivity and tendency to experience negative emotions.' : 'Ο Νευρωτισμός αντιπροσωπεύει τη συναισθηματική ευαισθησία και την τάση να βιώνει κανείς αρνητικά συναισθήματα.'
+                };
+
+                // Big Five items
+                const priority = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+                priority.forEach(cat => {
+                    if (scores[cat] !== undefined) {
+                        const item = document.createElement('div');
+                        item.className = 'legend-item';
+                        const color = cat === 'Neuroticism' ? '#fbbf24' : '#f472b6';
+                        item.innerHTML = `<div class="legend-color" style="background: ${color}"></div><div><strong>${cat}</strong> (${scores[cat]}%): ${traitExplanations[cat]}</div>`;
+                        legend.appendChild(item);
+                    }
+                });
+
+                // Attachment if available
+                if (attachment) {
+                    const attachItem = document.createElement('div');
+                    attachItem.className = 'legend-item';
+                    attachItem.innerHTML = `<div class="legend-color" style="background: #a855f7"></div><div><strong>${currentLang === 'en' ? 'Attachment Anxiety' : 'Άγχος Προσκόλλησης'}</strong> (${attachment.anxiety.toFixed(2)}): ${currentLang === 'en' ? 'Worry about abandonment, need for reassurance.' : 'Ανησυχία για εγκατάλειψη, ανάγκη για επιβεβαίωση.'}</div>`;
+                    legend.appendChild(attachItem);
+                    const avoidItem = document.createElement('div');
+                    avoidItem.className = 'legend-item';
+                    avoidItem.innerHTML = `<div class="legend-color" style="background: #8b5cf6"></div><div><strong>${currentLang === 'en' ? 'Attachment Avoidance' : 'Αποφυγή Προσκόλλησης'}</strong> (${attachment.avoidance.toFixed(2)}): ${currentLang === 'en' ? 'Discomfort with closeness, preference for independence.' : 'Δυσφορία με την εγγύτητα, προτίμηση για ανεξαρτησία.'}</div>`;
+                    legend.appendChild(avoidItem);
+                }
+            }
+
+            function generatePersonalityDescription(scores, name) {
+                if (!name) name = currentLang === 'en' ? "You" : "Εσείς";
+                const parts = [];
+                
+                const big5 = ["Openness", "Conscientiousness", "Extraversion", "Agreeableness", "Neuroticism"];
+                const traitDescriptions = {
+                    "Openness": { low: currentLang === 'en' ? "practical and conventional" : "πρακτικός και συμβατικός", high: currentLang === 'en' ? "curious and open to new experiences" : "περίεργος και ανοιχτός σε νέες εμπειρίες" },
+                    "Conscientiousness": { low: currentLang === 'en' ? "flexible and spontaneous" : "ευέλικτος και αυθόρμητος", high: currentLang === 'en' ? "organized and dependable" : "οργανωμένος και αξιόπιστος" },
+                    "Extraversion": { low: currentLang === 'en' ? "reserved and reflective" : "συγκρατημένος και στοχαστικός", high: currentLang === 'en' ? "outgoing and energetic" : "εξωστρεφής και ενεργητικός" },
+                    "Agreeableness": { low: currentLang === 'en' ? "competitive and straightforward" : "ανταγωνιστικός και ευθύς", high: currentLang === 'en' ? "compassionate and cooperative" : "συμπονετικός και συνεργάσιμος" },
+                    "Neuroticism": { low: currentLang === 'en' ? "emotionally stable and secure" : "συναισθηματικά σταθερός και ασφαλής", high: currentLang === 'en' ? "sensitive and emotionally aware" : "ευαίσθητος και συναισθηματικά ενήμερος" }
+                };
+
+                big5.forEach(function(trait) {
+                    if (scores[trait] !== undefined) {
+                        const level = scores[trait];
+                        let desc;
+                        if (level < 35) desc = traitDescriptions[trait].low;
+                        else if (level > 65) desc = traitDescriptions[trait].high;
+                        else desc = currentLang === 'en' ? "balanced in " + trait.toLowerCase() : "ισορροπημένος στην " + (trait === 'Openness' ? 'δεκτικότητα' : trait === 'Conscientiousness' ? 'συνείδηση' : trait === 'Extraversion' ? 'εξωστρέφεια' : trait === 'Agreeableness' ? 'προσήνεια' : 'νευρωτισμό');
+                        parts.push(desc);
+                    }
+                });
+
+                const uniqueParts = [...new Set(parts)];
+                let description = name + (currentLang === 'en' ? " presents as " : " παρουσιάζεται ως ");
+                if (uniqueParts.length === 0) description += (currentLang === 'en' ? "a unique individual with a balanced personality profile." : "ένα μοναδικό άτομο με ισορροπημένο προφίλ προσωπικότητας.");
+                else if (uniqueParts.length === 1) description += uniqueParts[0] + ".";
+                else {
+                    description += uniqueParts.slice(0, -1).join(", ") + (currentLang === 'en' ? ", and " : ", και ") + uniqueParts.slice(-1) + ".";
+                }
+                
+                if (scores['Attachment-Anxiety'] !== undefined) {
+                    const anxiety = scores['Attachment-Anxiety'];
+                    if (anxiety > 60) description += (currentLang === 'en' ? " You may experience some anxiety in relationships." : " Μπορεί να βιώνετε κάποιο άγχος στις σχέσεις.");
+                    else if (anxiety < 40) description += (currentLang === 'en' ? " You tend to feel secure in relationships." : " Τείνετε να νιώθετε ασφάλεια στις σχέσεις.");
+                }
+                
+                return description;
+            }
+
+            // Utility Functions
+            window.previousQuestion = function() {
+                if (state.currentQuestionIndex > 0) {
+                    if (state.mode === 'match') {
+                        if (state.currentPlayer === 'user') {
+                            state.p1Answers.pop();
+                        } else {
+                            state.p2Answers.pop();
+                        }
+                    } else {
+                        state.p1Answers.pop();
+                    }
+                    state.currentQuestionIndex--;
+                    renderQuestion();
+                } else {
+                    alert(currentLang === 'en' ? "You are at the first question." : "Είστε στην πρώτη ερώτηση.");
+                }
+            };
+
+            window.showCheckIdInput = function() {
+                const step1 = document.getElementById('check-step1');
+                const userSec = document.getElementById('check-user-id-section');
+                const idSec = document.getElementById('check-id-section');
+                if (step1) step1.classList.add('hidden');
+                if (userSec) userSec.classList.remove('hidden');
+                if (idSec) idSec.classList.add('hidden');
+            };
+
+            window.startCheckNew = function() {
+                const name = document.getElementById('check-your-name').value.trim();
+                if (!name) { 
+                    alert(currentLang === 'en' ? "Please enter your name." : "Παρακαλώ εισάγετε το όνομά σας."); 
+                    return; 
+                }
+                state.userName = name;
+                state.userEmail = null;
+                state.mode = 'check';
+                state.questionCount = 60;
+                state.activeMaster = essentialMaster;
+                state.presentation = shuffleBlocks(state.activeMaster);
+                state.currentQuestionIndex = 0;
+                state.p1Answers = [];
+                isNewCheckProfile = true;
+                switchView('quiz');
+            };
+
+            window.submitUserID = function() {
+                const input = document.getElementById('check-user-id').value.trim();
+                if (!input) {
+                    const err = document.getElementById('check-error');
+                    if (err) {
+                        err.innerText = currentLang === 'en' ? "Please enter an ID." : "Παρακαλώ εισάγετε ένα ID.";
+                        err.classList.remove('hidden');
+                    }
+                    return;
+                }
+                const parsed = parseIdString(input);
+                checkUserAnswers = generateAnswersFromId(parsed.id, essentialMaster);
+                checkUserProfileId = parsed.id;
+                checkUserEmail = parsed.email;
+                const loaded = document.getElementById('check-loaded-profile');
+                if (loaded) loaded.innerText = (currentLang === 'en' ? 'Profile loaded from ID: ' : 'Προφίλ φορτώθηκε από ID: ') + parsed.id + (parsed.email ? (currentLang === 'en' ? ' (email embedded)' : ' (ενσωματωμένο email)') : '');
+                const err = document.getElementById('check-error');
+                if (err) err.classList.add('hidden');
+                const idSec = document.getElementById('check-id-section');
+                if (idSec) idSec.classList.remove('hidden');
+            };
+
+            window.runCompatibilityCheck = function() {
+                const partnerInput = document.getElementById('check-partner-id').value.trim();
+                if (!partnerInput) {
+                    const err = document.getElementById('check-error');
+                    if (err) {
+                        err.innerText = currentLang === 'en' ? "Please enter partner's ID." : "Παρακαλώ εισάγετε το ID του συντρόφου.";
+                        err.classList.remove('hidden');
+                    }
+                    return;
+                }
+                if (!checkUserAnswers) {
+                    const err = document.getElementById('check-error');
+                    if (err) {
+                        err.innerText = currentLang === 'en' ? "Your profile not loaded. Please create or enter your ID first." : "Το προφίλ σας δεν φορτώθηκε. Παρακαλώ δημιουργήστε ή εισάγετε πρώτα το ID σας.";
+                        err.classList.remove('hidden');
+                    }
+                    return;
+                }
+                const parsed = parseIdString(partnerInput);
+                checkPartnerAnswers = generateAnswersFromId(parsed.id, essentialMaster);
+                checkPartnerId = parsed.id;
+                checkPartnerEmail = parsed.email;
+                
+                const userScores = computeCategoryScores(checkUserAnswers, essentialMaster);
+                const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                displayCheckResults(userScores, partnerScores, (currentLang === 'en' ? 'You' : 'Εσείς'), (currentLang === 'en' ? 'Profile#' : 'Προφίλ#') + parsed.id.substr(-4));
+            };
+
+            function generateAnswersFromId(id, questions) {
+                let seed = 0;
+                for (let i = 0; i < id.length; i++) {
+                    seed = ((seed << 5) - seed) + id.charCodeAt(i);
+                    seed |= 0;
+                }
+                function mulberry32() {
+                    seed += 0x6D2B79F5;
+                    let t = seed;
+                    t = Math.imul(t ^ t >>> 15, t | 1);
+                    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                }
+                const answers = [];
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    const val = Math.floor(mulberry32() * 5) + 1;
+                    answers.push({ questionId: q.id, answer: val, rawAnswer: val });
+                }
+                return answers;
+            }
+
+            function parseIdString(str) {
+                const parts = str.split(':');
+                const id = parts[0].trim();
+                let email = null;
+                if (parts.length > 1) {
+                    try {
+                        email = atob(parts[1].trim());
+                    } catch (e) {
+                        email = null;
+                    }
+                }
+                return { id: id, email: email };
+            }
+
+            window.showPartnerFullProfile = function() {
+                if (!checkPartnerAnswers) { 
+                    alert(currentLang === 'en' ? "No partner profile." : "Δεν υπάρχει προφίλ συντρόφου."); 
+                    return; 
+                }
+                const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                const partnerAttach = computeAttachmentScores(checkPartnerAnswers);
+                
+                const title = document.getElementById('solo-title');
+                const modeLabel = document.getElementById('solo-mode-label');
+                const idLabel = document.getElementById('solo-id-label');
+                const idEl = document.getElementById('solo-id');
+                if (title) title.innerText = currentLang === 'en' ? "Partner's Dimensional Map" : "Ο Διαστασιακός Χάρτης του Συντρόφου";
+                if (modeLabel) modeLabel.innerText = currentLang === 'en' ? "BFI-2 + ECR-12 Profile" : "Προφίλ BFI-2 + ECR-12";
+                if (idLabel) idLabel.innerText = currentLang === 'en' ? "Partner's Resonance ID" : "Resonance ID Συντρόφου";
+                const baseId = checkPartnerId || 'RS-****';
+                if (idEl) idEl.innerText = baseId;
+                
+                const fullString = checkPartnerEmail ? baseId + ':' + btoa(checkPartnerEmail) : baseId;
+                
+                const qr = qrcode(0, 'H');
+                qr.addData(fullString);
+                qr.make();
+                const canvas = document.getElementById('solo-qrcode');
+                if (canvas) {
+                    canvas.width = 150;
+                    canvas.height = 150;
+                    const ctx = canvas.getContext('2d');
+                    const cellSize = 150 / qr.getModuleCount();
+                    for (let row = 0; row < qr.getModuleCount(); row++) {
+                        for (let col = 0; col < qr.getModuleCount(); col++) {
+                            ctx.fillStyle = qr.isDark(row, col) ? '#f472b6' : 'transparent';
+                            ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+                
+                buildBarChart('solo-bar-chart', partnerScores);
+                
+                const anxietyEl = document.getElementById('attach-anxiety');
+                const avoidanceEl = document.getElementById('attach-avoidance');
+                const styleEl = document.getElementById('attach-style');
+                if (anxietyEl) anxietyEl.innerText = partnerAttach.anxiety.toFixed(2);
+                if (avoidanceEl) avoidanceEl.innerText = partnerAttach.avoidance.toFixed(2);
+                if (styleEl) styleEl.innerText = (currentLang === 'en' ? 'Attachment Style: ' : 'Στυλ Προσκόλλησης: ') + partnerAttach.style;
+                
+                document.getElementById('love-languages-section').classList.add('hidden');
+                
+                const summary = document.getElementById('solo-personality-summary');
+                if (summary) summary.innerText = generatePersonalityDescription(partnerScores, currentLang === 'en' ? 'Partner' : 'Σύντροφος');
+                
+                const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
+                const newBtn = document.querySelector('#view-results-solo .flex.gap-2 button:last-child');
+                if (copyBtn) {
+                    copyBtn.innerText = currentLang === 'en' ? 'Copy Partner ID' : 'Αντιγραφή ID Συντρόφου';
+                    copyBtn.dataset.fullString = fullString;
+                    copyBtn.onclick = function() {
+                        navigator.clipboard.writeText(this.dataset.fullString).then(function() { 
+                            alert(currentLang === 'en' ? 'Partner ID copied!' : 'Το ID του συντρόφου αντιγράφηκε!'); 
+                        });
+                    };
+                }
+                if (newBtn) {
+                    newBtn.innerText = currentLang === 'en' ? 'Back to Check' : 'Πίσω στον Έλεγχο';
+                    newBtn.onclick = function() {
+                        if (copyBtn) {
+                            copyBtn.innerText = currentLang === 'en' ? 'Copy ID' : 'Αντιγραφή ID';
+                            copyBtn.onclick = window.copySoloID;
+                        }
+                        if (newBtn) {
+                            newBtn.innerText = currentLang === 'en' ? 'New Session' : 'Νέα Συνεδρία';
+                            newBtn.onclick = restartToMain;
+                        }
+                        if (checkUserAnswers && checkPartnerAnswers) {
+                            const userScores = computeCategoryScores(checkUserAnswers, essentialMaster);
+                            const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
+                            displayCheckResults(userScores, partnerScores, (currentLang === 'en' ? 'You' : 'Εσείς'), (currentLang === 'en' ? 'Profile#' : 'Προφίλ#') + (checkPartnerId ? checkPartnerId.substr(-4) : ''));
+                        } else { restartToMain(); }
+                    };
+                }
+                
+                switchView('resultsSolo');
+            };
+
+            window.copySoloID = function() {
+                const copyBtn = document.querySelector('#view-results-solo .flex.gap-2 button:first-child');
+                if (copyBtn && copyBtn.dataset.fullString) {
+                    navigator.clipboard.writeText(copyBtn.dataset.fullString).then(function() { 
+                        alert(currentLang === 'en' ? 'ID copied!' : 'Το ID αντιγράφηκε!'); 
+                    });
+                } else {
+                    const idEl = document.getElementById('solo-id');
+                    if (idEl) navigator.clipboard.writeText(idEl.innerText).then(function() { 
+                        alert(currentLang === 'en' ? 'ID copied!' : 'Το ID αντιγράφηκε!'); 
+                    });
+                }
+            };
+
+            // Initialize language
+            setLanguage('en');
+        })();
+    </script>
+</body>
+</html>
