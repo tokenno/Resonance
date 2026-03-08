@@ -2389,7 +2389,7 @@ if (hiddenTraits.length > 0 && traitsContainer && hiddenTraitsSection) {
                 
                 const emailArea = document.getElementById('email-reveal-area');
                 const emailSpan = document.getElementById('revealed-email');
-                if (compat.rawOverall > 0.90 && checkPartnerEmail) {
+                if (compat.rawOverall > 0.75 && checkPartnerEmail) {
                     emailArea.classList.remove('hidden');
                     emailSpan.innerText = checkPartnerEmail;
                 } else {
@@ -2418,6 +2418,7 @@ if (hiddenTraits.length > 0 && traitsContainer && hiddenTraitsSection) {
                 
                 switchView('resultsCheck');
             }
+window.displayCheckResults = displayCheckResults;
 
             function generatePersonalityDescription(scores, name) {
                 if (!name) name = "You";
