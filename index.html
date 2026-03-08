@@ -1791,188 +1791,234 @@
                 return { anxiety: anxiety, avoidance: avoidance, style: style };
             }
 
-            function computeLoveLanguage(answers) {
-                const languages = {
-                    'LoveLanguage-Gifts': 0,
-                    'LoveLanguage-Time': 0,
-                    'LoveLanguage-Words': 0,
-                    'LoveLanguage-Touch': 0,
-                    'LoveLanguage-Service': 0
-                };
-                const counts = {};
-                
-                const qMap = {};
-                deepMaster.forEach(function(q) { qMap[q.id] = q; });
-                
-                answers.forEach(function(ans) {
-                    const q = qMap[ans.questionId];
-                    if (!q || !q.category.startsWith('LoveLanguage')) return;
-                    
-                    if (!counts[q.category]) counts[q.category] = 0;
-                    languages[q.category] += ans.answer;
-                    counts[q.category]++;
-                });
-                
-                let maxScore = 0;
-                let primary = 'Unknown';
-                
-                for (let lang in languages) {
-                    if (counts[lang]) {
-                        languages[lang] /= counts[lang];
-                        if (languages[lang] > maxScore) {
-                            maxScore = languages[lang];
-                            primary = lang.replace('LoveLanguage-', '');
-                        }
-                    }
-                }
-                
-                return { primary: primary, scores: languages };
+ function computeLoveLanguage(answers) {
+    const languages = {
+        'LoveLanguage-Gifts': 0,
+        'LoveLanguage-Time': 0,
+        'LoveLanguage-Words': 0,
+        'LoveLanguage-Touch': 0,
+        'LoveLanguage-Service': 0
+    };
+    const counts = {};
+    
+    const qMap = {};
+    deepMaster.forEach(q => qMap[q.id] = q);
+    
+    answers.forEach(ans => {
+        const q = qMap[ans.questionId];
+        if (!q || !q.category.startsWith('LoveLanguage')) return;
+        
+        if (!counts[q.category]) counts[q.category] = 0;
+        languages[q.category] += ans.answer;
+        counts[q.category]++;
+    });
+    
+    let maxScore = 0;
+    let primary = 'Unknown';
+    
+    for (let lang in languages) {
+        if (counts[lang]) {
+            languages[lang] /= counts[lang];
+            if (languages[lang] > maxScore) {
+                maxScore = languages[lang];
+                primary = lang.replace('LoveLanguage-', '');
             }
+        }
+    }
+    
+    return { primary: primary, scores: languages };
+}
+
 
             // Dimensional Compatibility Algorithm
-            function calculateDimensionalCompatibility(answers1, answers2, questions) {
-                const dimensions = {
-                    bigFive: { weight: 0.30, score: 0 },
-                    attachment: { weight: 0.25, score: 0 },
-                    values: { weight: 0.20, score: 0 },
-                    sociosexual: { weight: 0.15, score: 0 },
-                    communication: { weight: 0.10, score: 0 }
-                };
+  function calculateDimensionalCompatibility(answers1, answers2, questions) {
+    const dimensions = {
+        bigFive: { weight: 0.30, score: 0 },
+        attachment: { weight: 0.25, score: 0 },
+        values: { weight: 0.20, score: 0 },
+        sociosexual: { weight: 0.15, score: 0 },
+        communication: { weight: 0.10, score: 0 },
+        kink: { weight: 0.10, score: 0 } // New dimension for complementary traits
+    };
+    
+    const qMap = {};
+    questions.forEach(q => qMap[q.id] = q);
+    
+    const a1 = {}, a2 = {};
+    answers1.forEach(a => a1[a.questionId] = a.answer);
+    answers2.forEach(a => a2[a.questionId] = a.answer);
+    
+    // Big Five (similarity-based)
+    const bigFiveCats = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+    let bigFiveScore = 0;
+    let bigFiveCount = 0;
+    
+    bigFiveCats.forEach(cat => {
+        const catQuestions = questions.filter(q => q.category === cat);
+        if (catQuestions.length === 0) return;
+        
+        let catScore = 0;
+        catQuestions.forEach(q => {
+            const v1 = a1[q.id], v2 = a2[q.id];
+            if (v1 === undefined || v2 === undefined) return;
+            
+            const diff = Math.abs(v1 - v2);
+            const maxDiff = 4;
+            catScore += 1 - (diff / maxDiff);
+        });
+        
+        bigFiveScore += catScore / catQuestions.length;
+        bigFiveCount++;
+    });
+    
+    if (bigFiveCount > 0) dimensions.bigFive.score = bigFiveScore / bigFiveCount;
+    
+    // Attachment (similarity-based)
+    const attach1 = computeAttachmentScores(answers1);
+    const attach2 = computeAttachmentScores(answers2);
+    
+    const anxietyDiff = Math.abs(attach1.anxiety - attach2.anxiety);
+    const avoidanceDiff = Math.abs(attach1.avoidance - attach2.avoidance);
+    const attachDistance = Math.sqrt(Math.pow(anxietyDiff/4, 2) + Math.pow(avoidanceDiff/4, 2));
+    dimensions.attachment.score = Math.max(0, 1 - attachDistance);
+    
+    // Values (similarity-based)
+    const valueCats = ['Values', 'Lifestyle', 'Intimacy'];
+    let valuesScore = 0;
+    let valuesCount = 0;
+    
+    valueCats.forEach(cat => {
+        const catQuestions = questions.filter(q => q.category === cat);
+        if (catQuestions.length === 0) return;
+        
+        let catScore = 0;
+        let catWeight = 0;
+        
+        catQuestions.forEach(q => {
+            const v1 = a1[q.id], v2 = a2[q.id];
+            if (v1 === undefined || v2 === undefined) return;
+            
+            const diff = Math.abs(v1 - v2);
+            const maxDiff = 4;
+            catScore += (1 - (diff / maxDiff)) * q.weight;
+            catWeight += q.weight;
+        });
+        
+        if (catWeight > 0) {
+            valuesScore += catScore / catWeight;
+            valuesCount++;
+        }
+    });
+    
+    if (valuesCount > 0) dimensions.values.score = valuesScore / valuesCount;
+    
+    // Sociosexual (similarity-based)
+    const soiCats = ['SOI-Behavior', 'SOI-Attitude', 'SOI-Desire'];
+    let soiScore = 0;
+    let soiCount = 0;
+    
+    soiCats.forEach(cat => {
+        const catQuestions = questions.filter(q => q.category === cat);
+        if (catQuestions.length === 0) return;
+        
+        let catScore = 0;
+        catQuestions.forEach(q => {
+            const v1 = a1[q.id], v2 = a2[q.id];
+            if (v1 === undefined || v2 === undefined) return;
+            
+            const diff = Math.abs(v1 - v2);
+            const maxDiff = 4;
+            catScore += 1 - (diff / maxDiff);
+        });
+        
+        if (catQuestions.length > 0) {
+            soiScore += catScore / catQuestions.length;
+            soiCount++;
+        }
+    });
+    
+    if (soiCount > 0) dimensions.sociosexual.score = soiScore / soiCount;
+    
+    // Communication (similarity-based)
+    const conflictQuestions = questions.filter(q => q.category === 'Conflict-Resolution');
+    if (conflictQuestions.length > 0) {
+        let conflictScore = 0;
+        conflictQuestions.forEach(q => {
+            const v1 = a1[q.id], v2 = a2[q.id];
+            if (v1 === undefined || v2 === undefined) return;
+            
+            const diff = Math.abs(v1 - v2);
+            const maxDiff = 4;
+            conflictScore += 1 - (diff / maxDiff);
+        });
+        dimensions.communication.score = conflictScore / conflictQuestions.length;
+    }
+    
+    // KINK/COMPLEMENTARY TRAITS (complementary-based)
+    const kinkQuestions = questions.filter(q => q.category.startsWith('Kink-') && q.complementaryMap);
+    if (kinkQuestions.length > 0) {
+        let kinkScore = 0;
+        let kinkCount = 0;
+        
+        kinkQuestions.forEach(q => {
+            const v1 = a1[q.id], v2 = a2[q.id];
+            if (v1 === undefined || v2 === undefined) return;
+            
+            // Use complementaryMap if available
+            if (q.complementaryMap) {
+                // Map v1 (1-5) to preferred complementary value (0-2)
+                const mappedIndex = Math.min(Math.max(Math.round(v1 - 1), 0), 2);
+                const preferredV2 = q.complementaryMap[mappedIndex];
                 
-                const qMap = {};
-                questions.forEach(function(q) { qMap[q.id] = q; });
-                
-                const a1 = {}, a2 = {};
-                answers1.forEach(function(a) { a1[a.questionId] = a.answer; });
-                answers2.forEach(function(a) { a2[a.questionId] = a.answer; });
-                
-                // Big Five
-                const bigFiveCats = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
-                let bigFiveScore = 0;
-                let bigFiveCount = 0;
-                
-                bigFiveCats.forEach(function(cat) {
-                    const catQuestions = questions.filter(function(q) { return q.category === cat; });
-                    if (catQuestions.length === 0) return;
-                    
-                    let catScore = 0;
-                    catQuestions.forEach(function(q) {
-                        const v1 = a1[q.id], v2 = a2[q.id];
-                        if (v1 === undefined || v2 === undefined) return;
-                        
-                        const diff = Math.abs(v1 - v2);
-                        const maxDiff = 4;
-                        catScore += 1 - (diff / maxDiff);
-                    });
-                    
-                    bigFiveScore += catScore / catQuestions.length;
-                    bigFiveCount++;
-                });
-                
-                if (bigFiveCount > 0) dimensions.bigFive.score = bigFiveScore / bigFiveCount;
-                
-                // Attachment
-                const attach1 = computeAttachmentScores(answers1);
-                const attach2 = computeAttachmentScores(answers2);
-                
-                const anxietyDiff = Math.abs(attach1.anxiety - attach2.anxiety);
-                const avoidanceDiff = Math.abs(attach1.avoidance - attach2.avoidance);
-                const attachDistance = Math.sqrt(Math.pow(anxietyDiff/4, 2) + Math.pow(avoidanceDiff/4, 2));
-                dimensions.attachment.score = Math.max(0, 1 - attachDistance);
-                
-                // Values
-                const valueCats = ['Values', 'Lifestyle', 'Intimacy'];
-                let valuesScore = 0;
-                let valuesCount = 0;
-                
-                valueCats.forEach(function(cat) {
-                    const catQuestions = questions.filter(function(q) { return q.category === cat; });
-                    if (catQuestions.length === 0) return;
-                    
-                    let catScore = 0;
-                    let catWeight = 0;
-                    
-                    catQuestions.forEach(function(q) {
-                        const v1 = a1[q.id], v2 = a2[q.id];
-                        if (v1 === undefined || v2 === undefined) return;
-                        
-                        const diff = Math.abs(v1 - v2);
-                        const maxDiff = 4;
-                        catScore += (1 - (diff / maxDiff)) * q.weight;
-                        catWeight += q.weight;
-                    });
-                    
-                    if (catWeight > 0) {
-                        valuesScore += catScore / catWeight;
-                        valuesCount++;
-                    }
-                });
-                
-                if (valuesCount > 0) dimensions.values.score = valuesScore / valuesCount;
-                
-                // Sociosexual
-                const soiCats = ['SOI-Behavior', 'SOI-Attitude', 'SOI-Desire'];
-                let soiScore = 0;
-                let soiCount = 0;
-                
-                soiCats.forEach(function(cat) {
-                    const catQuestions = questions.filter(function(q) { return q.category === cat; });
-                    if (catQuestions.length === 0) return;
-                    
-                    let catScore = 0;
-                    catQuestions.forEach(function(q) {
-                        const v1 = a1[q.id], v2 = a2[q.id];
-                        if (v1 === undefined || v2 === undefined) return;
-                        
-                        const diff = Math.abs(v1 - v2);
-                        const maxDiff = 4;
-                        catScore += 1 - (diff / maxDiff);
-                    });
-                    
-                    if (catQuestions.length > 0) {
-                        soiScore += catScore / catQuestions.length;
-                        soiCount++;
-                    }
-                });
-                
-                if (soiCount > 0) dimensions.sociosexual.score = soiScore / soiCount;
-                
-                // Communication
-                const conflictQuestions = questions.filter(function(q) { return q.category === 'Conflict-Resolution'; });
-                if (conflictQuestions.length > 0) {
-                    let conflictScore = 0;
-                    conflictQuestions.forEach(function(q) {
-                        const v1 = a1[q.id], v2 = a2[q.id];
-                        if (v1 === undefined || v2 === undefined) return;
-                        
-                        const diff = Math.abs(v1 - v2);
-                        const maxDiff = 4;
-                        conflictScore += 1 - (diff / maxDiff);
-                    });
-                    dimensions.communication.score = conflictScore / conflictQuestions.length;
+                if (preferredV2 !== undefined) {
+                    const p2 = Math.min(Math.max(Math.round(v2 - 1), 0), 2);
+                    const diff = Math.abs(p2 - preferredV2);
+                    kinkScore += 1 - diff * 0.5; // perfect = 1, off by 1 = 0.5, off by 2 = 0
+                } else {
+                    // fallback to similarity
+                    const diff = Math.abs(v1 - v2);
+                    kinkScore += 1 - (diff / 4);
                 }
-                
-                let overall = 0;
-                let totalWeight = 0;
-                
-                for (let dim in dimensions) {
-                    overall += dimensions[dim].score * dimensions[dim].weight;
-                    totalWeight += dimensions[dim].weight;
-                }
-                
-                return {
-                    overall: Math.round((overall / totalWeight) * 100),
-                    dimensions: {
-                        bigFive: Math.round(dimensions.bigFive.score * 100),
-                        attachment: Math.round(dimensions.attachment.score * 100),
-                        values: Math.round(dimensions.values.score * 100),
-                        sociosexual: Math.round(dimensions.sociosexual.score * 100),
-                        communication: Math.round(dimensions.communication.score * 100)
-                    },
-                    attachment: { attach1: attach1, attach2: attach2 }
-                };
+            } else {
+                const diff = Math.abs(v1 - v2);
+                kinkScore += 1 - (diff / 4);
             }
-
+            kinkCount++;
+        });
+        
+        if (kinkCount > 0) {
+            dimensions.kink.score = kinkScore / kinkCount;
+        }
+    } else {
+        // If no kink questions, redistribute weight to other dimensions
+        dimensions.kink.weight = 0;
+    }
+    
+    // Calculate weighted overall score
+    let overall = 0;
+    let totalWeight = 0;
+    
+    for (let dim in dimensions) {
+        overall += dimensions[dim].score * dimensions[dim].weight;
+        totalWeight += dimensions[dim].weight;
+    }
+    
+    const rawOverall = overall / totalWeight;
+    
+    return {
+        overall: Math.round(rawOverall * 100),
+        rawOverall: rawOverall, // Keep raw for threshold checks
+        dimensions: {
+            bigFive: Math.round(dimensions.bigFive.score * 100),
+            attachment: Math.round(dimensions.attachment.score * 100),
+            values: Math.round(dimensions.values.score * 100),
+            sociosexual: Math.round(dimensions.sociosexual.score * 100),
+            communication: Math.round(dimensions.communication.score * 100),
+            kink: Math.round(dimensions.kink.score * 100)
+        },
+        attachment: { attach1: attach1, attach2: attach2 }
+    };
+}
             // Display Functions
             function buildBarChart(containerId, scores) {
                 const container = document.getElementById(containerId);
@@ -2035,7 +2081,28 @@
                 }
                 
                 buildBarChart('solo-bar-chart', scores);
-                
+                // Populate the "What do these scores mean?" legend
+populateSoloLegend(scores, attachment);
+
+// Detect and display hidden psychological patterns
+const hiddenTraits = detectHiddenTraits(scores, state.p1Answers, state.presentation);
+const traitsContainer = document.getElementById('traits-container');
+const hiddenTraitsSection = document.getElementById('hidden-traits');
+
+if (hiddenTraits.length > 0 && traitsContainer && hiddenTraitsSection) {
+    traitsContainer.innerHTML = '';
+    hiddenTraits.forEach(trait => {
+        traitsContainer.innerHTML += `
+            <div class="hidden-trait">
+                <h4 class="text-pink-300 font-bold text-sm mb-1">${trait.name}</h4>
+                <p class="text-xs opacity-80 leading-relaxed">${trait.desc}</p>
+            </div>
+        `;
+    });
+    hiddenTraitsSection.classList.remove('hidden');
+} else if (hiddenTraitsSection) {
+    hiddenTraitsSection.classList.add('hidden');
+}
                 const anxietyEl = document.getElementById('attach-anxiety');
                 const avoidanceEl = document.getElementById('attach-avoidance');
                 const styleEl = document.getElementById('attach-style');
@@ -2064,57 +2131,218 @@
                 switchView('resultsSolo');
             }
 
-            function displayMatchResults(scores1, scores2, attach1, attach2) {
-                const p1 = document.getElementById('res-p1');
-                const p2 = document.getElementById('res-p2');
-                if (p1) p1.innerText = state.userName || 'You';
-                if (p2) p2.innerText = state.partnerName || 'Partner';
-                
-                const compat = calculateDimensionalCompatibility(state.p1Answers, state.p2Answers, state.presentation);
-                
-                const scoreEl = document.getElementById('match-potential-score');
-                const descEl = document.getElementById('match-potential-desc');
-                if (scoreEl) scoreEl.innerText = compat.overall + '%';
-                if (descEl) {
-                    const desc = compat.overall > 80 ? 'Exceptional alignment' : 
-                                compat.overall > 65 ? 'Strong compatibility' : 
-                                compat.overall > 50 ? 'Moderate resonance' : 
-                                compat.overall > 35 ? 'Significant differences' : 'Challenging alignment';
-                    descEl.innerText = desc;
-                }
-                
-                const breakdown = document.getElementById('dimensional-breakdown');
-                if (breakdown) {
-                    breakdown.innerHTML = '<div class="flex justify-between text-sm"><span>Big Five Personality</span><span class="text-pink-300">' + compat.dimensions.bigFive + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-pink-500 h-1 rounded" style="width:' + compat.dimensions.bigFive + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Attachment Styles</span><span class="text-purple-300">' + compat.dimensions.attachment + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-purple-500 h-1 rounded" style="width:' + compat.dimensions.attachment + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Core Values</span><span class="text-emerald-300">' + compat.dimensions.values + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-emerald-500 h-1 rounded" style="width:' + compat.dimensions.values + '%"></div></div>' + (state.questionCount >= 90 ? '<div class="flex justify-between text-sm mt-2"><span>Sociosexual</span><span class="text-amber-300">' + compat.dimensions.sociosexual + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-amber-500 h-1 rounded" style="width:' + compat.dimensions.sociosexual + '%"></div></div><div class="flex justify-between text-sm mt-2"><span>Communication</span><span class="text-cyan-300">' + compat.dimensions.communication + '%</span></div><div class="w-full bg-white/10 h-1 rounded"><div class="bg-cyan-500 h-1 rounded" style="width:' + compat.dimensions.communication + '%"></div></div>' : '');
-                }
-                
-                buildBarChart('match-bar-chart1', scores1);
-                buildBarChart('match-bar-chart2', scores2);
-                
-                const bridgeContainer = document.getElementById('match-bridge-container');
-                if (bridgeContainer) {
-                    bridgeContainer.innerHTML = '';
-                    const dims = [
-                        { name: 'Big Five personality', score: compat.dimensions.bigFive, tip: 'Explore your different approaches to life and find complementary strengths.' },
-                        { name: 'Attachment security', score: compat.dimensions.attachment, tip: 'Practice clear communication about needs for closeness and space.' },
-                        { name: 'Core values', score: compat.dimensions.values, tip: 'Discuss your priorities in life and find shared ground.' },
-                        { name: 'Sociosexual attitudes', score: compat.dimensions.sociosexual, tip: 'Have open conversations about intimacy expectations and boundaries.' },
-                        { name: 'Communication style', score: compat.dimensions.communication, tip: 'Learn each other\'s conflict resolution preferences.' }
-                    ];
-                    
-                    const weakDims = dims.filter(function(d) { return d.score < 60; }).sort(function(a,b) { return a.score - b.score; });
-                    
-                    if (weakDims.length > 0) {
-                        weakDims.slice(0, 2).forEach(function(d) {
-                            bridgeContainer.innerHTML += '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs"><strong>' + d.name + ' (' + d.score + '%)</strong>: ' + d.tip + '</div>';
-                        });
-                    } else {
-                        bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs">Excellent compatibility across all dimensions! Focus on maintaining open communication.</div>';
-                    }
-                }
-                
-                switchView('resultsMatch');
+            function detectHiddenTraits(scores, answers, questions) {
+    const traits = [];
+    const qMap = {};
+    questions.forEach(q => qMap[q.id] = q);
+    
+    // Trait 1: High Sensitivity (High Neuroticism + High Openness)
+    if (scores['Neuroticism'] > 70 && scores['Openness'] > 70) {
+        traits.push({
+            name: "The Creative Worrier",
+            desc: "High emotional depth combined with vivid imagination creates rich inner worlds but potential anxiety spirals.",
+            color: "purple"
+        });
+    }
+    
+    // Trait 2: Controlled Chaos (Low Conscientiousness + High Extraversion)
+    if (scores['Conscientiousness'] < 35 && scores['Extraversion'] > 65) {
+        traits.push({
+            name: "Spontaneous Catalyst",
+            desc: "You generate energy and ideas but may struggle with follow-through. Partners often become the 'organizer'.",
+            color: "pink"
+        });
+    }
+    
+    // Trait 3: Warm Strategist (High Agreeableness + High Conscientiousness)
+    if (scores['Agreeableness'] > 70 && scores['Conscientiousness'] > 70) {
+        traits.push({
+            name: "The Reliable Anchor",
+            desc: "Others depend on your consistency and care. Be mindful of resentment from unvoiced needs.",
+            color: "emerald"
+        });
+    }
+    
+    // Trait 4: Detached Observer (Low Extraversion + Low Agreeableness)
+    if (scores['Extraversion'] < 35 && scores['Agreeableness'] < 45) {
+        traits.push({
+            name: "Sovereign Self",
+            desc: "You value autonomy and truth over harmony. Direct communication is essential with partners.",
+            color: "slate"
+        });
+    }
+    
+    // Trait 5: Anxious-Avoidant Trap (High Anxiety + High Avoidance)
+    const attach = computeAttachmentScores(answers);
+    if (attach.anxiety > 3.5 && attach.avoidance > 3.5) {
+        traits.push({
+            name: "The Approach-Avoid Dance",
+            desc: "You crave closeness but fear it simultaneously. This creates push-pull dynamics in relationships.",
+            color: "red"
+        });
+    }
+    
+    // Trait 6: Secure Base (Low Anxiety + Low Avoidance)
+    if (attach.anxiety < 2.5 && attach.avoidance < 2.5) {
+        traits.push({
+            name: "The Secure Harbor",
+            desc: "Rare combination of low anxiety and comfort with intimacy. You likely had consistent early caregivers.",
+            color: "teal"
+        });
+    }
+    
+    // Trait 7: Opposite Values Conflict (Deep mode only)
+    if (state.questionCount >= 90) {
+        const loveLang = computeLoveLanguage(answers);
+        if (loveLang.scores) {
+            const scores = Object.values(loveLang.scores);
+            const max = Math.max(...scores);
+            const min = Math.min(...scores);
+            if (max - min < 0.5) {
+                traits.push({
+                    name: "Love Language Universalist",
+                    desc: "You appreciate all forms of affection equally—flexible, but may confuse partners who have strong preferences.",
+                    color: "amber"
+                });
             }
+        }
+    }
+    
+    // Trait 8: Dark Triad Risk (Extreme mode only)
+    if (state.questionCount === 120) {
+        const darkTriadCats = ['DarkTriad-Machiavellianism', 'DarkTriad-Narcissism', 'DarkTriad-Psychopathy'];
+        let darkTotal = 0;
+        darkTriadCats.forEach(cat => {
+            if (scores[cat]) darkTotal += scores[cat];
+        });
+        if (darkTotal / 3 > 70) {
+            traits.push({
+                name: "High Dark Triad Profile",
+                desc: "Above-average scores in manipulation, grandiosity, or callousness. May indicate strategic mating approach.",
+                color: "rose"
+            });
+        }
+    }
+    
+    return traits;
+}
+
+   function displayMatchResults(scores1, scores2, attach1, attach2) {
+    const p1 = document.getElementById('res-p1');
+    const p2 = document.getElementById('res-p2');
+    if (p1) p1.innerText = state.userName || 'You';
+    if (p2) p2.innerText = state.partnerName || 'Partner';
+
+    const compat = calculateDimensionalCompatibility(state.p1Answers, state.p2Answers, state.presentation);
+
+    const scoreEl = document.getElementById('match-potential-score');
+    const descEl = document.getElementById('match-potential-desc');
+    if (scoreEl) scoreEl.innerText = compat.overall + '%';
+    if (descEl) {
+        const desc = compat.overall > 80 ? 'Exceptional alignment' :
+                    compat.overall > 65 ? 'Strong compatibility' :
+                    compat.overall > 50 ? 'Moderate resonance' :
+                    compat.overall > 35 ? 'Significant differences' : 'Challenging alignment';
+        descEl.innerText = desc;
+    }
+
+    const breakdown = document.getElementById('dimensional-breakdown');
+    if (breakdown) {
+        let html = `
+            <div class="flex justify-between text-sm"><span>Big Five Personality</span><span class="text-pink-300">${compat.dimensions.bigFive}%</span></div>
+            <div class="w-full bg-white/10 h-1 rounded"><div class="bg-pink-500 h-1 rounded" style="width:${compat.dimensions.bigFive}%"></div></div>
+            <div class="flex justify-between text-sm mt-2"><span>Attachment Styles</span><span class="text-purple-300">${compat.dimensions.attachment}%</span></div>
+            <div class="w-full bg-white/10 h-1 rounded"><div class="bg-purple-500 h-1 rounded" style="width:${compat.dimensions.attachment}%"></div></div>
+            <div class="flex justify-between text-sm mt-2"><span>Core Values</span><span class="text-emerald-300">${compat.dimensions.values}%</span></div>
+            <div class="w-full bg-white/10 h-1 rounded"><div class="bg-emerald-500 h-1 rounded" style="width:${compat.dimensions.values}%"></div></div>
+        `;
+        
+        // Deep mode dimensions (90+)
+        if (state.questionCount >= 90) {
+            html += `
+                <div class="flex justify-between text-sm mt-2"><span>Sociosexual</span><span class="text-amber-300">${compat.dimensions.sociosexual}%</span></div>
+                <div class="w-full bg-white/10 h-1 rounded"><div class="bg-amber-500 h-1 rounded" style="width:${compat.dimensions.sociosexual}%"></div></div>
+                <div class="flex justify-between text-sm mt-2"><span>Communication</span><span class="text-cyan-300">${compat.dimensions.communication}%</span></div>
+                <div class="w-full bg-white/10 h-1 rounded"><div class="bg-cyan-500 h-1 rounded" style="width:${compat.dimensions.communication}%"></div></div>
+            `;
+        }
+
+        // Extreme mode: Kink compatibility (120+)
+        if (state.questionCount >= 120 && compat.dimensions.kink !== undefined) {
+            html += `
+                <div class="flex justify-between text-sm mt-2"><span>Kink Compatibility</span><span class="text-rose-300">${compat.dimensions.kink}%</span></div>
+                <div class="w-full bg-white/10 h-1 rounded"><div class="bg-rose-500 h-1 rounded" style="width:${compat.dimensions.kink}%"></div></div>
+            `;
+            // Optional complementary note (if score is high enough)
+            if (compat.dimensions.kink > 50) {
+                html += `<div class="text-xs text-rose-300 mt-1">Strong complementary dynamics detected</div>`;
+            }
+        }
+
+        breakdown.innerHTML = html;
+    }
+
+    // Build bar charts for both individuals
+    buildBarChart('match-bar-chart1', scores1);
+    buildBarChart('match-bar-chart2', scores2);
+
+    // Bridge recommendations (unchanged)
+    const bridgeContainer = document.getElementById('match-bridge-container');
+    if (bridgeContainer) {
+        bridgeContainer.innerHTML = '';
+        const dims = [
+            { name: 'Big Five personality', score: compat.dimensions.bigFive, tip: 'Explore your different approaches to life and find complementary strengths.' },
+            { name: 'Attachment security', score: compat.dimensions.attachment, tip: 'Practice clear communication about needs for closeness and space.' },
+            { name: 'Core values', score: compat.dimensions.values, tip: 'Discuss your priorities in life and find shared ground.' },
+            { name: 'Sociosexual attitudes', score: compat.dimensions.sociosexual, tip: 'Have open conversations about intimacy expectations and boundaries.' },
+            { name: 'Communication style', score: compat.dimensions.communication, tip: 'Learn each other\'s conflict resolution preferences.' }
+        ];
+
+        const weakDims = dims.filter(function(d) { return d.score < 60; }).sort(function(a, b) { return a.score - b.score; });
+
+        if (weakDims.length > 0) {
+            weakDims.slice(0, 2).forEach(function(d) {
+                bridgeContainer.innerHTML += '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs"><strong>' + d.name + ' (' + d.score + '%)</strong>: ' + d.tip + '</div>';
+            });
+        } else {
+            bridgeContainer.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs">Excellent compatibility across all dimensions! Focus on maintaining open communication.</div>';
+        }
+    }
+
+    switchView('resultsMatch');
+}
+
+            function populateLegend() {
+    const legend = document.getElementById('solo-legend');
+    if (!legend) return;
+    
+    legend.innerHTML = `
+        <div class="legend-item">
+            <div class="legend-color" style="background: #22c55e;"></div>
+            <span><strong>0-35% (Low):</strong> You score lower than average on this trait. For Big Five, this indicates the left-end of the spectrum (e.g., practical vs. curious for Openness).</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #eab308;"></div>
+            <span><strong>36-65% (Average):</strong> You fall within the normal range, showing balanced expression of this trait.</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f472b6;"></div>
+            <span><strong>66-100% (High):</strong> You score higher than average. For Big Five, this indicates the right-end of the spectrum (e.g., curious vs. practical for Openness).</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #a855f7;"></div>
+            <span><strong>Attachment Anxiety (1-5):</strong> Fear of abandonment. Lower is more secure. Above 3.5 suggests preoccupation with relationships.</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #c084fc;"></div>
+            <span><strong>Attachment Avoidance (1-5):</strong> Discomfort with closeness. Lower is more secure. Above 3.5 suggests emotional distance.</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #fbbf24;"></div>
+            <span><strong>Neuroticism:</strong> Emotional sensitivity. High = more reactive to stress; Low = more emotionally stable.</span>
+        </div>
+    `;
+}
 
             function displayCheckResults(scores1, scores2, name1, name2) {
                 const p1 = document.getElementById('check-res-p1');
@@ -2144,7 +2372,7 @@
                 
                 const emailArea = document.getElementById('email-reveal-area');
                 const emailSpan = document.getElementById('revealed-email');
-                if (compat.overall > 90 && checkPartnerEmail) {
+                if (compat.rawOverall > 0.90 && checkPartnerEmail) {
                     emailArea.classList.remove('hidden');
                     emailSpan.innerText = checkPartnerEmail;
                 } else {
@@ -2307,6 +2535,61 @@
                 const partnerScores = computeCategoryScores(checkPartnerAnswers, essentialMaster);
                 displayCheckResults(userScores, partnerScores, 'You', 'Profile#' + parsed.id.substr(-4));
             };
+
+            function calculateComplementaryScore(value1, value2, complementaryMap) {
+    if (!complementaryMap) return null;
+    
+    // complementaryMap format: {0:2, 1:1, 2:0} means 0 matches with 2, 1 with 1, 2 with 0
+    const expectedMatch = complementaryMap[value1];
+    if (expectedMatch === undefined) return null;
+    
+    // Perfect complementary match
+    if (value2 === expectedMatch) return 1.0;
+    
+    // Partial match - calculate distance
+    const maxDist = 4; // 1-5 scale
+    const actualDist = Math.abs(value2 - expectedMatch);
+    return Math.max(0, 1 - (actualDist / maxDist));
+}
+
+function populateSoloLegend(scores, attachment) {
+    const legend = document.getElementById('solo-legend');
+    if (!legend) return;
+    legend.innerHTML = ''; // clear any existing content
+
+    // Trait explanations
+    const traitExplanations = {
+        'Openness': 'Openness reflects imagination, curiosity, and willingness to try new things.',
+        'Conscientiousness': 'Conscientiousness indicates organization, dependability, and discipline.',
+        'Extraversion': 'Extraversion measures sociability, talkativeness, and energy in social settings.',
+        'Agreeableness': 'Agreeableness involves trust, cooperation, and compassion toward others.',
+        'Neuroticism': 'Neuroticism represents emotional sensitivity and tendency to experience negative emotions.'
+    };
+
+    // Big Five items
+    const priority = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
+    priority.forEach(cat => {
+        if (scores[cat] !== undefined) {
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            const color = cat === 'Neuroticism' ? '#fbbf24' : '#f472b6';
+            item.innerHTML = `<div class="legend-color" style="background: ${color}"></div><div><strong>${cat}</strong> (${scores[cat]}%): ${traitExplanations[cat]}</div>`;
+            legend.appendChild(item);
+        }
+    });
+
+    // Attachment if available
+    if (attachment) {
+        const attachItem = document.createElement('div');
+        attachItem.className = 'legend-item';
+        attachItem.innerHTML = `<div class="legend-color" style="background: #a855f7"></div><div><strong>Attachment Anxiety</strong> (${attachment.anxiety.toFixed(2)}): Worry about abandonment, need for reassurance.</div>`;
+        legend.appendChild(attachItem);
+        const avoidItem = document.createElement('div');
+        avoidItem.className = 'legend-item';
+        avoidItem.innerHTML = `<div class="legend-color" style="background: #8b5cf6"></div><div><strong>Attachment Avoidance</strong> (${attachment.avoidance.toFixed(2)}): Discomfort with closeness, preference for independence.</div>`;
+        legend.appendChild(avoidItem);
+    }
+}
 
             function generateAnswersFromId(id, questions) {
                 let seed = 0;
