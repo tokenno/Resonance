@@ -716,11 +716,12 @@
                     <div id="dimensional-breakdown" class="space-y-2"></div>
                 </div>
 
-                <div class="sound-row">
-                    <button onclick="playHarmony('match')" class="sound-btn">🎵 Play Harmony</button>
-                    <button onclick="playTraits('match')" class="sound-btn">🎹 Play Traits</button>
-                    <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
-                </div>
+            <div class="sound-row">
+    <button onclick="playHarmony('match')" class="sound-btn">🎵 Play Melody</button>
+    <button onclick="downloadMelody('match')" class="sound-btn">⬇ Download Melody</button>
+  
+    <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
+</div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/5 rounded-xl p-3 border border-white/10">
@@ -768,11 +769,12 @@
                     <p id="revealed-email" class="text-sm break-all">email@example.com</p>
                 </div>
 
-                <div class="sound-row">
-                    <button onclick="playHarmony('check')" class="sound-btn">🎵 Play Harmony</button>
-                    <button onclick="playTraits('check')" class="sound-btn">🎹 Play Traits</button>
-                    <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
-                </div>
+            <div class="sound-row">
+    <button onclick="playHarmony('match')" class="sound-btn">🎵 Play Melody</button>
+    <button onclick="downloadMelody('match')" class="sound-btn">⬇ Download Melody</button>
+
+    <button onclick="stopSound()" class="sound-btn">⏹ Stop</button>
+</div>
 
                 <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p class="text-xs uppercase tracking-widest mb-3 text-center text-emerald-300">Dimensional Analysis</p>
@@ -870,6 +872,54 @@
             let sequenceTimeout = null;
             let currentFreqs = [];
 
+            // Intervals in semitones for various chord types
+const CHORD_INTERVALS = {
+    // Triads
+    'maj':   [0, 4, 7],        // major
+    'min':   [0, 3, 7],        // minor
+    'dim':   [0, 3, 6],        // diminished
+    'aug':   [0, 4, 8],        // augmented
+    'sus4':  [0, 5, 7],        // suspended 4th
+
+    // Seventh chords
+    '7':     [0, 4, 7, 10],    // dominant 7th
+    'maj7':  [0, 4, 7, 11],    // major 7th
+    'min7':  [0, 3, 7, 10],    // minor 7th
+    'm7b5':  [0, 3, 6, 10],    // half-diminished
+    'dim7':  [0, 3, 6, 9],     // diminished 7th
+    '7b5':   [0, 4, 6, 10],    // dominant 7 flat 5
+    '7#5':   [0, 4, 8, 10],    // dominant 7 sharp 5
+    'mM7':   [0, 3, 7, 11],    // minor-major 7th
+    'aug7':  [0, 4, 8, 10]     // augmented 7th (same as 7#5)
+};
+
+// Root frequency: C4 (middle C)
+const ROOT_FREQ = 261.63;
+
+function generateChordProgression(compatibility) {
+    // Define progressions from most consonant to most dissonant
+    const progressions = [
+        { range: [90, 100], chords: ['maj', 'maj', 'maj', 'maj'] },  // I–IV–V–I (all major)
+        { range: [75, 90],  chords: ['maj', 'min', 'maj', 'maj'] },  // I–vi–IV–V
+        { range: [60, 75],  chords: ['min', 'min7', '7', 'maj7'] },  // ii–V–I (Dm7 G7 Cmaj7)
+        { range: [40, 60],  chords: ['m7b5', '7b9', 'min'] },        // iiø7 – V7alt – i (altered)
+        { range: [20, 40],  chords: ['aug', 'maj7#11', 'dim7'] },    // more dissonant
+        { range: [0, 20],   chords: ['dim7', 'dim7', 'aug', '7#5'] } // chromatic/dissonant
+    ];
+
+    // Find the matching progression
+    let selected = progressions.find(p => compatibility >= p.range[0] && compatibility <= p.range[1]);
+    if (!selected) selected = progressions[2]; // fallback
+
+    return selected.chords;
+}
+
+function getChordFrequencies(chordSymbol) {
+    const intervals = CHORD_INTERVALS[chordSymbol];
+    if (!intervals) return [ROOT_FREQ]; // fallback
+    return intervals.map(semi => ROOT_FREQ * Math.pow(2, semi / 12));
+}
+
             function initAudio() {
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -912,112 +962,53 @@
                 return 1.414;
             }
 
-            window.playHarmony = function(mode) {
-                initAudio();
-                stopSound();
-                let compatibility;
-                if (mode === 'match') {
-                    const scoreEl = document.getElementById('match-potential-score');
-                    compatibility = parseInt(scoreEl.innerText) || 50;
-                } else {
-                    const verdictEl = document.getElementById('check-verdict');
-                    compatibility = parseInt(verdictEl.innerText) || 50;
-                }
-                const ratio = getRatioFromCompatibility(compatibility);
-                const baseFreq = 440;
-                const freq1 = baseFreq;
-                const freq2 = baseFreq * ratio;
+    window.playHarmony = function(mode) {
+    initAudio();
+    stopSound(); // stops any ongoing sequence
 
-                const osc1 = audioCtx.createOscillator();
-                osc1.type = 'sine';
-                osc1.frequency.value = freq1;
-                const osc2 = audioCtx.createOscillator();
-                osc2.type = 'sine';
-                osc2.frequency.value = freq2;
+    // Determine compatibility
+    let compatibility;
+    if (mode === 'match') {
+        const scoreEl = document.getElementById('match-potential-score');
+        compatibility = parseInt(scoreEl.innerText) || 50;
+    } else {
+        const verdictEl = document.getElementById('check-verdict');
+        compatibility = parseInt(verdictEl.innerText) || 50;
+    }
 
-                osc1.connect(gainNode);
-                osc2.connect(gainNode);
+    const melody = generateMelody(compatibility);
+    let index = 0;
 
-                oscillators = [osc1, osc2];
-                osc1.start();
-                osc2.start();
-            };
+    function playNext() {
+        if (index >= melody.length) return;
+        const note = melody[index];
 
-            window.playTraits = function(mode) {
-                initAudio();
-                stopSound();
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = note.freq;
 
-                let scores1, scores2;
-                if (mode === 'match') {
-                    if (state.p1Answers.length && state.p2Answers.length) {
-                        scores1 = computeCategoryScores(state.p1Answers, state.presentation);
-                        scores2 = computeCategoryScores(state.p2Answers, state.presentation);
-                    } else {
-                        alert("Trait data not available.");
-                        return;
-                    }
-                } else {
-                    if (checkUserAnswers && checkPartnerAnswers) {
-                        scores1 = computeCategoryScores(checkUserAnswers, essentialMaster);
-                        scores2 = computeCategoryScores(checkPartnerAnswers, essentialMaster);
-                    } else {
-                        alert("Trait data not available.");
-                        return;
-                    }
-                }
+        const gain = audioCtx.createGain();
+        gain.gain.value = 0.1; // volume
 
-                const freqs = [];
-                for (let cat in scores1) {
-                    const val = scores1[cat];
-                    const freq = 200 + val * 6;
-                    freqs.push(freq);
-                }
-                for (let cat in scores2) {
-                    const val = scores2[cat];
-                    const freq = 200 + val * 6;
-                    freqs.push(freq);
-                }
-                currentFreqs = freqs;
+        osc.connect(gain);
+        gain.connect(gainNode);
 
-                let index = 0;
-                const duration = 2;
-                const fadeTime = 0.05;
+        const now = audioCtx.currentTime;
+        osc.start(now);
+        osc.stop(now + note.duration);
 
-                function playNext() {
-                    if (index >= freqs.length) index = 0;
-                    const freq = freqs[index];
+        oscillators.push(osc);
+        osc.onended = () => {
+            const idx = oscillators.indexOf(osc);
+            if (idx > -1) oscillators.splice(idx, 1);
+        };
 
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
+        index++;
+        sequenceTimeout = setTimeout(playNext, note.duration * 1000);
+    }
 
-                    const gain = audioCtx.createGain();
-                    gain.gain.value = 0;
-
-                    osc.connect(gain);
-                    gain.connect(gainNode);
-
-                    const now = audioCtx.currentTime;
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.1, now + fadeTime);
-                    gain.gain.setValueAtTime(0.1, now + duration - fadeTime);
-                    gain.gain.linearRampToValueAtTime(0, now + duration);
-
-                    oscillators.push(osc);
-                    osc.start(now);
-                    osc.stop(now + duration);
-
-                    osc.onended = () => {
-                        const idx = oscillators.indexOf(osc);
-                        if (idx > -1) oscillators.splice(idx, 1);
-                    };
-
-                    index++;
-                    sequenceTimeout = setTimeout(playNext, duration * 1000);
-                }
-
-                playNext();
-            };
+    playNext();
+};
 
             // Generative Visual
             window.generateVisual = function(mode) {
@@ -2569,6 +2560,113 @@ window.displayCheckResults = displayCheckResults;
     const actualDist = Math.abs(value2 - expectedMatch);
     return Math.max(0, 1 - (actualDist / maxDist));
 }
+
+function generateMelody(compatibility) {
+    const progression = generateChordProgression(compatibility);
+    const melody = [];
+    const noteDuration = 0.25; // seconds per note
+
+    progression.forEach(chordSymbol => {
+        const freqs = getChordFrequencies(chordSymbol);
+        // Arpeggiate up (root, third, fifth, seventh if exists)
+        freqs.forEach(freq => {
+            melody.push({ freq: freq, duration: noteDuration });
+        });
+        // Optional: add a slight pause between chords? Not needed.
+    });
+
+    return melody;
+}
+
+function floatToWav(samples, sampleRate = 44100) {
+    const buffer = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buffer);
+
+    // RIFF header
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeString(view, 8, 'WAVE');
+    // fmt chunk
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    // data chunk
+    writeString(view, 36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+
+    // Write samples
+    let offset = 44;
+    for (let i = 0; i < samples.length; i++) {
+        let s = Math.max(-1, Math.min(1, samples[i]));
+        s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        view.setInt16(offset, s, true);
+        offset += 2;
+    }
+    return buffer;
+}
+
+function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+
+window.downloadMelody = function(mode) {
+    // Get compatibility
+    let compatibility;
+    if (mode === 'match') {
+        const scoreEl = document.getElementById('match-potential-score');
+        compatibility = parseInt(scoreEl.innerText) || 50;
+    } else {
+        const verdictEl = document.getElementById('check-verdict');
+        compatibility = parseInt(verdictEl.innerText) || 50;
+    }
+
+    const melody = generateMelody(compatibility);
+    const sampleRate = 44100;
+    const totalDuration = melody.reduce((sum, note) => sum + note.duration, 0);
+    const totalSamples = Math.ceil(totalDuration * sampleRate);
+
+    // Create offline context
+    const offlineCtx = new OfflineAudioContext(1, totalSamples, sampleRate);
+
+    // Schedule notes
+    let startTime = 0;
+    melody.forEach(note => {
+        const osc = offlineCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = note.freq;
+
+        const gain = offlineCtx.createGain();
+        gain.gain.value = 0.1;
+
+        osc.connect(gain);
+        gain.connect(offlineCtx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + note.duration);
+        startTime += note.duration;
+    });
+
+    // Render and download
+    offlineCtx.startRendering().then(renderedBuffer => {
+        const audioData = renderedBuffer.getChannelData(0); // float32 array
+        const wavBuffer = floatToWav(audioData, sampleRate);
+        const blob = new Blob([wavBuffer], { type: 'audio/wav' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `compatibility_${compatibility}.wav`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+};
 
 function populateSoloLegend(scores, attachment) {
     const legend = document.getElementById('solo-legend');
